@@ -18,8 +18,8 @@ process.stdin.on('end', () => {
   if (!modelPath) process.exit(0);
   const r = lintPaths([file], derive(JSON.parse(fs.readFileSync(modelPath, 'utf8'))), { varRoots: [path.dirname(modelPath)] });
   if (!r.findings.length) process.exit(0);
-  process.stderr.write(`derive: ${path.basename(file)} uses values with no derived meaning:\n` +
+  process.stderr.write(`axiomatic: ${path.basename(file)} uses values with no derived meaning:\n` +
     r.findings.slice(0, 25).map((f) => `${f.tier} ${f.rule} line ${f.line}: ${f.message} → ${f.fix}`).join('\n') +
-    '\nUse the meaning-named token. If no token fits, the model is missing a fact: add it and run derive system.\n');
+    '\nUse the meaning-named token. If no token fits, the model is missing a fact: add it and run axiomatic system.\n');
   process.exit(2);
 });

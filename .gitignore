@@ -3,4 +3,4 @@ node_modules/
 .DS_Store
 Thumbs.db
 # local verify output (the demo report is kept as an example)
-/derive-report/
+/axiomatic-report/

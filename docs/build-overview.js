@@ -1,6 +1,6 @@
 'use strict';
 // Builds docs/overview.html: the live derivation explorer, the verified demo and the premises,
-// with the engine inlined and the page's own tokens derived by Derive.
+// with the engine inlined and the page's own tokens derived by Axiomatic UI.
 const fs = require('fs');
 const path = require('path');
 const { derive } = require('../src/derive');
@@ -12,7 +12,7 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
 // The page's readers: mixed expertise, occasional visits, a few minutes, desktop and phone.
 const pageModel = {
-  product: { name: 'Derive overview' },
+  product: { name: 'Axiomatic UI overview' },
   people: { expertise: 'mixed', frequency: 'occasional', sessionLength: 'minutes' },
   context: { devices: ['desktop', 'phone'], input: ['mouse', 'touch'] },
   themes: ['light', 'dark'],
@@ -26,7 +26,7 @@ const engine = `(function () {
   function def(name, fn) { var m = { exports: {} }; fn(m, m.exports, function (p) { return modules[p.replace('./', '')]; }); modules[name] = m.exports; }
   def('color', function (module, exports, require) {\n${read('src/color.js')}\n});
   def('derive', function (module, exports, require) {\n${read('src/derive.js')}\n});
-  window.DeriveEngine = modules.derive;
+  window.AxiomaticEngine = modules.derive;
 })();`;
 
 const audit = JSON.parse(read('demo/report/audit.json'));

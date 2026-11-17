@@ -1,5 +1,5 @@
 {
-  "name": "derive",
+  "name": "axiomatic-ui",
   "version": "0.3.0",
   "description": "Interfaces derived from first principles: model the people and tasks, derive every visual value with its reason, verify the rendered screen still says what it should.",
   "license": "MIT",

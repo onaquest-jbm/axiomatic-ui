@@ -1,17 +1,17 @@
 ---
-name: derive-verify
+name: axiomatic-verify
 description: Check that a rendered screen still says what its derivation says - salience order, one primary, Fitts ordering, grouping gaps, only derived values, human limits - at phone and desktop widths in both themes, then look at the screenshots. Use after any UI change and before reporting UI work as done.
 ---
 
-# derive-verify
+# axiomatic-verify
 
 Source code can't show whether the thing that matters is the thing that's seen first. That only exists once the screen is rendered, so verification renders it.
 
 ## Run
 
 ```bash
-derive lint <changed files> --model model.json
-derive verify scenarios.json --out derive-report
+axiomatic lint <changed files> --model model.json
+axiomatic verify scenarios.json --out axiomatic-report
 ```
 
 `scenarios.json` lists what to render:
@@ -36,7 +36,7 @@ derive verify scenarios.json --out derive-report
 | **meaning** | A difference means nothing, or a meaning isn't visible. Examples: an unplanned element is louder than the top task, salience order inverted, a rare action is a bigger target than a frequent one, a group's inner gap is as big as its outer gap, two accent-filled buttons, a box inside a box. | Fix the cause: model → plan → code, in that order. |
 | **derivation** | A value is on screen that the derivation never produced. | Use the token for the meaning, or add the meaning to the model. |
 
-Regions that *display* other designs (color swatches, live previews, screenshots, charts of design data) are content, not interface. Mark them `data-derive="specimen"` and they are left out of meaning and derivation checks; floor checks still apply.
+Regions that *display* other designs (color swatches, live previews, screenshots, charts of design data) are content, not interface. Mark them `data-axiomatic="specimen"` and they are left out of meaning and derivation checks; floor checks still apply.
 
 The salience measure is a simple model (size × contrast × chroma × position), not human vision. Treat it as a tripwire. **The screenshots are the judge.**
 

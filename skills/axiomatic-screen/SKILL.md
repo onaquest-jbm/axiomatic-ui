@@ -1,9 +1,9 @@
 ---
-name: derive-screen
+name: axiomatic-screen
 description: Plan and build one screen from the model - decide what is seen first, which actions are visible and how big, how content groups - write that plan into model.json, then build it using only meaning-named derived tokens. Use whenever building or changing a screen, view, panel or component in a project with a model.json.
 ---
 
-# derive-screen
+# axiomatic-screen
 
 ## 1. Plan before code
 
@@ -29,7 +29,7 @@ Add the screen to `model.json` under `screens`:
 
 How to decide each part:
 - **serves**: the tasks this screen exists for. Anything on screen that serves no task should not be there.
-- **salience**: order the elements by the task tier from `derive why model.json tasks`, adjusted for *now*. Something that blocks the person (a pending decision, an error) goes first while it exists. Exactly one first.
+- **salience**: order the elements by the task tier from `axiomatic why model.json tasks`, adjusted for *now*. Something that blocks the person (a pending decision, an error) goes first while it exists. Exactly one first.
 - **actions**: every control, with its task's frequency. Frequency decides its tier: constant → the one accent-filled control; frequent → visible, quiet; occasional → text button or in context; rare → menu or command palette.
 - **groups**: what belongs together. Each group is separated from its surroundings by the next gap level up.
 
@@ -75,4 +75,4 @@ Rules that follow from the axiom:
 
 ## 3. Then verify
 
-Run `derive-verify`. You are not done until it passes and you have looked at the screenshots.
+Run `axiomatic-verify`. You are not done until it passes and you have looked at the screenshots.

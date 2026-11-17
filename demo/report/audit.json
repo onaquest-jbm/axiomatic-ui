@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T05:38:47.590Z",
+  "generatedAt": "2026-11-17T09:47:58.438Z",
   "browser": "chrome.exe",
   "product": {
     "name": "Workbench",
@@ -2287,9 +2287,9 @@
             "selector": "header.topbar > div.diffstat > span.add",
             "salience": 38,
             "rect": {
-              "x": 1222,
+              "x": 1219,
               "y": 12,
-              "w": 18,
+              "w": 19,
               "h": 15
             }
           }
@@ -2421,19 +2421,19 @@
             "selector": "header.topbar > div.diffstat > span.add",
             "salience": 38,
             "rect": {
-              "x": 338,
+              "x": 335,
               "y": 24,
-              "w": 18,
+              "w": 19,
               "h": 15
             }
           },
           {
             "selector": "header.topbar > div.diffstat > span.del",
-            "salience": 36,
+            "salience": 37,
             "rect": {
-              "x": 362,
+              "x": 361,
               "y": 24,
-              "w": 18,
+              "w": 19,
               "h": 15
             }
           }
@@ -2586,9 +2586,9 @@
             "selector": "header.topbar > div.diffstat > span.del",
             "salience": 40,
             "rect": {
-              "x": 1246,
+              "x": 1245,
               "y": 12,
-              "w": 18,
+              "w": 19,
               "h": 15
             }
           }
@@ -2629,7 +2629,7 @@
         {
           "name": "Show command details",
           "clickToPaintMs": 16,
-          "handlerMs": 0,
+          "handlerMs": 1,
           "motionMs": 140,
           "animations": 4
         }
@@ -2720,9 +2720,9 @@
             "selector": "header.topbar > div.diffstat > span.del",
             "salience": 40,
             "rect": {
-              "x": 362,
+              "x": 361,
               "y": 24,
-              "w": 18,
+              "w": 19,
               "h": 15
             }
           },
@@ -2730,9 +2730,9 @@
             "selector": "header.topbar > div.diffstat > span.add",
             "salience": 36,
             "rect": {
-              "x": 338,
+              "x": 335,
               "y": 24,
-              "w": 18,
+              "w": 19,
               "h": 15
             }
           }

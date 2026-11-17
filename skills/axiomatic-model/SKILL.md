@@ -1,9 +1,9 @@
 ---
-name: derive-model
-description: Build or update model.json - the people, their tasks (with frequency, consequence and reversibility), the information and its states - which every UI decision is derived from. Use when a project has UI work and no model.json, when derive check reports errors, or when the product's users or tasks change.
+name: axiomatic-model
+description: Build or update model.json - the people, their tasks (with frequency, consequence and reversibility), the information and its states - which every UI decision is derived from. Use when a project has UI work and no model.json, when axiomatic check reports errors, or when the product's users or tasks change.
 ---
 
-# derive-model
+# axiomatic-model
 
 The model is the input to every design decision. If it is wrong, every derived value is wrong in a consistent, confident way. **Its contents are facts to get from the owner and the product. Do not invent them.**
 
@@ -33,9 +33,9 @@ Ask in this order. Give your proposed answer for each so they can say "yes" or c
 ## 3. Check and derive
 
 ```bash
-derive check model.json      # errors are missing facts; warnings are weak spots
-derive system model.json --out src/design
-derive why model.json tasks  # read back how each task will be treated
+axiomatic check model.json      # errors are missing facts; warnings are weak spots
+axiomatic system model.json --out src/design
+axiomatic why model.json tasks  # read back how each task will be treated
 ```
 
 Read `derivation.md` back to the owner in plain words ("Approving commands will be the most prominent thing on its screen, and the Run button itself will be the confirmation, with no extra dialog, because you do it constantly"). Their disagreement is the most valuable input you will get: it means a fact in the model is wrong.

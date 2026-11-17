@@ -1,9 +1,9 @@
 ---
-name: derive
-description: Design and build user interfaces from first principles - derive every visual decision from the people, their tasks and the limits of perception, instead of sampling familiar-looking defaults. Use before creating, changing or reviewing any UI (web, Electron, React, HTML/CSS, Compose). Routes to derive-model, derive-screen, derive-verify, derive-critique, and derive-retrofit for interfaces that already exist.
+name: axiomatic
+description: Design and build user interfaces from first principles - derive every visual decision from the people, their tasks and the limits of perception, instead of sampling familiar-looking defaults. Use before creating, changing or reviewing any UI (web, Electron, React, HTML/CSS, Compose). Routes to axiomatic-model, axiomatic-screen, axiomatic-verify, axiomatic-critique, and axiomatic-retrofit for interfaces that already exist.
 ---
 
-# derive
+# axiomatic
 
 ## The axiom
 
@@ -17,7 +17,7 @@ Generated-looking UI is both failures at once, because a model with no knowledge
 
 ## The premises
 
-Everything is derived from twelve facts about people and encoding. `derive principles` prints them with sources. In short:
+Everything is derived from twelve facts about people and encoding. `axiomatic principles` prints them with sources. In short:
 
 | Premise | What it decides |
 |---|---|
@@ -36,13 +36,13 @@ Everything is derived from twelve facts about people and encoding. `derive princ
 
 ## The method
 
-1. **Model** the people, tasks and information: `derive-model`. These are facts; get them from the owner and the product. Never invent them.
-2. **Derive** the system: `derive system model.json`. Every value comes out with its reason (`derivation.md`, `derive why model.json <key>`). Tokens are named by meaning (`--gap-group`, `--ink-secondary`, `--text-heading`), so using one is choosing a meaning.
-3. **Plan and build each screen**: `derive-screen`. Write the screen's salience order, actions and groups into the model first, then build using only tokens.
-4. **Verify** that the rendered screen still says what the derivation says: `derive-verify`. The verifier checks salience order, Fitts ordering, grouping gaps, one primary per view, and that only derived values appear. Then look at the screenshots yourself.
-5. **Critique** with fresh eyes: `derive-critique` in a subagent that did not write the code.
+1. **Model** the people, tasks and information: `axiomatic-model`. These are facts; get them from the owner and the product. Never invent them.
+2. **Derive** the system: `axiomatic system model.json`. Every value comes out with its reason (`derivation.md`, `axiomatic why model.json <key>`). Tokens are named by meaning (`--gap-group`, `--ink-secondary`, `--text-heading`), so using one is choosing a meaning.
+3. **Plan and build each screen**: `axiomatic-screen`. Write the screen's salience order, actions and groups into the model first, then build using only tokens.
+4. **Verify** that the rendered screen still says what the derivation says: `axiomatic-verify`. The verifier checks salience order, Fitts ordering, grouping gaps, one primary per view, and that only derived values appear. Then look at the screenshots yourself.
+5. **Critique** with fresh eyes: `axiomatic-critique` in a subagent that did not write the code.
 
-**The interface already exists?** Start with `derive-retrofit`: it recovers the model from the product, maps the values in use onto meanings, and decides how much should change (sometimes nothing) before any of the steps above.
+**The interface already exists?** Start with `axiomatic-retrofit`: it recovers the model from the product, maps the values in use onto meanings, and decides how much should change (sometimes nothing) before any of the steps above.
 
 ## When the result is wrong
 

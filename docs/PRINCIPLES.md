@@ -1,6 +1,6 @@
 # Principles
 
-The premises Derive reasons from. Every derived value cites one or more of these. Generated from `src/principles.js`.
+The premises Axiomatic UI reasons from. Every derived value cites one or more of these. Generated from `src/principles.js`.
 
 ## An interface exists to close two gulfs
 

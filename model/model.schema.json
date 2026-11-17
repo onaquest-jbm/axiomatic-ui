@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "derive model",
+  "title": "Axiomatic UI model",
   "description": "Facts about the people, their work and the information. Every design value is derived from these; none of them is a style choice.",
   "type": "object",
   "required": ["product", "people", "context", "tasks"],

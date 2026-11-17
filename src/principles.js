@@ -1,7 +1,7 @@
 'use strict';
-// The premises Derive reasons from. Each one is a fact about people or about encoding, with the
-// number Derive uses, where it comes from, and what in the interface it decides.
-// Everything Derive outputs cites one or more of these ids.
+// The premises Axiomatic UI reasons from. Each one is a fact about people or about encoding, with the
+// number Axiomatic UI uses, where it comes from, and what in the interface it decides.
+// Everything Axiomatic UI outputs cites one or more of these ids.
 
 const PRINCIPLES = [
   {

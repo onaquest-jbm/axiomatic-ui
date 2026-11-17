@@ -1,8 +1,8 @@
-<title>Derive</title>
+<title>Axiomatic UI</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* This page's tokens were derived by Derive itself, from a model of its readers:
+/* This page's tokens were derived by Axiomatic UI itself, from a model of its readers:
    mixed expertise, occasional visits, minutes per session, desktop and phone. */
 __PAGE_TOKENS__
 /* Tier colors map to derived states: floor = error, meaning = warning, derivation = info. */
@@ -136,10 +136,10 @@ ul.plain li { margin-bottom: var(--gap-related); }
 
 <div class="wrap">
   <header class="prose">
-    <h1>Derive</h1>
+    <h1>Axiomatic UI</h1>
     <p class="secondary">Interfaces derived from first principles. People, tasks and the limits of perception go in. Every visual value comes out with its reason, and the rendered screen is checked against that reasoning.</p>
     <div class="axiom">Every visual difference must mean something, and every meaningful difference must be visible.</div>
-    <p class="secondary">Generated UI fails both halves of that sentence at once. There's decoration that means nothing, and the one thing that needs the person looks like everything else. That happens because a model that doesn't know what matters picks the most common-looking option at every step. Derive doesn't ban styles. It makes the agent know what each thing means, then encode exactly that.</p>
+    <p class="secondary">Generated UI fails both halves of that sentence at once. There's decoration that means nothing, and the one thing that needs the person looks like everything else. That happens because a model that doesn't know what matters picks the most common-looking option at every step. Axiomatic UI doesn't ban styles. It makes the agent know what each thing means, then encode exactly that.</p>
   </header>
 
   <section id="explore">
@@ -167,7 +167,7 @@ ul.plain li { margin-bottom: var(--gap-related); }
         <div class="field"><span>Preview theme</span><div class="seg" data-key="theme"><button type="button" data-v="light">Light</button><button type="button" data-v="dark">Dark</button></div></div>
       </div>
       <div class="outputs">
-        <div class="preview" data-derive="specimen"><div class="pv" id="pv">
+        <div class="preview" data-axiomatic="specimen"><div class="pv" id="pv">
           <div class="pv-side">
             <div class="day">Today</div>
             <div class="pv-row sel"><span class="pv-dot" data-state="waiting"></span><span>Fix login redirect</span><span>2m</span></div>
@@ -185,10 +185,10 @@ ul.plain li { margin-bottom: var(--gap-related); }
           </div>
         </div></div>
         <div class="grid2">
-          <div class="panel"><h3>Type: one size per rank</h3><div class="typesample" id="type" data-derive="specimen"></div></div>
+          <div class="panel"><h3>Type: one size per rank</h3><div class="typesample" id="type" data-axiomatic="specimen"></div></div>
           <div class="panel"><h3>Space: one gap per level of relatedness</h3><div class="ladder" id="space"></div></div>
         </div>
-        <div class="panel"><h3>Color: one per meaning, solved to contrast</h3><div class="swatches" id="colors" data-derive="specimen"></div></div>
+        <div class="panel"><h3>Color: one per meaning, solved to contrast</h3><div class="swatches" id="colors" data-axiomatic="specimen"></div></div>
         <div class="panel"><h3>Targets, motion, response</h3><div class="nums" id="nums"></div></div>
         <div class="panel"><h3>Why each value is what it is</h3><ul class="trace" id="trace"></ul></div>
       </div>
@@ -198,19 +198,19 @@ ul.plain li { margin-bottom: var(--gap-related); }
   <section id="verified">
     <div class="prose">
       <h2>Verified on a rendered screen</h2>
-      <p class="secondary">One coding-agent screen, built two ways, then checked by <code>derive verify</code> in Edge. The verifier asks whether the screen still says what the model says. Is the planned first thing actually the loudest? Are frequent actions the bigger targets? Are groups tighter inside than out? Do only derived values appear?</p>
+      <p class="secondary">One coding-agent screen, built two ways, then checked by <code>axiomatic verify</code> in Edge. The verifier asks whether the screen still says what the model says. Is the planned first thing actually the loudest? Are frequent actions the bigger targets? Are groups tighter inside than out? Do only derived values appear?</p>
     </div>
     <div class="controls">
       <div class="seg" data-key="version"><button type="button" data-v="Before">Typical generated</button><button type="button" data-v="After">Derived</button></div>
       <div class="seg" data-key="view"><button type="button" data-v="light-1280">Desktop</button><button type="button" data-v="light-390">Phone</button><button type="button" data-v="dark-1280">Dark</button></div>
     </div>
     <div class="demo">
-      <div class="shot" id="shot" data-derive="specimen"></div>
+      <div class="shot" id="shot" data-axiomatic="specimen"></div>
       <div>
-        <div class="counts" id="counts" data-derive="specimen"></div>
+        <div class="counts" id="counts" data-axiomatic="specimen"></div>
         <h3 style="margin-bottom: var(--gap-related)">Attention: planned order vs what's measured</h3>
         <p class="meta tertiary" style="margin-bottom: var(--gap-group)">Blue bars are the planned order, gray are the loudest unplanned elements. A heuristic (size × contrast × color × position), checked against the screenshot.</p>
-        <div class="sal" id="sal" data-derive="specimen"></div>
+        <div class="sal" id="sal" data-axiomatic="specimen"></div>
         <ul class="findings" id="findings"></ul>
       </div>
     </div>
@@ -219,7 +219,7 @@ ul.plain li { margin-bottom: var(--gap-related); }
   <section id="premises">
     <div class="prose">
       <h2>The twelve premises</h2>
-      <p class="secondary">Facts about people and about encoding. Each comes with the number Derive uses and what it decides. Every derived value cites at least one.</p>
+      <p class="secondary">Facts about people and about encoding. Each comes with the number Axiomatic UI uses and what it decides. Every derived value cites at least one.</p>
     </div>
     <div class="premises" id="plist"></div>
   </section>
@@ -230,11 +230,11 @@ ul.plain li { margin-bottom: var(--gap-related); }
       <p class="secondary">Five agent skills and five commands. When something looks wrong, fix the cause: the model first, then the screen plan, then the code. Never patch a value inline.</p>
     </div>
     <div class="steps">
-      <div class="step"><b>1 Model</b><code>derive-model</code>: people, tasks (frequency, consequence, reversibility), text ranks, states. Facts from the owner, never invented.</div>
-      <div class="step"><b>2 Derive</b><code>derive system</code>: every value and its reason, as tokens named by meaning, plus <code>derivation.md</code>.</div>
-      <div class="step"><b>3 Plan and build</b><code>derive-screen</code>: salience order, actions with frequencies, and groups, then build with meaning tokens only.</div>
-      <div class="step"><b>4 Verify</b><code>derive verify</code>: render, measure, check against the plan, then look at the screenshots.</div>
-      <div class="step"><b>5 Critique</b><code>derive-critique</code>: a fresh subagent asks what each difference means and what's missing.</div>
+      <div class="step"><b>1 Model</b><code>axiomatic-model</code>: people, tasks (frequency, consequence, reversibility), text ranks, states. Facts from the owner, never invented.</div>
+      <div class="step"><b>2 Derive</b><code>axiomatic system</code>: every value and its reason, as tokens named by meaning, plus <code>derivation.md</code>.</div>
+      <div class="step"><b>3 Plan and build</b><code>axiomatic-screen</code>: salience order, actions with frequencies, and groups, then build with meaning tokens only.</div>
+      <div class="step"><b>4 Verify</b><code>axiomatic verify</code>: render, measure, check against the plan, then look at the screenshots.</div>
+      <div class="step"><b>5 Critique</b><code>axiomatic-critique</code>: a fresh subagent asks what each difference means and what's missing.</div>
     </div>
   </section>
 
@@ -284,7 +284,7 @@ function renderExplorer() {
   for (const seg of document.querySelectorAll('#inputs .seg')) for (const b of seg.querySelectorAll('button')) b.setAttribute('aria-pressed', String(state[seg.dataset.key] === b.dataset.v));
   $('hue').disabled = $('hue-none').checked;
   $('hue-v').textContent = $('hue-none').checked ? '' : $('hue').value + '°';
-  const d = DeriveEngine.derive(model());
+  const d = AxiomaticEngine.derive(model());
   const c = d.color[state.theme];
   // Preview: write derived values into the preview's own custom properties.
   const pv = $('pv');

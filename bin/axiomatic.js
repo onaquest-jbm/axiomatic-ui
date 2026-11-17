@@ -8,16 +8,16 @@ const { writeAll } = require('../src/tokens');
 const { lintPaths, RULES } = require('../src/lint');
 const { PRINCIPLES, BY_ID } = require('../src/principles');
 
-const HELP = `derive: interfaces derived from people, tasks and perception instead of sampled from habit
+const HELP = `axiomatic: interfaces derived from people, tasks and perception instead of sampled from habit
 
-  derive init [model.json]                 Starter model. Its TODOs are facts to get from the owner.
-  derive check <model.json>                Is the model complete enough to derive from?
-  derive system <model.json> [--out dir]   Derive every value: tokens.css, base.css, design.ts, Derived.kt,
+  axiomatic init [model.json]                 Starter model. Its TODOs are facts to get from the owner.
+  axiomatic check <model.json>                Is the model complete enough to derive from?
+  axiomatic system <model.json> [--out dir]   Derive every value: tokens.css, base.css, design.ts, Derived.kt,
                                            derivation.json and derivation.md (each value with its reason).
-  derive why <model.json> <key>            Explain one decision, e.g. "space", "type.sizes", "color.accent".
-  derive lint <paths...> --model <model.json>   Static check: only derived, meaning-named values in source.
-  derive verify <scenarios.json> [--out dir]    Render, measure and check the screen against the derivation.
-  derive principles                        The premises everything is derived from, with sources.
+  axiomatic why <model.json> <key>            Explain one decision, e.g. "space", "type.sizes", "color.accent".
+  axiomatic lint <paths...> --model <model.json>   Static check: only derived, meaning-named values in source.
+  axiomatic verify <scenarios.json> [--out dir]    Render, measure and check the screen against the derivation.
+  axiomatic principles                        The premises everything is derived from, with sources.
 `;
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i !== -1 ? process.argv[i + 1] : d; };
 const pos = () => { const a = process.argv.slice(3), o = []; for (let i = 0; i < a.length; i++) { if (a[i].startsWith('--')) { if (!['--headed'].includes(a[i])) i++; continue; } o.push(a[i]); } return o; };
@@ -30,7 +30,7 @@ async function main() {
     const f = pos()[0] || 'model.json';
     if (fs.existsSync(f)) { console.error(`${f} exists.`); return 1; }
     fs.writeFileSync(f, JSON.stringify(starter(), null, 2) + '\n');
-    console.log(`Wrote ${f}. The derive-model skill walks through filling it in with the owner.`);
+    console.log(`Wrote ${f}. The axiomatic-model skill walks through filling it in with the owner.`);
     return 0;
   }
   if (cmd === 'check') {
@@ -75,14 +75,14 @@ async function main() {
     const { audit } = require('../src/audit');
     const { writeReport } = require('../src/report');
     const f = pos()[0];
-    const out = arg('--out', path.join(path.dirname(f), 'derive-report'));
+    const out = arg('--out', path.join(path.dirname(f), 'axiomatic-report'));
     const rep = await audit(f, out, { headed: process.argv.includes('--headed') });
     console.log(`\nReport: ${writeReport(out)}`);
     return rep.results.some((r) => r.counts.floor || r.counts.meaning) ? 1 : 0;
   }
   if (cmd === 'principles') {
     for (const p of PRINCIPLES) console.log(`\n${p.name}  [${p.id}]\n  ${p.statement}\n  Uses: ${p.numbers}\n  Decides: ${p.decides}\n  Source: ${p.source}`);
-    console.log(`\n${RULES.length} static rules map onto these; run "derive lint" to see them in use.`);
+    console.log(`\n${RULES.length} static rules map onto these; run "axiomatic lint" to see them in use.`);
     return 0;
   }
   process.stderr.write(HELP);

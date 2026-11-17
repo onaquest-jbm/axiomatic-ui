@@ -1,9 +1,9 @@
 ---
-name: derive-critique
-description: Independent first-principles review of rendered screenshots against model.json, run in a fresh-context subagent that did not write the code. Asks what each visual difference means and which meanings are missing. Use after derive-verify for non-trivial UI work, or to review an existing interface.
+name: axiomatic-critique
+description: Independent first-principles review of rendered screenshots against model.json, run in a fresh-context subagent that did not write the code. Asks what each visual difference means and which meanings are missing. Use after axiomatic-verify for non-trivial UI work, or to review an existing interface.
 ---
 
-# derive-critique
+# axiomatic-critique
 
 Run this in a **fresh subagent**. Give it only: `model.json`, `derivation.md`, the screenshots (all widths and themes) and `audit.json`. Do not give it the code or the conversation that produced it.
 

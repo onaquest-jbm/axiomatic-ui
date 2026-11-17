@@ -71,9 +71,9 @@ function probe(opts) {
     return true;
   };
 
-  // Regions marked data-derive="specimen" display other designs (swatches, previews, screenshots).
+  // Regions marked data-axiomatic="specimen" display other designs (swatches, previews, screenshots).
   // They are content, not this interface, so they are left out of meaning and derivation checks.
-  const specimen = (el) => !!(el.closest && el.closest('[data-derive="specimen"]'));
+  const specimen = (el) => !!(el.closest && el.closest('[data-axiomatic="specimen"]'));
   const all = Array.from(document.body.querySelectorAll('*')).slice(0, 6000);
   const styles = new Map();
   const vis = [];

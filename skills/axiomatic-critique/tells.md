@@ -1,6 +1,6 @@
 # Tells
 
-Patterns that usually mean the axiom broke somewhere upstream. They are for **recognising** a failure in an existing or rendered screen, not a list to build against: a screen built with `derive-screen` should never produce them, and removing one without fixing its cause just makes room for the next.
+Patterns that usually mean the axiom broke somewhere upstream. They are for **recognising** a failure in an existing or rendered screen, not a list to build against: a screen built with `axiomatic-screen` should never produce them, and removing one without fixing its cause just makes room for the next.
 
 Each tell names which half of the axiom fails and where the cause usually lives.
 
@@ -30,4 +30,4 @@ Each tell names which half of the axiom fails and where the cause usually lives.
 
 When a tell appears, name the cause and the level in the finding, not just the tell.
 
-Several of these patterns are adapted from unslop by Damir Sokolovsky (github.com/heydamir/unslop), licensed CC BY 4.0 (creativecommons.org/licenses/by/4.0). Derive maps them to causes instead of fixing them one by one.
+Several of these patterns are adapted from unslop by Damir Sokolovsky (github.com/heydamir/unslop), licensed CC BY 4.0 (creativecommons.org/licenses/by/4.0). Axiomatic UI maps them to causes instead of fixing them one by one.

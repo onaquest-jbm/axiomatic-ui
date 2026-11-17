@@ -26,9 +26,9 @@ const CANDIDATES = {
 };
 
 function findBrowser() {
-  if (process.env.DERIVE_BROWSER) return process.env.DERIVE_BROWSER;
+  if (process.env.AXIOMATIC_BROWSER) return process.env.AXIOMATIC_BROWSER;
   for (const p of CANDIDATES[process.platform] || CANDIDATES.linux) if (fs.existsSync(p)) return p;
-  throw new Error('No Chromium browser found. Set DERIVE_BROWSER to a Chrome, Edge or Chromium executable.');
+  throw new Error('No Chromium browser found. Set AXIOMATIC_BROWSER to a Chrome, Edge or Chromium executable.');
 }
 
 class WS extends EventEmitter {
@@ -125,7 +125,7 @@ class Session extends EventEmitter {
 
 async function launch({ headless = true } = {}) {
   const exe = findBrowser();
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'derive-'));
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'axiomatic-'));
   const args = [
     '--remote-debugging-port=0', `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check',
     '--disable-extensions', '--disable-background-networking', '--disable-sync', '--hide-scrollbars', '--mute-audio',

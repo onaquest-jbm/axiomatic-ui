@@ -70,7 +70,7 @@ test('lint: literal values are underived, meaning tokens pass', () => {
   assert.ok(!rules('.a { transition: background-color var(--duration-state) var(--ease-enter); }').includes('motion-unscoped'));
   assert.ok(lintText('<div class="card transition-all">x</div>', 'x.html', d, ctx()).some((f) => f.rule === 'motion-unscoped'));
   assert.ok(rules('.a { padding: var(--gap4); }').includes('unknown-token'));
-  assert.ok(!rules('.a { color: #123456; } /* derive-ignore raw-color: logo artwork from brand guide */').includes('raw-color'));
+  assert.ok(!rules('.a { color: #123456; } /* axiomatic-ignore raw-color: logo artwork from brand guide */').includes('raw-color'));
 });
 
 test('model check catches missing facts', () => {
