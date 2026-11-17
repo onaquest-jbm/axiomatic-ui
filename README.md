@@ -51,3 +51,7 @@ v0.3 adds the retrofit path, rules for words, numbers, charts and icons, a tells
 ## Acknowledgements
 
 Several of the patterns in `skills/axiomatic-critique/tells.md`, and the idea of sizing a change before touching an existing screen, are adapted from [unslop](https://github.com/heydamir/unslop) by Damir Sokolovsky, licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Axiomatic UI takes a different approach: it doesn't fix those patterns one at a time, it traces each one back to the missing decision that caused it.
+
+## License
+
+Public domain, under [the Unlicense](LICENSE): do anything you want with it. The one exception is the material adapted from unslop in `skills/axiomatic-critique/tells.md`, which stays under CC BY 4.0 and keeps its credit line.
