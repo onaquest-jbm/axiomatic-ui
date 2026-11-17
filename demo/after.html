@@ -1,0 +1,201 @@
+<!doctype html>
+<!-- Built from demo/model.json through derive. Every value is a derived token named for its meaning.
+     Screen plan: (1) the pending request, because work is blocked on this person;
+     (2) the agent's explanation the decision depends on; (3) the composer; (4) the current chat. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fix login redirect · Workbench</title>
+<link rel="stylesheet" href="design/tokens.css">
+<link rel="stylesheet" href="design/base.css">
+<style>
+  .app { display: grid; grid-template-columns: 248px minmax(0, 1fr); height: 100vh; }
+
+  /* Navigation region: sunken, because it is a different region from the work. */
+  .sidebar { background: var(--surface-sunken); display: flex; flex-direction: column; min-height: 0; padding: var(--gap-group) var(--gap-related); gap: var(--gap-section); }
+  .sidebar-head { display: flex; align-items: center; justify-content: space-between; padding-left: var(--gap-related); }
+  .project { font-weight: var(--weight-strong); }
+  .day { display: flex; flex-direction: column; gap: var(--gap-control); }
+  .day h2 { margin: 0; padding-left: var(--gap-related); font-size: var(--text-meta); font-weight: var(--weight-regular); color: var(--ink-tertiary); }
+  .chats { list-style: none; margin: 0; padding: 0; }
+  .chat { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: var(--gap-related); width: 100%; min-height: var(--control-height); padding: 0 var(--gap-related); border: 0; border-radius: var(--radius-control); background: none; color: var(--ink-primary); text-align: left; cursor: pointer; transition: background-color var(--duration-state) var(--ease-enter); }
+  .chat:hover { background: var(--surface-canvas); }
+  .chat[aria-current="page"] { background: var(--selection); }
+  .chat-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chat-meta { font-size: var(--text-meta); color: var(--ink-tertiary); font-variant-numeric: tabular-nums; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; justify-self: center; }
+  .dot.waiting { background: var(--state-waiting); }
+  .dot.running { width: 10px; height: 10px; border: 2px solid var(--state-running); border-right-color: transparent; animation: spin 0.8s linear infinite; }
+  .dot.idle { background: var(--edge-control); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Controls: three treatments for three tiers. */
+  .btn { display: inline-flex; align-items: center; gap: var(--gap-related); min-height: var(--control-height); padding: 0 var(--gap-group); border: 1px solid var(--edge-control); border-radius: var(--radius-control); background: var(--surface-base); color: var(--ink-primary); cursor: pointer; white-space: nowrap; transition: background-color var(--duration-state) var(--ease-enter); }
+  .btn:hover { background: var(--surface-canvas); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: var(--weight-strong); }
+  .btn.primary:hover { background: var(--accent-hover); }
+  .btn.text { border-color: transparent; background: none; color: var(--ink-secondary); padding: 0 var(--gap-related); }
+  .btn.text:hover { background: var(--surface-canvas); color: var(--ink-primary); }
+  kbd { font-size: var(--text-meta); font-family: var(--font-ui); color: var(--ink-tertiary); }
+  .btn.primary kbd { color: var(--on-accent); }
+
+  /* Work region. */
+  .main { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; background: var(--surface-canvas); }
+  .topbar { display: flex; align-items: center; gap: var(--gap-group); padding: var(--gap-group) var(--gap-section); border-bottom: 1px solid var(--edge-separator); }
+  .topbar h1 { margin: 0; font-size: var(--text-heading); line-height: var(--leading-heading); font-weight: var(--weight-strong); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .branch { font-family: var(--font-code); font-size: var(--text-meta); color: var(--ink-tertiary); white-space: nowrap; }
+  .grow { flex: 1; }
+  .diffstat { display: flex; gap: var(--gap-related); font-family: var(--font-code); font-size: var(--text-meta); color: var(--ink-secondary); white-space: nowrap; }
+  .add { color: var(--state-success); }
+  .del { color: var(--state-error); }
+  .menu-btn { display: none; }
+
+  .transcript { overflow-y: auto; padding: var(--gap-region) var(--gap-section); }
+  .column { max-width: 72ch; margin: 0 auto; display: flex; flex-direction: column; gap: var(--gap-region); }
+  .user-msg { align-self: flex-end; max-width: 85%; padding: var(--gap-related) var(--gap-group); border-radius: var(--radius-container); background: var(--surface-sunken); color: var(--ink-primary); }
+  .turn { display: flex; flex-direction: column; gap: var(--gap-related); }
+  .turn p { margin: 0; max-width: var(--measure); }
+  .steps summary { display: inline-flex; align-items: center; min-height: var(--target-min); cursor: pointer; color: var(--ink-secondary); list-style: none; }
+  .steps summary::-webkit-details-marker { display: none; }
+  .steps summary::before { content: "›"; width: var(--gap-section); color: var(--ink-tertiary); transition: transform var(--duration-state) var(--ease-enter); }
+  .steps[open] summary::before { transform: rotate(90deg); }
+  .steps ol { list-style: none; margin: 0; padding: 0 0 0 var(--gap-section); font-family: var(--font-code); color: var(--ink-secondary); }
+
+  /* The pending request: the one enclosed object on the page, because it is the one thing waiting on the person. */
+  .request { display: flex; flex-direction: column; gap: var(--gap-group); padding: var(--gap-section); border: 1px solid var(--edge-control); border-radius: var(--radius-container); background: var(--surface-base); }
+  .request-head { display: flex; flex-direction: column; gap: var(--gap-control); }
+  .request-head strong { font-size: var(--text-heading); line-height: var(--leading-heading); font-weight: var(--weight-strong); }
+  .request-head span { color: var(--ink-secondary); }
+  .command { margin: 0; padding: var(--gap-related) var(--gap-group); border-radius: var(--radius-control); background: var(--surface-sunken); font-family: var(--font-code); overflow-x: auto; white-space: pre; }
+  .request-why { color: var(--ink-secondary); overflow: hidden; height: 0; opacity: 0; transition: height var(--duration-element) var(--ease-enter), opacity var(--duration-element) var(--ease-enter); }
+  .request-why p { margin: 0; max-width: var(--measure); }
+  .request-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-related); }
+  /* Details is about the request, not a response to it, so a spacer sets it apart from the decision group. */
+
+  .composer { padding: 0 var(--gap-section) var(--gap-section); }
+  .composer-box { max-width: 72ch; margin: 0 auto; border: 1px solid var(--edge-control); border-radius: var(--radius-container); background: var(--surface-base); }
+  .composer-box:focus-within { border-color: var(--focus); box-shadow: 0 0 0 1px var(--focus); }
+  .composer textarea { display: block; width: 100%; border: 0; resize: none; background: none; padding: var(--gap-group); min-height: 56px; }
+  .composer textarea:focus-visible { outline: none; }
+  .composer-bar { display: flex; align-items: center; gap: var(--gap-related); padding: 0 var(--gap-related) var(--gap-related); }
+  .composer-bar select { border: 0; background: none; color: var(--ink-secondary); min-height: var(--target-min); }
+  .composer-note { font-size: var(--text-meta); color: var(--ink-tertiary); white-space: nowrap; }
+
+  @media (max-width: 720px), (pointer: coarse) {
+    .btn, .chat, .composer-bar select, .steps summary { min-height: var(--target-touch); }
+    kbd { display: none; }
+  }
+  @media (max-width: 720px) {
+    .app { grid-template-columns: minmax(0, 1fr); }
+    .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; z-index: var(--layer-overlay); transform: translateX(-100%); transition: transform var(--duration-region) var(--ease-exit); box-shadow: var(--elevation-overlay); }
+    .sidebar.open { transform: none; transition-timing-function: var(--ease-enter); }
+    .menu-btn { display: inline-flex; }
+    .branch, .composer-note { display: none; }
+    .topbar, .transcript { padding-left: var(--gap-group); padding-right: var(--gap-group); }
+    .composer { padding: 0 var(--gap-group) var(--gap-group); }
+    /* Thumbs: the constant decision gets the widest targets in the row. */
+    .request-actions .primary, .request-actions [data-action=deny] { flex: 1 1 0; justify-content: center; }
+    .request-actions .grow { flex-basis: 100%; height: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar" id="sidebar" aria-label="Chats">
+    <div class="sidebar-head">
+      <span class="project">checkout-service</span>
+      <button class="btn text" type="button">New chat <kbd>Ctrl N</kbd></button>
+    </div>
+    <div class="day">
+      <h2>Today</h2>
+      <ul class="chats today">
+        <li><button class="chat" type="button" aria-current="page"><span class="dot waiting" aria-label="Waiting for you"></span><span class="chat-title">Fix login redirect</span><span class="chat-meta">2m</span></button></li>
+        <li><button class="chat" type="button"><span class="dot running" aria-label="Running"></span><span class="chat-title">Move pricing rules into config</span><span class="chat-meta">14m</span></button></li>
+        <li><button class="chat" type="button"><span class="dot idle" aria-label="Idle"></span><span class="chat-title">Flaky webhook retry test</span><span class="chat-meta">1h</span></button></li>
+      </ul>
+    </div>
+    <div class="day">
+      <h2>Yesterday</h2>
+      <ul class="chats">
+        <li><button class="chat" type="button"><span class="dot idle" aria-label="Idle"></span><span class="chat-title">Upgrade Stripe SDK to v14</span><span class="chat-meta">Tue</span></button></li>
+        <li><button class="chat" type="button"><span class="dot idle" aria-label="Idle"></span><span class="chat-title">Add idempotency keys to refunds</span><span class="chat-meta">Tue</span></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="btn text menu-btn" type="button" id="menu" aria-controls="sidebar" aria-expanded="false">Chats</button>
+      <h1>Fix login redirect</h1>
+      <span class="branch">fix/login-redirect</span>
+      <span class="grow"></span>
+      <div class="diffstat" aria-label="3 files changed, 41 lines added, 12 removed"><span>3 files</span><span class="add">+41</span><span class="del">−12</span></div>
+    </header>
+
+    <div class="transcript">
+      <div class="column">
+        <div class="user-msg">After signing in, users who came from /cart land on /home instead of going back to the cart. Fix it and add a test.</div>
+
+        <div class="turn">
+          <p>The <code>returnTo</code> parameter is dropped when the OAuth callback builds its redirect. I changed the callback to keep it and to allow only same-origin paths, then added a test for the /cart case.</p>
+          <details class="steps">
+            <summary>Read 6 files, edited 3</summary>
+            <ol>
+              <li>edit src/auth/callback.ts +18 −9</li>
+              <li>edit src/auth/safe-redirect.ts +17</li>
+              <li>edit test/auth/callback.test.ts +6 −3</li>
+            </ol>
+          </details>
+        </div>
+
+        <section class="request" aria-labelledby="req-title">
+          <div class="request-head">
+            <strong id="req-title">Run this command to check the fix?</strong>
+            <span>It runs tests only. No network, no database.</span>
+          </div>
+          <pre class="command">npm test -- test/auth</pre>
+          <div class="request-why" id="why"><p>Runs the 23 tests in test/auth, including the new case for a return path from /cart.</p></div>
+          <div class="request-actions">
+            <button class="btn primary" type="button">Run tests <kbd>Enter</kbd></button>
+            <button class="btn" type="button" data-action="deny">Deny <kbd>Esc</kbd></button>
+            <button class="btn text" type="button" data-action="always">Always allow</button>
+            <span class="grow"></span>
+            <button class="btn text" type="button" id="why-toggle" aria-controls="why" aria-expanded="false">Details</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <form class="composer" onsubmit="return false">
+      <div class="composer-box">
+        <textarea id="prompt" rows="2" aria-label="Message" placeholder="Reply, or queue the next request"></textarea>
+        <div class="composer-bar">
+          <select aria-label="Permission mode"><option>Ask before commands</option><option>Accept edits</option><option>Plan only</option></select>
+          <span class="grow"></span>
+          <span class="composer-note">Sends after you decide</span>
+          <select aria-label="Model"><option>Opus 5.5</option><option>Sonnet 5.5</option></select>
+          <button class="btn" type="submit">Queue</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  const why = document.getElementById('why');
+  const toggle = document.getElementById('why-toggle');
+  toggle.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    why.style.height = open ? why.scrollHeight + 'px' : '0px';
+    why.style.opacity = open ? '1' : '0';
+  });
+  const menu = document.getElementById('menu');
+  menu.addEventListener('click', () => {
+    const open = menu.getAttribute('aria-expanded') !== 'true';
+    menu.setAttribute('aria-expanded', String(open));
+    document.getElementById('sidebar').classList.toggle('open', open);
+  });
+</script>
+</body>
+</html>

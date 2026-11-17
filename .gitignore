@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+# local verify output (the demo report is kept as an example)
+/derive-report/

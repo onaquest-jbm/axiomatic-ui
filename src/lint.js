@@ -1,0 +1,134 @@
+'use strict';
+// Static check, no browser. Source may only use derived tokens, which are named by meaning.
+// A literal number or color in a style is a value nobody derived, so it carries no meaning.
+// Suppress one finding with a reason:  /* derive-ignore raw-color: brand logo artwork */
+const fs = require('fs');
+const path = require('path');
+const { tokenNames } = require('./tokens');
+
+const EXT = new Set(['.css', '.scss', '.less', '.html', '.htm', '.jsx', '.tsx', '.vue', '.svelte', '.astro', '.js', '.ts']);
+const MARKUP = new Set(['.html', '.htm', '.jsx', '.tsx', '.vue', '.svelte', '.astro']);
+const SKIP = new Set(['node_modules', '.git', 'dist', 'build', 'out', '.next', 'coverage', 'vendor', 'reports', 'design']);
+
+const RULES = [
+  { id: 'raw-color', tier: 'derivation', principle: 'encoding', title: 'Color written as a literal', fix: 'Use the token for the meaning: --ink-*, --surface-*, --edge-*, --accent, --state-*.' },
+  { id: 'raw-space', tier: 'derivation', principle: 'grouping', title: 'Spacing written as a number', fix: 'Pick the relatedness level: --gap-control, --gap-related, --gap-group, --gap-section, --gap-region.' },
+  { id: 'raw-size', tier: 'derivation', principle: 'encoding', title: 'Font size written as a number', fix: 'Pick the text rank: --text-meta, --text-body, --text-heading, …' },
+  { id: 'raw-motion', tier: 'derivation', principle: 'motion', title: 'Duration written as a number', fix: 'Pick what is moving: --duration-state, --duration-element, --duration-region.' },
+  { id: 'raw-layer', tier: 'derivation', principle: 'encoding', title: 'z-index written as a number', fix: 'Pick the layer: --layer-sticky, --layer-overlay, --layer-modal, --layer-toast.' },
+  { id: 'raw-radius', tier: 'derivation', principle: 'encoding', title: 'Radius written as a number', fix: '--radius-control for controls, --radius-container for things that hold them.' },
+  { id: 'unknown-token', tier: 'derivation', principle: 'encoding', title: 'Token that was never derived', fix: 'Use a token from tokens.css, or add the meaning to the model and re-derive.' },
+  { id: 'decorative-color', tier: 'meaning', principle: 'encoding', title: 'Gradient or gradient text', fix: 'A color change must mean something; use a surface or ink token.' },
+  { id: 'decorative-depth', tier: 'meaning', principle: 'encoding', title: 'Backdrop blur or decorative shadow', fix: 'Depth means "floats above and is temporary"; only overlays get --elevation-overlay.' },
+  { id: 'decorative-motion', tier: 'meaning', principle: 'motion', title: 'Overshoot, bounce or endless animation', fix: 'Motion reports a change; use --ease-enter/--ease-exit, loop only progress indicators.' },
+  { id: 'motion-unscoped', tier: 'meaning', principle: 'motion', title: 'Transition on every property', fix: 'Name the property that changes (background-color, opacity, transform), so only real changes move.' },
+  { id: 'decorative-symbol', tier: 'meaning', principle: 'encoding', title: 'Emoji in interface text', fix: 'Symbols must map to a state or object; use text or the icon set.' },
+  { id: 'focus-removed', tier: 'floor', principle: 'legibility', title: 'Focus indicator removed without replacement', fix: 'Keep :focus-visible from base.css or show focus on a wrapper with :focus-within.' },
+  { id: 'zoom-blocked', tier: 'floor', principle: 'legibility', title: 'Pinch zoom disabled', fix: 'Remove user-scalable=no and maximum-scale.' },
+  { id: 'clickable-non-control', tier: 'floor', principle: 'pointing', title: 'Click handler on a div or span', fix: 'Use <button> or <a href>.' },
+  { id: 'img-no-alt', tier: 'floor', principle: 'legibility', title: 'Image without alt', fix: 'alt="" for decoration, a description otherwise.' },
+];
+const BY = Object.fromEntries(RULES.map((r) => [r.id, r]));
+const COLOR_RE = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch)\([^)]*\)/g;
+const SPACE_PROP = /^(?:margin|padding|gap|row-gap|column-gap|inset|top|right|bottom|left)(?:-[a-z-]+)?$/;
+
+function walk(t, out) {
+  const st = fs.statSync(t);
+  if (st.isFile()) { if (EXT.has(path.extname(t).toLowerCase())) out.push(t); return out; }
+  for (const e of fs.readdirSync(t, { withFileTypes: true })) {
+    if (e.isDirectory()) { if (!SKIP.has(e.name) && !e.name.startsWith('.')) walk(path.join(t, e.name), out); }
+    else if (EXT.has(path.extname(e.name).toLowerCase())) out.push(path.join(t, e.name));
+  }
+  return out;
+}
+
+function nearest(d, kind, px) {
+  const table = kind === 'space' ? Object.entries(d.space) : kind === 'size' ? Object.entries(d.type.sizes) : Object.entries(d.motion);
+  let best = null;
+  for (const [k, v] of table) if (!best || Math.abs(v - px) < Math.abs(best[1] - px)) best = [k, v];
+  const prefix = kind === 'space' ? 'gap' : kind === 'size' ? 'text' : 'duration';
+  return best ? `--${prefix}-${best[0]} (${best[1]}${kind === 'motion' ? 'ms' : 'px'})` : '';
+}
+
+function lintText(text, file, d, ctx) {
+  const out = [];
+  if (/Generated by derive/.test(text.slice(0, 300))) return out;
+  const ext = path.extname(file).toLowerCase();
+  const markup = MARKUP.has(ext);
+  const lines = text.split(/\r?\n/);
+  const names = ctx.names;
+  const local = new Set([...text.matchAll(/(?:^|[;{\s])--([a-z][a-z0-9-]*)\s*:/g)].map((m) => m[1]));
+  const hasFocus = /focus-visible|focus-within/.test(text);
+  const add = (id, i, msg) => {
+    for (const j of [i, i - 1]) {
+      const m = j >= 0 && lines[j].match(/derive-ignore\s+([\w-]+(?:\s*,\s*[\w-]+)*)\s*:\s*\S/);
+      if (m && m[1].split(/\s*,\s*/).includes(id)) { ctx.suppressed++; return; }
+    }
+    const r = BY[id];
+    out.push({ rule: id, tier: r.tier, principle: r.principle, file, line: i + 1, message: msg || r.title, fix: r.fix, excerpt: lines[i].trim().slice(0, 140) });
+  };
+  let inComment = false;
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    if (inComment) { const e = line.indexOf('*/'); if (e === -1) continue; line = ' '.repeat(e + 2) + line.slice(e + 2); inComment = false; }
+    line = line.replace(/\/\*.*?\*\//g, (s) => ' '.repeat(s.length)).replace(/<!--.*?-->/g, (s) => ' '.repeat(s.length));
+    const o = line.indexOf('/*'); if (o !== -1) { inComment = true; line = line.slice(0, o); }
+    if (/^\s*\/\//.test(line)) continue;
+
+    for (const m of line.matchAll(/var\(\s*--([a-z][a-z0-9-]*)/g)) if (!names.has(m[1]) && !local.has(m[1]) && !ctx.projectVars.has(m[1])) add('unknown-token', i, `var(--${m[1]}) was never derived.`);
+    if (/outline\s*:\s*(none|0)\b/.test(line) && !hasFocus) add('focus-removed', i);
+    if (/user-scalable\s*=\s*(no|0)|maximum-scale\s*=\s*1(\.0)?\b/.test(line)) add('zoom-blocked', i);
+    if (markup && /<(div|span|li|td)\b(?![^>]*\brole\s*=)[^>]*\bon[cC]lick\s*=/.test(line)) add('clickable-non-control', i);
+    if (markup && /<img\b(?![^>]*\balt\s*=)[^>]*>/i.test(line)) add('img-no-alt', i);
+
+    for (const m of line.matchAll(/(?:^|[;{\s"'`])(-{0,2}[a-z][a-z-]*)\s*:\s*([^;{}"'`]+)/g)) {
+      const prop = m[1].toLowerCase(), value = m[2].trim();
+      if (/^(https?|data|mailto)$/.test(prop)) continue;
+      const bare = value.replace(/var\([^)]*\)/g, '');
+      const colors = bare.match(COLOR_RE);
+      if (colors && !/^(content|src)$/.test(prop) && !/^(transparent|currentcolor|inherit)$/i.test(bare.trim())) add('raw-color', i, `${prop}: ${colors[0]} has no derived meaning.`);
+      if (/gradient\(/.test(value) && !/mask/.test(prop)) add('decorative-color', i);
+      if (/background-clip$/.test(prop) && /text/.test(value)) add('decorative-color', i, 'Gradient text.');
+      if (/backdrop-filter$/.test(prop) && /blur/.test(value)) add('decorative-depth', i);
+      if (prop === 'box-shadow' && !/var\(/.test(value) && !/^none$/.test(value) && !/inset/.test(value)) add('decorative-depth', i, 'A literal shadow: depth should only mean "overlay".');
+      if (/^transition(-property)?$/.test(prop) && /(^|[\s,])all\b/.test(value)) add('motion-unscoped', i);
+      const bez = value.match(/cubic-bezier\(([^)]+)\)/);
+      if (bez) { const n = bez[1].split(',').map(Number); if (n[1] < 0 || n[1] > 1 || n[3] < 0 || n[3] > 1) add('decorative-motion', i, 'Overshoot easing.'); }
+      if (/infinite/.test(value) && !/spin|progress|load|pulse/i.test(value)) add('decorative-motion', i, 'Endless animation.');
+      if (SPACE_PROP.test(prop)) {
+        const px = bare.split(/\s+/).map((p) => p.match(/^-?(\d*\.?\d+)(px|rem|em)$/)).filter(Boolean).map((x) => parseFloat(x[1]) * (x[2] === 'px' ? 1 : 16)).filter((v) => v > 0);
+        if (px.length && !/^(top|left|right|bottom|inset)$/.test(prop)) add('raw-space', i, `${prop}: ${px[0]}px. Nearest meaning: ${nearest(d, 'space', px[0])}.`);
+      }
+      if (prop === 'font-size') { const x = bare.trim().match(/^(\d*\.?\d+)(px|rem|em)$/); if (x) { const v = parseFloat(x[1]) * (x[2] === 'px' ? 1 : 16); add('raw-size', i, `font-size ${x[0]}. Nearest rank: ${nearest(d, 'size', v)}.`); } }
+      if (/^(transition|transition-duration|animation|animation-duration)$/.test(prop) && !(/infinite/.test(value) && /spin|progress|load|pulse/i.test(value))) {
+        const t = bare.match(/(\d*\.?\d+)(ms|s)\b/);
+        if (t) { const ms = parseFloat(t[1]) * (t[2] === 's' ? 1000 : 1); if (ms > 0) add('raw-motion', i, `${prop} ${t[0]}. Nearest: ${nearest(d, 'motion', ms)}.`); }
+      }
+      if (prop === 'z-index' && /^-?\d+$/.test(bare.trim()) && !['0', '1', '-1'].includes(bare.trim())) add('raw-layer', i, `z-index ${bare.trim()}.`);
+      if (prop === 'border-radius' && /\d+px/.test(bare) && !/^(0|50%|9999px)$/.test(bare.trim())) add('raw-radius', i, `border-radius ${bare.trim()}.`);
+    }
+    if (markup) {
+      const textOnly = line.replace(/<[^>]*>/g, ' ').replace(/\{[^}]*\}/g, ' ');
+      if (/\p{Extended_Pictographic}/u.test(textOnly)) add('decorative-symbol', i);
+      if (/class(Name)?\s*=\s*["'{`][^"'}`]*\btransition-all\b/.test(line)) add('motion-unscoped', i, 'Tailwind transition-all moves every property.');
+    }
+  }
+  return out;
+}
+
+function lintPaths(targets, d, opts = {}) {
+  const files = [];
+  for (const t of targets) walk(t, files);
+  const varFiles = [...files];
+  for (const r of opts.varRoots || []) walk(r, varFiles);
+  const projectVars = new Set();
+  for (const f of new Set(varFiles)) for (const m of fs.readFileSync(f, 'utf8').matchAll(/(?:^|[;{\s])--([a-z][a-z0-9-]*)\s*:/g)) projectVars.add(m[1]);
+  const ctx = { names: tokenNames(d), projectVars, suppressed: 0 };
+  let findings = [];
+  for (const f of files) findings = findings.concat(lintText(fs.readFileSync(f, 'utf8'), f, d, ctx));
+  const counts = { floor: 0, meaning: 0, derivation: 0, finish: 0 };
+  for (const f of findings) counts[f.tier]++;
+  return { files: files.length, findings, counts, suppressed: ctx.suppressed };
+}
+
+module.exports = { RULES, lintText, lintPaths };

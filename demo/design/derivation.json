@@ -1,0 +1,542 @@
+{
+  "model": {
+    "product": {
+      "name": "Workbench",
+      "purpose": "Let a developer hand coding work to an agent, stay in control of what it runs, and accept or reject what it changed."
+    },
+    "density": "compact",
+    "themes": [
+      "light",
+      "dark"
+    ]
+  },
+  "type": {
+    "sizes": {
+      "meta": 11,
+      "body": 13,
+      "heading": 15
+    },
+    "weights": {
+      "regular": 400,
+      "strong": 600
+    },
+    "leading": {
+      "body": 1.4,
+      "heading": 1.25
+    },
+    "measure": "68ch",
+    "ratio": 1.15,
+    "body": 13
+  },
+  "space": {
+    "control": 4,
+    "related": 6,
+    "group": 10,
+    "section": 16,
+    "region": 26
+  },
+  "target": {
+    "min": 24,
+    "control": 30,
+    "touch": 44
+  },
+  "radius": {
+    "control": 6,
+    "container": 10
+  },
+  "color": {
+    "light": {
+      "surface-canvas": "#f4f7fb",
+      "surface-base": "#fefeff",
+      "surface-sunken": "#edf0f4",
+      "ink-primary": "#202428",
+      "ink-secondary": "#484e54",
+      "ink-tertiary": "#646a70",
+      "edge-separator": "#dbdfe4",
+      "edge-control": "#81868b",
+      "accent": "#006cba",
+      "on-accent": "#ffffff",
+      "accent-hover": "#005da3",
+      "focus": "#006cba",
+      "selection": "#ddedff",
+      "state-running": "#0f6bb4",
+      "state-waiting": "#8e5f00",
+      "state-error": "#af463e",
+      "state-success": "#007935"
+    },
+    "dark": {
+      "surface-canvas": "#111315",
+      "surface-base": "#171a1c",
+      "surface-sunken": "#0b0d10",
+      "ink-primary": "#eaf0f6",
+      "ink-secondary": "#adb3ba",
+      "ink-tertiary": "#898f95",
+      "edge-separator": "#2d3134",
+      "edge-control": "#6d7277",
+      "accent": "#52aafe",
+      "on-accent": "#0b1723",
+      "accent-hover": "#76baff",
+      "focus": "#52aafe",
+      "selection": "#192837",
+      "state-running": "#4394e1",
+      "state-waiting": "#c28300",
+      "state-error": "#de6f65",
+      "state-success": "#3fa25c"
+    }
+  },
+  "motion": {
+    "state": 90,
+    "element": 140,
+    "region": 200
+  },
+  "response": {
+    "feedbackMs": 100,
+    "progressMs": 1000,
+    "cancelMs": 10000
+  },
+  "tasks": [
+    {
+      "id": "decide",
+      "does": "Approve or deny a command the agent wants to run",
+      "kind": "act",
+      "frequency": "constant",
+      "consequence": "high",
+      "tier": "primary",
+      "treatment": [
+        "most salient thing on its screen; the one accent-filled action",
+        "irreversible but frequent: the control itself is the confirmation, so it states exactly what will happen; no extra dialog, which would become a reflex and protect nothing",
+        "keyboard shortcut, shown next to the label"
+      ]
+    },
+    {
+      "id": "follow",
+      "does": "Follow what the agent is doing and why",
+      "kind": "read",
+      "frequency": "constant",
+      "consequence": "low",
+      "tier": "secondary",
+      "treatment": [
+        "always visible, updates in place; no action needed to see it"
+      ]
+    },
+    {
+      "id": "review",
+      "does": "See what changed (files, +/- lines)",
+      "kind": "read",
+      "frequency": "frequent",
+      "consequence": "medium",
+      "tier": "secondary",
+      "treatment": [
+        "always visible, updates in place; no action needed to see it"
+      ]
+    },
+    {
+      "id": "ask",
+      "does": "Send the next instruction",
+      "kind": "act",
+      "frequency": "frequent",
+      "consequence": "low",
+      "tier": "secondary",
+      "treatment": [
+        "visible, quiet styling",
+        "act immediately; offer undo instead of asking first",
+        "keyboard shortcut, shown next to the label"
+      ]
+    },
+    {
+      "id": "switch",
+      "does": "Switch to another running chat",
+      "kind": "act",
+      "frequency": "frequent",
+      "consequence": "low",
+      "tier": "secondary",
+      "treatment": [
+        "visible, quiet styling",
+        "act immediately; offer undo instead of asking first",
+        "keyboard shortcut, shown next to the label"
+      ]
+    },
+    {
+      "id": "trust",
+      "does": "Always allow a command class",
+      "kind": "act",
+      "frequency": "occasional",
+      "consequence": "high",
+      "tier": "tertiary",
+      "treatment": [
+        "visible as a text button, or in context where it applies",
+        "reversible but costly: state the consequence in the control, keep undo available"
+      ]
+    },
+    {
+      "id": "configure",
+      "does": "Change model or permission mode",
+      "kind": "act",
+      "frequency": "occasional",
+      "consequence": "medium",
+      "tier": "tertiary",
+      "treatment": [
+        "visible as a text button, or in context where it applies",
+        "act immediately; offer undo instead of asking first"
+      ]
+    },
+    {
+      "id": "start",
+      "does": "Start a new chat",
+      "kind": "act",
+      "frequency": "occasional",
+      "consequence": "low",
+      "tier": "tertiary",
+      "treatment": [
+        "visible as a text button, or in context where it applies",
+        "act immediately; offer undo instead of asking first"
+      ]
+    }
+  ],
+  "budget": {
+    "primaryPerView": 1,
+    "visibleActionsPerGroup": 4,
+    "groupsPerLevel": 4
+  },
+  "elevation": {
+    "overlay": "0 8px 24px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.10)"
+  },
+  "z": {
+    "base": 0,
+    "sticky": 10,
+    "overlay": 200,
+    "modal": 300,
+    "toast": 400
+  },
+  "trace": [
+    {
+      "key": "density",
+      "value": "compact",
+      "because": "Experts in long, daily sessions gain more from seeing more at once (less scrolling, less to remember) than they lose to tighter spacing; they already know the layout.",
+      "principles": [
+        "memory",
+        "grouping"
+      ],
+      "inputs": {
+        "expertise": "expert",
+        "frequency": "daily",
+        "sessionLength": "hours"
+      }
+    },
+    {
+      "key": "type.body",
+      "value": 13,
+      "because": "Desktop text is read at 50-70 cm; 13-16 px is legible, and denser layouts sit at the low end.",
+      "principles": [
+        "legibility"
+      ],
+      "inputs": {
+        "primaryDevice": "desktop",
+        "density": "compact"
+      }
+    },
+    {
+      "key": "type.ratio",
+      "value": 1.15,
+      "because": "Adjacent ranks must differ by at least ~15% in size to be read as different ranks rather than inconsistency; denser layouts use the smallest step that is still distinct.",
+      "principles": [
+        "encoding",
+        "salience"
+      ],
+      "inputs": {
+        "density": "compact"
+      }
+    },
+    {
+      "key": "type.sizes",
+      "value": {
+        "meta": 11,
+        "body": 13,
+        "heading": 15
+      },
+      "because": "One size per text rank the information actually has (3): meta, body, heading. No other sizes exist, so every size difference means a rank difference. Smaller ranks are clamped to 11 px.",
+      "principles": [
+        "encoding",
+        "legibility"
+      ],
+      "inputs": {
+        "ranks": [
+          "meta",
+          "body",
+          "heading"
+        ],
+        "ratio": 1.15,
+        "body": 13
+      }
+    },
+    {
+      "key": "type.weights",
+      "value": {
+        "regular": 400,
+        "strong": 600
+      },
+      "because": "Two weights: weight is a second channel for rank when size steps are small. A third weight would be a difference people cannot reliably name.",
+      "principles": [
+        "encoding"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "type.leading",
+      "value": {
+        "body": 1.4,
+        "heading": 1.25
+      },
+      "because": "Body line height of 1.4-1.5 lets the eye find the next line; headings are short, so tighter leading keeps them one unit.",
+      "principles": [
+        "legibility",
+        "grouping"
+      ],
+      "inputs": {
+        "density": "compact"
+      }
+    },
+    {
+      "key": "type.measure",
+      "value": "68ch",
+      "because": "Running text is limited to about 68 characters per line, inside the 45-75 range where reading speed and return sweeps are best.",
+      "principles": [
+        "legibility"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "space",
+      "value": {
+        "control": 4,
+        "related": 6,
+        "group": 10,
+        "section": 16,
+        "region": 26
+      },
+      "because": "Five relatedness levels: inside a control, between related items, between groups, between sections, between regions. Each is at least 1.5x the level inside it, so proximity alone tells people what belongs together. Base: half the body size (6.5px); grid: 2 px.",
+      "principles": [
+        "grouping",
+        "encoding"
+      ],
+      "inputs": {
+        "body": 13,
+        "step": 1.6
+      }
+    },
+    {
+      "key": "target.min",
+      "value": 24,
+      "because": "With a mouse, 24 px is the floor below which pointing time and errors rise sharply.",
+      "principles": [
+        "pointing"
+      ],
+      "inputs": {
+        "input": [
+          "mouse",
+          "keyboard",
+          "touch"
+        ]
+      }
+    },
+    {
+      "key": "target.touch",
+      "value": 44,
+      "because": "Touch is also an input, so layouts used with a finger (coarse pointer or phone width) switch to 44 px targets.",
+      "principles": [
+        "pointing"
+      ],
+      "inputs": {
+        "input": [
+          "mouse",
+          "keyboard",
+          "touch"
+        ]
+      }
+    },
+    {
+      "key": "target.control",
+      "value": 30,
+      "because": "Control height = one line of body text (18px) plus control padding on both sides, but never below the minimum target.",
+      "principles": [
+        "pointing",
+        "grouping"
+      ],
+      "inputs": {
+        "lineH": 18
+      }
+    },
+    {
+      "key": "radius.control",
+      "value": 6,
+      "because": "Rounded corners mark a thing as one pickable object. A small radius proportional to control height reads as a control without competing with content.",
+      "principles": [
+        "convention",
+        "encoding"
+      ],
+      "inputs": {
+        "controlHeight": 30
+      }
+    },
+    {
+      "key": "radius.container",
+      "value": 10,
+      "because": "Containers that hold controls use the control radius plus the inner gap, so the inner and outer curves stay concentric and read as one shape.",
+      "principles": [
+        "grouping"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "color.hue",
+      "value": 250,
+      "because": "No brand color given: blue, the long-standing convention for interactive and selected things.",
+      "principles": [
+        "convention"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "color.surfaces",
+      "value": "canvas, base, sunken",
+      "because": "Three surfaces, one per region role: the app canvas, content that sits on it, and inset wells. They differ by a small lightness step so regions separate without borders.",
+      "principles": [
+        "grouping",
+        "encoding"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "color.ink",
+      "value": "primary 13:1, secondary 7:1, tertiary 4.5:1",
+      "because": "Three text emphasis ranks, each solved to an exact contrast against the lightest/darkest surface it sits on. The lowest rank is still above the 4.5:1 reading floor; each step roughly halves contrast so the ranks are distinct.",
+      "principles": [
+        "legibility",
+        "encoding",
+        "salience"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "color.edges",
+      "value": "separator 1.25:1, control 3:1",
+      "because": "Two edge meanings: a separator (only where spacing cannot show the grouping) is faint; a control boundary must reach 3:1 so people can find the thing to click.",
+      "principles": [
+        "legibility",
+        "grouping",
+        "encoding"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "color.accent",
+      "value": "one accent",
+      "because": "One accent hue means one thing: the primary action and the current selection. A second accent would be a second meaning competing for the same attention.",
+      "principles": [
+        "salience",
+        "encoding"
+      ],
+      "inputs": {
+        "hue": 250
+      }
+    },
+    {
+      "key": "color.states",
+      "value": "running, waiting, error, success",
+      "because": "One color per state the information actually has (4). States not in the model get no color. Each is solved to 4.5:1 so it can be used as text.",
+      "principles": [
+        "encoding",
+        "legibility"
+      ],
+      "inputs": {
+        "states": [
+          "running",
+          "waiting",
+          "error",
+          "success"
+        ]
+      }
+    },
+    {
+      "key": "motion.state",
+      "value": 90,
+      "because": "In-place state changes (color, opacity) need just enough time to read as a change rather than a flicker.",
+      "principles": [
+        "motion"
+      ],
+      "inputs": {
+        "expert": true
+      }
+    },
+    {
+      "key": "motion.element",
+      "value": 140,
+      "because": "An element appearing, leaving or expanding: long enough to be seen as one object transforming, short enough not to wait for.",
+      "principles": [
+        "motion",
+        "response"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "motion.region",
+      "value": 200,
+      "because": "A panel or sidebar crossing a large distance needs the most time to stay readable as movement, and stays under 250 ms.",
+      "principles": [
+        "motion",
+        "response"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "motion.easing",
+      "value": "decelerate in, accelerate out",
+      "because": "Things entering slow down into place (they arrive under control); things leaving speed up (they get out of the way). Overshoot would add motion that means nothing.",
+      "principles": [
+        "motion",
+        "encoding"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "response",
+      "value": {
+        "feedbackMs": 100,
+        "progressMs": 1000,
+        "cancelMs": 10000
+      },
+      "because": "Every input shows a visible result within 100 ms. Work over 1 s shows progress. Work over 10 s can be cancelled.",
+      "principles": [
+        "response"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "tasks",
+      "value": "decide: primary; follow: secondary; review: secondary; ask: secondary; switch: secondary; trust: tertiary; configure: tertiary; start: tertiary",
+      "because": "Tasks are ranked by how often they happen, then by how much a mistake costs. Rank decides salience; frequency decides visibility and target size; consequence decides friction.",
+      "principles": [
+        "salience",
+        "choice",
+        "pointing",
+        "consequence"
+      ],
+      "inputs": {}
+    },
+    {
+      "key": "budget",
+      "value": {
+        "primaryPerView": 1,
+        "visibleActionsPerGroup": 4,
+        "groupsPerLevel": 4
+      },
+      "because": "One primary per view (one thing is seen first). About four visible actions per group and four groups competing at each level, the size of working memory.",
+      "principles": [
+        "salience",
+        "memory",
+        "choice"
+      ],
+      "inputs": {}
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "../model/model.schema.json",
+  "product": {
+    "name": "Workbench",
+    "purpose": "Let a developer hand coding work to an agent, stay in control of what it runs, and accept or reject what it changed."
+  },
+  "people": {
+    "who": "Developers supervising coding agents on their own repositories",
+    "expertise": "expert",
+    "frequency": "daily",
+    "sessionLength": "hours"
+  },
+  "context": {
+    "devices": ["desktop", "phone"],
+    "input": ["mouse", "keyboard", "touch"],
+    "conventions": ["VS Code", "GitHub pull request view", "Slack"]
+  },
+  "themes": ["light", "dark"],
+  "information": {
+    "textRanks": ["meta", "body", "heading"],
+    "states": ["running", "waiting", "error", "success"],
+    "objects": [
+      { "id": "chat", "volume": "dozens", "changes": "live", "shows": "title, state, last activity" },
+      { "id": "turn", "volume": "hundreds per chat", "changes": "streaming", "shows": "what the agent said and did" },
+      { "id": "request", "volume": "0-1 at a time", "changes": "appears, then resolved", "shows": "the command, why, what it can touch" },
+      { "id": "diff", "volume": "1-40 files", "changes": "after each edit", "shows": "files, lines added and removed" }
+    ]
+  },
+  "tasks": [
+    { "id": "decide", "does": "Approve or deny a command the agent wants to run", "frequency": "constant", "consequence": "high", "reversible": false },
+    { "id": "follow", "does": "Follow what the agent is doing and why", "kind": "read", "frequency": "constant", "consequence": "low", "reversible": true },
+    { "id": "ask", "does": "Send the next instruction", "frequency": "frequent", "consequence": "low", "reversible": true },
+    { "id": "switch", "does": "Switch to another running chat", "frequency": "frequent", "consequence": "low", "reversible": true },
+    { "id": "review", "does": "See what changed (files, +/- lines)", "kind": "read", "frequency": "frequent", "consequence": "medium", "reversible": true },
+    { "id": "trust", "does": "Always allow a command class", "frequency": "occasional", "consequence": "high", "reversible": true },
+    { "id": "configure", "does": "Change model or permission mode", "frequency": "occasional", "consequence": "medium", "reversible": true },
+    { "id": "start", "does": "Start a new chat", "frequency": "occasional", "consequence": "low", "reversible": true }
+  ],
+  "screens": [
+    {
+      "id": "session",
+      "name": "Session with a pending request",
+      "serves": ["decide", "follow", "ask", "switch", "review", "trust", "configure", "start"],
+      "plan": {
+        "salience": [
+          { "selector": ".request", "task": "decide", "why": "Work is blocked until the person decides; it is the only thing that needs them now." },
+          { "selector": ".turn p", "task": "follow", "why": "The agent's explanation is what the decision depends on." },
+          { "selector": ".composer-box", "task": "ask" },
+          { "selector": ".chat[aria-current]", "task": "switch" }
+        ],
+        "actions": [
+          { "selector": ".request .primary", "task": "decide", "frequency": "constant" },
+          { "selector": ".request [data-action=deny]", "task": "decide", "frequency": "frequent" },
+          { "selector": ".composer button[type=submit]", "task": "ask", "frequency": "frequent" },
+          { "selector": ".request [data-action=always]", "task": "trust", "frequency": "occasional" },
+          { "selector": "#why-toggle", "task": "decide", "frequency": "occasional" }
+        ],
+        "groups": [
+          { "name": "request actions", "members": [".request-actions .primary", ".request-actions [data-action=always]", ".request-actions [data-action=deny]"] },
+          { "name": "today's chats", "members": [".chats.today li"] }
+        ]
+      }
+    }
+  ]
+}

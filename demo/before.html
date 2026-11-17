@@ -1,0 +1,97 @@
+<!doctype html>
+<!-- A deliberately typical agent-generated version of the screen. Do not copy. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>AI Coding Assistant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  body { margin: 0; font-family: 'Inter', sans-serif; background: #f8f9ff; color: #1f2937; }
+  .hero { background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%); padding: 28px 36px; text-align: center; color: white; }
+  .hero h1 { font-size: 34px; margin: 0; font-weight: 800; background: linear-gradient(90deg, #fff, #e0e7ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { font-size: 17px; opacity: .85; margin: 10px 0 0; }
+  .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: 11px; color: #8b5cf6; font-weight: 700; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 28px; padding: 30px; }
+  .card { background: rgba(255,255,255,.7); backdrop-filter: blur(12px); border: 1px solid #e5e7eb; border-radius: 24px; box-shadow: 0 20px 50px rgba(99,102,241,.15); padding: 26px; transition: all .5s cubic-bezier(.68,-0.55,.27,1.55); }
+  .card:hover { transform: translateY(-4px) scale(1.01); }
+  .card .card { border-radius: 18px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+  .card .card .card { border-radius: 14px; padding: 14px; }
+  .side-title { font-size: 19px; font-weight: 700; text-align: center; }
+  .chat-item { display: flex; gap: 10px; align-items: center; padding: 13px; border-radius: 16px; margin-bottom: 10px; background: #fff; border: 1px solid #eef; border-left: 4px solid #8b5cf6; font-weight: 600; }
+  .chat-item small { display: block; font-size: 11.5px; color: #b0b4bd; font-weight: 600; }
+  .msg { text-align: center; font-size: 15px; line-height: 1.7; }
+  .msg h3 { font-size: 21px; font-weight: 800; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 22px 0; }
+  .stat { text-align: center; }
+  .stat .icon { font-size: 30px; }
+  .stat b { display: block; font-size: 26px; font-weight: 800; background: linear-gradient(90deg, #6366f1, #ec4899); -webkit-background-clip: text; color: transparent; }
+  .stat span { font-size: 13px; color: #a1a1aa; font-weight: 600; }
+  .perm { text-align: center; }
+  .btn { border: none; border-radius: 999px; padding: 9px 26px; font-weight: 700; font-size: 14px; cursor: pointer; transition: all .45s cubic-bezier(.68,-0.55,.27,1.55); outline: none; }
+  .btn-primary { background: linear-gradient(90deg, #6366f1, #a855f7); color: white; box-shadow: 0 10px 25px rgba(168,85,247,.4); }
+  .btn-ghost { background: #f3f4f6; color: #9ca3af; }
+  .btn:hover { transform: scale(1.06); }
+  .icon-btn { width: 20px; height: 20px; border-radius: 6px; background: #eef2ff; border: none; font-size: 10px; cursor: pointer; }
+  .details { max-height: 0; overflow: hidden; transition: max-height .6s ease; }
+  .details.open { max-height: 400px; }
+  .composer { margin-top: 22px; display: flex; gap: 12px; align-items: center; }
+  .composer input { flex: 1; padding: 15px 20px; border-radius: 999px; border: 2px solid #e0e7ff; font-size: 15px; outline: none; }
+  .glow { animation: glow 2.4s ease-in-out infinite; }
+  @keyframes glow { 50% { box-shadow: 0 0 40px rgba(168,85,247,.55); } }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: #f5f3ff; color: #a78bfa; font-size: 12px; font-weight: 700; z-index: 9999; position: relative; }
+</style>
+</head>
+<body>
+  <div class="hero">
+    <div class="eyebrow">Next-Generation Development</div>
+    <h1>✨ AI Coding Assistant</h1>
+    <p>Supercharge your workflow and unleash seamless, effortless coding with cutting-edge AI 🚀</p>
+  </div>
+  <div class="layout">
+    <aside class="card">
+      <div class="eyebrow">Your Workspace</div>
+      <div class="side-title">💬 Recent Chats</div>
+      <div class="chat-item">🔥 <div>Fix Login Bug<small>2 minutes ago</small></div></div>
+      <div class="chat-item">⚡ <div>Refactor API Layer<small>1 hour ago</small></div></div>
+      <div class="chat-item">🎨 <div>Update Dashboard<small>Yesterday</small></div></div>
+      <div class="chat-item" onclick="alert('new')">➕ <div>New Chat<small>Start fresh!</small></div></div>
+    </aside>
+    <main class="card">
+      <div class="eyebrow">Active Session</div>
+      <div class="card">
+        <div class="msg">
+          <h3>🤖 Working On Your Request!</h3>
+          <p>I'm analyzing your codebase to seamlessly fix the login redirect issue. This revolutionary approach will elevate your authentication flow to the next level!</p>
+        </div>
+        <div class="stats">
+          <div class="stat card"><div class="icon">📁</div><b>12</b><span>Files Analyzed</span></div>
+          <div class="stat card"><div class="icon">⚡</div><b>10x</b><span>Faster Than Manual</span></div>
+          <div class="stat card"><div class="icon">✅</div><b>98%</b><span>Confidence Score</span></div>
+        </div>
+        <div class="card perm glow">
+          <div class="eyebrow">Action Required</div>
+          <h3>🔐 Permission Needed!</h3>
+          <p style="color:#a1a1aa">The assistant wants to run <code>npm test -- auth</code></p>
+          <button class="btn btn-primary" id="approve">Approve And Run</button>
+          <button class="btn btn-ghost">Deny Request</button>
+          <button class="icon-btn" id="toggle" aria-label="details">▼</button>
+          <div class="details" id="details"><p>This command will run the authentication test suite in your project directory to verify the fix works as expected across all scenarios.</p></div>
+        </div>
+      </div>
+      <div class="composer">
+        <input placeholder="Ask me anything...">
+        <button class="btn btn-primary">Send ✨</button>
+        <span class="pill">Claude Opus</span>
+      </div>
+    </main>
+  </div>
+<script>
+  document.getElementById('toggle').addEventListener('click', () => {
+    // simulate heavy work in the click handler
+    const t = performance.now(); while (performance.now() - t < 140) {}
+    document.getElementById('details').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

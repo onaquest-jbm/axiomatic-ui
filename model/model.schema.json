@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "derive model",
+  "description": "Facts about the people, their work and the information. Every design value is derived from these; none of them is a style choice.",
+  "type": "object",
+  "required": ["product", "people", "context", "tasks"],
+  "properties": {
+    "product": { "type": "object", "required": ["purpose"], "properties": { "name": { "type": "string" }, "purpose": { "type": "string" } } },
+    "people": {
+      "type": "object",
+      "required": ["expertise", "frequency", "sessionLength"],
+      "properties": {
+        "who": { "type": "string" },
+        "expertise": { "enum": ["novice", "mixed", "expert"] },
+        "frequency": { "enum": ["daily", "weekly", "occasional"] },
+        "sessionLength": { "enum": ["minutes", "hours"] }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "devices": { "type": "array", "items": { "enum": ["desktop", "phone", "tablet"] }, "description": "Primary first." },
+        "input": { "type": "array", "items": { "enum": ["mouse", "keyboard", "touch", "pen"] } },
+        "conventions": { "type": "array", "items": { "type": "string" }, "description": "Products these people already use daily." }
+      }
+    },
+    "themes": { "type": "array", "items": { "enum": ["light", "dark"] } },
+    "brand": { "type": "object", "properties": { "accent": { "type": "string" }, "hue": { "type": "number" } } },
+    "information": {
+      "type": "object",
+      "properties": {
+        "textRanks": { "type": "array", "items": { "type": "string" }, "description": "Text ranks the content really has, smallest first; must include body." },
+        "states": { "type": "array", "items": { "type": "string" }, "description": "States objects can be in. Each gets exactly one color." },
+        "objects": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "does", "frequency", "consequence"],
+        "properties": {
+          "id": { "type": "string" },
+          "does": { "type": "string", "description": "Verb + object." },
+          "kind": { "enum": ["act", "read"], "default": "act" },
+          "frequency": { "enum": ["constant", "frequent", "occasional", "rare"] },
+          "consequence": { "enum": ["low", "medium", "high"] },
+          "reversible": { "type": "boolean" }
+        }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "serves": { "type": "array", "items": { "type": "string" } },
+          "plan": {
+            "type": "object",
+            "properties": {
+              "salience": { "type": "array", "items": { "type": "object", "required": ["selector"], "properties": { "selector": { "type": "string" }, "task": { "type": "string" }, "why": { "type": "string" } } } },
+              "actions": { "type": "array", "items": { "type": "object", "required": ["selector", "frequency"], "properties": { "selector": { "type": "string" }, "task": { "type": "string" }, "frequency": { "enum": ["constant", "frequent", "occasional", "rare"] } } } },
+              "groups": { "type": "array", "items": { "type": "object", "required": ["members"], "properties": { "name": { "type": "string" }, "members": { "type": "array", "items": { "type": "string" } } } } }
+            }
+          }
+        }
+      }
+    },
+    "override": { "type": "object", "description": "Escape hatch for a fact the model can't express yet, e.g. density. Every use should become a model field." }
+  }
+}

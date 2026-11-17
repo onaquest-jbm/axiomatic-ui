@@ -1,0 +1,360 @@
+<title>Derive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* This page's tokens were derived by Derive itself, from a model of its readers:
+   mixed expertise, occasional visits, minutes per session, desktop and phone. */
+__PAGE_TOKENS__
+/* Tier colors map to derived states: floor = error, meaning = warning, derivation = info. */
+:root { --tier-floor: var(--state-error); --tier-meaning: var(--state-warning); --tier-derivation: var(--state-info); }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-canvas); color: var(--ink-primary); font-family: var(--font-ui); font-size: var(--text-body); line-height: var(--leading-body); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+code, kbd, pre { font-family: var(--font-code); font-size: inherit; }
+input[type=checkbox] { margin: 0; accent-color: var(--accent); }
+.wrap { max-width: 1160px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: var(--gap-region) var(--gap-region); }
+.prose { max-width: var(--measure); }
+h1 { font-size: var(--text-title); line-height: var(--leading-heading); margin: 0 0 var(--gap-related); }
+h2 { font-size: var(--text-heading); line-height: var(--leading-heading); margin: 0 0 var(--gap-related); }
+h3 { font-size: var(--text-body); margin: 0; font-weight: var(--weight-strong); }
+p { margin: 0 0 var(--gap-group); }
+.secondary { color: var(--ink-secondary); }
+.tertiary { color: var(--ink-tertiary); }
+.meta { font-size: var(--text-meta); }
+section { padding-top: var(--gap-region); margin-top: var(--gap-region); border-top: 1px solid var(--edge-separator); }
+.axiom { margin: var(--gap-section) 0; padding: var(--gap-group) var(--gap-section); border-left: 3px solid var(--accent); background: var(--surface-base); font-size: var(--text-heading); line-height: var(--leading-heading); font-weight: var(--weight-strong); max-width: var(--measure); }
+
+/* Segmented inputs */
+.field { display: flex; flex-direction: column; gap: var(--gap-control); }
+.field > span { font-size: var(--text-meta); color: var(--ink-secondary); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--edge-control); border-radius: var(--radius-control); overflow: hidden; background: var(--surface-base); width: fit-content; }
+.seg button { border: 0; background: none; color: var(--ink-secondary); font: inherit; font-size: var(--text-meta); min-height: var(--target-min); padding: 0 var(--gap-group); cursor: pointer; transition: background-color var(--duration-state) var(--ease-enter); }
+.seg button + button { border-left: 1px solid var(--edge-separator); }
+.seg button[aria-pressed="true"] { background: var(--selection); color: var(--ink-primary); font-weight: var(--weight-strong); }
+.seg button:not([aria-pressed="true"]):hover { background: var(--surface-sunken); color: var(--ink-primary); }
+.checks { display: flex; flex-wrap: wrap; gap: var(--gap-related) var(--gap-group); font-size: var(--text-meta); }
+.checks label { display: inline-flex; align-items: center; gap: var(--gap-control); min-height: var(--target-min); cursor: pointer; }
+input[type=range] { width: 100%; min-height: var(--target-min); margin: 0; accent-color: var(--accent); }
+@media (pointer: coarse), (max-width: 720px) { .seg button { min-width: var(--target-touch); } .seg button, .checks label, input[type=range], .premises summary { min-height: var(--target-touch); } }
+
+/* Explorer */
+.explorer { display: grid; grid-template-columns: minmax(0, 280px) minmax(0, 1fr); gap: var(--gap-region); align-items: start; margin-top: var(--gap-section); }
+@media (max-width: 900px) { .explorer { grid-template-columns: minmax(0, 1fr); } }
+.inputs { display: flex; flex-direction: column; gap: var(--gap-section); position: sticky; top: var(--gap-section); }
+@media (max-width: 900px) { .inputs { position: static; } }
+.outputs { display: flex; flex-direction: column; gap: var(--gap-section); min-width: 0; }
+.panel { background: var(--surface-base); border: 1px solid var(--edge-separator); border-radius: var(--radius-container); padding: var(--gap-section); min-width: 0; }
+.panel h3 { margin-bottom: var(--gap-group); }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-section); }
+@media (max-width: 640px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.ladder { display: flex; flex-direction: column; gap: var(--gap-related); }
+.rung { display: grid; grid-template-columns: 72px minmax(0, 1fr) 44px; align-items: center; gap: var(--gap-group); font-size: var(--text-meta); }
+.rung .bar { height: 10px; background: var(--accent); border-radius: 2px; transition: width var(--duration-element) var(--ease-enter); }
+.rung .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-secondary); }
+.typesample { display: flex; flex-direction: column; gap: var(--gap-related); }
+.typesample div { display: flex; align-items: baseline; gap: var(--gap-group); }
+.typesample .lab { width: 72px; flex: none; font-size: var(--text-meta); color: var(--ink-tertiary); }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: var(--gap-related); }
+.sw { display: flex; flex-direction: column; border: 1px solid var(--edge-separator); border-radius: var(--radius-control); overflow: hidden; font-size: var(--text-meta); }
+.sw .chip { height: 32px; }
+.sw .info { padding: var(--gap-control) var(--gap-related); display: flex; justify-content: space-between; gap: var(--gap-control); }
+.sw .info span:last-child { color: var(--ink-tertiary); font-variant-numeric: tabular-nums; }
+.nums { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--gap-group); }
+.nums div { display: flex; flex-direction: column; }
+.nums b { font-size: var(--text-heading); font-variant-numeric: tabular-nums; }
+.nums span { font-size: var(--text-meta); color: var(--ink-secondary); }
+.trace { list-style: none; margin: 0; padding: 0; }
+.trace li { display: grid; grid-template-columns: minmax(0, 170px) minmax(0, 1fr); gap: var(--gap-group); padding: var(--gap-related) 0; border-bottom: 1px solid var(--edge-separator); transition: background-color var(--duration-element) var(--ease-exit); }
+.trace li.changed { background: var(--selection); }
+.trace .k { font-family: var(--font-code); font-size: var(--text-meta); overflow-wrap: anywhere; }
+.trace .k b { display: block; font-family: var(--font-ui); font-size: var(--text-body); font-weight: var(--weight-strong); }
+.trace .why { font-size: var(--text-meta); color: var(--ink-secondary); }
+.trace .why em { font-style: normal; color: var(--ink-tertiary); }
+@media (max-width: 640px) { .trace li { grid-template-columns: minmax(0, 1fr); gap: var(--gap-control); } }
+
+/* Live preview: its custom properties are overwritten inline with the derivation. */
+.preview { border-radius: var(--radius-container); overflow: hidden; border: 1px solid var(--edge-separator); }
+.pv { background: var(--surface-canvas); color: var(--ink-primary); font-family: var(--font-ui); font-size: var(--text-body); line-height: var(--leading-body); display: grid; grid-template-columns: minmax(0, 180px) minmax(0, 1fr); min-height: 280px; }
+@media (max-width: 640px) { .pv { grid-template-columns: minmax(0, 1fr); } .pv-side { display: none; } }
+.pv-side { background: var(--surface-sunken); padding: var(--gap-group) var(--gap-related); display: flex; flex-direction: column; gap: var(--gap-control); }
+.pv-side .day { font-size: var(--text-meta); color: var(--ink-tertiary); padding: 0 var(--gap-related); margin-top: var(--gap-related); }
+.pv-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: var(--gap-related); align-items: center; min-height: var(--control-height); padding: 0 var(--gap-related); border-radius: var(--radius-control); }
+.pv-row.sel { background: var(--selection); }
+.pv-row span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-row span:last-child { font-size: var(--text-meta); color: var(--ink-tertiary); }
+.pv-dot { width: 8px; height: 8px; border-radius: 50%; }
+.pv-main { padding: var(--gap-section); display: flex; flex-direction: column; gap: var(--gap-section); min-width: 0; }
+.pv-main h4 { margin: 0; font-size: var(--text-heading); line-height: var(--leading-heading); }
+.pv-main p { margin: 0; color: var(--ink-secondary); }
+.pv-card { background: var(--surface-base); border: 1px solid var(--edge-control); border-radius: var(--radius-container); padding: var(--gap-section); display: flex; flex-direction: column; gap: var(--gap-group); }
+.pv-code { background: var(--surface-sunken); border-radius: var(--radius-control); padding: var(--gap-related) var(--gap-group); font-family: var(--font-code); overflow-x: auto; }
+.pv-actions { display: flex; flex-wrap: wrap; gap: var(--gap-related); }
+.pv-btn { display: inline-flex; align-items: center; min-height: var(--control-height); padding: 0 var(--gap-group); border-radius: var(--radius-control); border: 1px solid var(--edge-control); background: var(--surface-base); color: var(--ink-primary); font: inherit; }
+.pv-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: var(--weight-strong); }
+.pv-btn.text { border-color: transparent; background: none; color: var(--ink-secondary); }
+
+/* Verified demo */
+.controls { display: flex; flex-wrap: wrap; gap: var(--gap-group); align-items: center; margin: var(--gap-section) 0 var(--gap-group); }
+.demo { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--gap-section); align-items: start; }
+@media (max-width: 900px) { .demo { grid-template-columns: minmax(0, 1fr); } }
+.shot { position: relative; border: 1px solid var(--edge-separator); border-radius: var(--radius-container); overflow: hidden; background: var(--surface-sunken); }
+.shot.phone { max-width: 390px; margin: 0 auto; }
+.shot img { display: block; width: 100%; height: auto; }
+.mark { position: absolute; border: 2px solid; border-radius: 2px; }
+.mark.floor { border-color: var(--tier-floor); } .mark.meaning { border-color: var(--tier-meaning); } .mark.derivation { border-color: var(--tier-derivation); }
+.counts { display: flex; gap: var(--gap-section); margin-bottom: var(--gap-group); }
+.counts div { display: flex; flex-direction: column; }
+.counts b { font-size: var(--text-heading); line-height: var(--leading-heading); font-variant-numeric: tabular-nums; }
+.counts span { font-size: var(--text-meta); }
+.t-floor { color: var(--tier-floor); } .t-meaning { color: var(--tier-meaning); } .t-derivation { color: var(--tier-derivation); }
+.sal { display: flex; flex-direction: column; gap: var(--gap-related); margin-bottom: var(--gap-section); }
+.sal-row { display: grid; grid-template-columns: minmax(0, 120px) minmax(0, 1fr) 36px; gap: var(--gap-related); align-items: center; font-size: var(--text-meta); }
+.sal-row .bar { height: 8px; border-radius: 2px; background: var(--ink-tertiary); }
+.sal-row.planned .bar { background: var(--accent); }
+.sal-row .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-secondary); }
+.findings { list-style: none; margin: 0; padding: 0; max-height: 360px; overflow: auto; font-size: var(--text-meta); }
+.findings li { padding: var(--gap-related) 0; border-bottom: 1px solid var(--edge-separator); }
+.findings li b { font-weight: var(--weight-strong); }
+.findings .p { color: var(--ink-tertiary); }
+
+/* Premises */
+.premises { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--gap-region); }
+@media (max-width: 760px) { .premises { grid-template-columns: minmax(0, 1fr); } }
+.premises details { border-bottom: 1px solid var(--edge-separator); }
+.premises summary { cursor: pointer; padding: var(--gap-group) 0; min-height: var(--target-min); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap-control); }
+.premises summary b { font-weight: var(--weight-strong); }
+.premises summary span { font-size: var(--text-meta); color: var(--ink-secondary); }
+.premises .body { padding: 0 0 var(--gap-group); font-size: var(--text-meta); color: var(--ink-secondary); display: flex; flex-direction: column; gap: var(--gap-related); }
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap-group); margin-top: var(--gap-section); }
+@media (max-width: 900px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+.step { padding: var(--gap-group) 0; border-top: 2px solid var(--edge-control); font-size: var(--text-meta); color: var(--ink-secondary); }
+.step b { display: block; font-size: var(--text-body); color: var(--ink-primary); margin-bottom: var(--gap-control); }
+ul.plain { margin: 0 0 var(--gap-group); padding-left: var(--gap-section); }
+ul.plain li { margin-bottom: var(--gap-related); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="prose">
+    <h1>Derive</h1>
+    <p class="secondary">Interfaces derived from first principles. People, tasks and the limits of perception go in. Every visual value comes out with its reason, and the rendered screen is checked against that reasoning.</p>
+    <div class="axiom">Every visual difference must mean something, and every meaningful difference must be visible.</div>
+    <p class="secondary">Generated UI fails both halves of that sentence at once. There's decoration that means nothing, and the one thing that needs the person looks like everything else. That happens because a model that doesn't know what matters picks the most common-looking option at every step. Derive doesn't ban styles. It makes the agent know what each thing means, then encode exactly that.</p>
+  </header>
+
+  <section id="explore">
+    <div class="prose">
+      <h2>Change the people, watch the interface re-derive</h2>
+      <p class="secondary">This runs the actual derivation engine in your browser. Every value below follows from the inputs on the left. Changed values are highlighted, and each one says why.</p>
+    </div>
+    <div class="explorer">
+      <div class="inputs" id="inputs">
+        <div class="field"><span>Expertise</span><div class="seg" data-key="expertise"><button type="button" data-v="novice">Novice</button><button type="button" data-v="mixed">Mixed</button><button type="button" data-v="expert">Expert</button></div></div>
+        <div class="field"><span>How often they use it</span><div class="seg" data-key="frequency"><button type="button" data-v="daily">Daily</button><button type="button" data-v="weekly">Weekly</button><button type="button" data-v="occasional">Occasionally</button></div></div>
+        <div class="field"><span>Session length</span><div class="seg" data-key="sessionLength"><button type="button" data-v="minutes">Minutes</button><button type="button" data-v="hours">Hours</button></div></div>
+        <div class="field"><span>Primary device</span><div class="seg" data-key="device"><button type="button" data-v="desktop">Desktop</button><button type="button" data-v="phone">Phone</button></div></div>
+        <div class="field"><span>Text ranks in the content</span><div class="seg" data-key="ranks"><button type="button" data-v="3">3</button><button type="button" data-v="4">4</button><button type="button" data-v="5">5</button></div></div>
+        <div class="field"><span>States objects can be in</span><div class="checks" id="states">
+          <label><input type="checkbox" value="running" checked> running</label>
+          <label><input type="checkbox" value="waiting" checked> waiting</label>
+          <label><input type="checkbox" value="error" checked> error</label>
+          <label><input type="checkbox" value="success"> success</label>
+        </div></div>
+        <div class="field"><span>Brand hue <span id="hue-v" class="tertiary"></span></span>
+          <label class="checks"><label><input type="checkbox" id="hue-none" checked> none (use convention)</label></label>
+          <input type="range" id="hue" min="0" max="359" value="160" aria-label="Brand hue" disabled>
+        </div>
+        <div class="field"><span>Preview theme</span><div class="seg" data-key="theme"><button type="button" data-v="light">Light</button><button type="button" data-v="dark">Dark</button></div></div>
+      </div>
+      <div class="outputs">
+        <div class="preview" data-derive="specimen"><div class="pv" id="pv">
+          <div class="pv-side">
+            <div class="day">Today</div>
+            <div class="pv-row sel"><span class="pv-dot" data-state="waiting"></span><span>Fix login redirect</span><span>2m</span></div>
+            <div class="pv-row"><span class="pv-dot" data-state="running"></span><span>Move pricing rules</span><span>14m</span></div>
+            <div class="pv-row"><span class="pv-dot" data-state="error"></span><span>Flaky webhook test</span><span>1h</span></div>
+          </div>
+          <div class="pv-main">
+            <h4>Fix login redirect</h4>
+            <p>The returnTo parameter is dropped when the callback builds its redirect. I kept it and allowed only same-origin paths.</p>
+            <div class="pv-card">
+              <strong>Run this command to check the fix?</strong>
+              <div class="pv-code">npm test -- test/auth</div>
+              <div class="pv-actions"><span class="pv-btn primary">Run tests</span><span class="pv-btn">Deny</span><span class="pv-btn text">Always allow</span></div>
+            </div>
+          </div>
+        </div></div>
+        <div class="grid2">
+          <div class="panel"><h3>Type: one size per rank</h3><div class="typesample" id="type" data-derive="specimen"></div></div>
+          <div class="panel"><h3>Space: one gap per level of relatedness</h3><div class="ladder" id="space"></div></div>
+        </div>
+        <div class="panel"><h3>Color: one per meaning, solved to contrast</h3><div class="swatches" id="colors" data-derive="specimen"></div></div>
+        <div class="panel"><h3>Targets, motion, response</h3><div class="nums" id="nums"></div></div>
+        <div class="panel"><h3>Why each value is what it is</h3><ul class="trace" id="trace"></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="verified">
+    <div class="prose">
+      <h2>Verified on a rendered screen</h2>
+      <p class="secondary">One coding-agent screen, built two ways, then checked by <code>derive verify</code> in Edge. The verifier asks whether the screen still says what the model says. Is the planned first thing actually the loudest? Are frequent actions the bigger targets? Are groups tighter inside than out? Do only derived values appear?</p>
+    </div>
+    <div class="controls">
+      <div class="seg" data-key="version"><button type="button" data-v="Before">Typical generated</button><button type="button" data-v="After">Derived</button></div>
+      <div class="seg" data-key="view"><button type="button" data-v="light-1280">Desktop</button><button type="button" data-v="light-390">Phone</button><button type="button" data-v="dark-1280">Dark</button></div>
+    </div>
+    <div class="demo">
+      <div class="shot" id="shot" data-derive="specimen"></div>
+      <div>
+        <div class="counts" id="counts" data-derive="specimen"></div>
+        <h3 style="margin-bottom: var(--gap-related)">Attention: planned order vs what's measured</h3>
+        <p class="meta tertiary" style="margin-bottom: var(--gap-group)">Blue bars are the planned order, gray are the loudest unplanned elements. A heuristic (size × contrast × color × position), checked against the screenshot.</p>
+        <div class="sal" id="sal" data-derive="specimen"></div>
+        <ul class="findings" id="findings"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="premises">
+    <div class="prose">
+      <h2>The twelve premises</h2>
+      <p class="secondary">Facts about people and about encoding. Each comes with the number Derive uses and what it decides. Every derived value cites at least one.</p>
+    </div>
+    <div class="premises" id="plist"></div>
+  </section>
+
+  <section id="method">
+    <div class="prose">
+      <h2>The method</h2>
+      <p class="secondary">Five agent skills and five commands. When something looks wrong, fix the cause: the model first, then the screen plan, then the code. Never patch a value inline.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><b>1 Model</b><code>derive-model</code>: people, tasks (frequency, consequence, reversibility), text ranks, states. Facts from the owner, never invented.</div>
+      <div class="step"><b>2 Derive</b><code>derive system</code>: every value and its reason, as tokens named by meaning, plus <code>derivation.md</code>.</div>
+      <div class="step"><b>3 Plan and build</b><code>derive-screen</code>: salience order, actions with frequencies, and groups, then build with meaning tokens only.</div>
+      <div class="step"><b>4 Verify</b><code>derive verify</code>: render, measure, check against the plan, then look at the screenshots.</div>
+      <div class="step"><b>5 Critique</b><code>derive-critique</code>: a fresh subagent asks what each difference means and what's missing.</div>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="prose">
+      <h2>Where it stands</h2>
+      <ul class="plain">
+        <li>v0.2: engine, meaning-named tokens (CSS, TS, Kotlin), static lint, browser verifier, edit-time hook, five skills, 9 tests.</li>
+        <li>Building it surfaced real reasoning errors, and each one is now fixed in the engine. Confirming a constant action would have become a reflex. Text colors were never solved against the selection color. A rare action was a bigger target than the frequent one next to it.</li>
+        <li>Not yet: a real codebase with a real model (ALI is the obvious first), a fresh agent using the skills end to end, browsers other than Edge on Windows.</li>
+        <li>The salience measure is a tripwire, not a model of vision. The screenshots stay the judge.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+__ENGINE__
+const DEMO = __DEMO__;
+const PREMISES = __PRINCIPLES__;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const PNAME = Object.fromEntries(PREMISES.map((p) => [p.id, p.name]));
+
+// ---------- explorer
+const pageDark = document.documentElement.dataset.theme === 'dark' || (document.documentElement.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+const state = { expertise: 'expert', frequency: 'daily', sessionLength: 'hours', device: 'desktop', ranks: '3', theme: pageDark ? 'dark' : 'light', version: 'After', view: 'light-1280' };
+let previous = null;
+function model() {
+  const ranks = { 3: ['meta', 'body', 'heading'], 4: ['meta', 'body', 'heading', 'title'], 5: ['caption', 'meta', 'body', 'heading', 'title'] }[state.ranks];
+  const states = Array.from(document.querySelectorAll('#states input:checked')).map((i) => i.value);
+  const m = {
+    product: { name: 'Example' },
+    people: { expertise: state.expertise, frequency: state.frequency, sessionLength: state.sessionLength },
+    context: { devices: state.device === 'phone' ? ['phone', 'desktop'] : ['desktop', 'phone'], input: state.device === 'phone' ? ['touch'] : ['mouse', 'keyboard', 'touch'] },
+    themes: ['light', 'dark'], information: { textRanks: ranks, states },
+  };
+  if (!$('hue-none').checked) m.brand = { hue: Number($('hue').value) };
+  return m;
+}
+function contrastOf(a, b) {
+  const p = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+  const L = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; const [r, g, b2] = p(c); return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b2); };
+  const x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+function renderExplorer() {
+  for (const seg of document.querySelectorAll('#inputs .seg')) for (const b of seg.querySelectorAll('button')) b.setAttribute('aria-pressed', String(state[seg.dataset.key] === b.dataset.v));
+  $('hue').disabled = $('hue-none').checked;
+  $('hue-v').textContent = $('hue-none').checked ? '' : $('hue').value + '°';
+  const d = DeriveEngine.derive(model());
+  const c = d.color[state.theme];
+  // Preview: write derived values into the preview's own custom properties.
+  const pv = $('pv');
+  const set = (k, v) => pv.style.setProperty(k, v);
+  for (const [k, v] of Object.entries(d.type.sizes)) set(`--text-${k}`, v + 'px');
+  set('--leading-body', d.type.leading.body); set('--leading-heading', d.type.leading.heading);
+  for (const [k, v] of Object.entries(d.space)) set(`--gap-${k}`, v + 'px');
+  set('--control-height', d.target.control + 'px'); set('--radius-control', d.radius.control + 'px'); set('--radius-container', d.radius.container + 'px');
+  for (const [k, v] of Object.entries(c)) set(`--${k}`, v);
+  set('--text-title', (d.type.sizes.title || d.type.sizes.heading) + 'px');
+  for (const dot of pv.querySelectorAll('.pv-dot')) { const s = c['state-' + dot.dataset.state]; dot.style.background = s || 'var(--edge-control)'; dot.title = s ? dot.dataset.state : `"${dot.dataset.state}" is not a state in the model, so it gets no color`; }
+
+  $('type').innerHTML = Object.entries(d.type.sizes).map(([k, v]) => `<div><span class="lab">${k} · ${v}px</span><span style="font-size:${v}px;line-height:1.25${k === 'heading' || k === 'title' ? ';font-weight:600' : ''}">Run tests</span></div>`).join('');
+  const maxS = Math.max(...Object.values(d.space));
+  $('space').innerHTML = Object.entries(d.space).map(([k, v]) => `<div class="rung"><span>${k}</span><span class="bar" style="width:${(v / maxS) * 100}%"></span><span class="v">${v}px</span></div>`).join('');
+  const worst = state.theme === 'light' ? c['surface-sunken'] : c['surface-base'];
+  const show = ['surface-canvas', 'surface-base', 'surface-sunken', 'selection', 'ink-primary', 'ink-secondary', 'ink-tertiary', 'edge-separator', 'edge-control', 'accent', ...Object.keys(c).filter((k) => k.startsWith('state-'))];
+  $('colors').innerHTML = show.map((k) => {
+    const surf = /^surface|selection/.test(k);
+    const r = surf ? '' : contrastOf(c[k], worst).toFixed(1) + ':1';
+    return `<div class="sw"><span class="chip" style="background:${c[k]}"></span><span class="info"><span>${k}</span><span>${r || c[k]}</span></span></div>`;
+  }).join('');
+  $('nums').innerHTML = [
+    ['Density', d.model.density], ['Minimum target', d.target.min + ' px'], ['Control height', d.target.control + ' px'],
+    ['State change', d.motion.state + ' ms'], ['Element motion', d.motion.element + ' ms'], ['Region motion', d.motion.region + ' ms'],
+    ['Feedback within', d.response.feedbackMs + ' ms'], ['Line length', d.type.measure],
+  ].map(([k, v]) => `<div><b>${v}</b><span>${k}</span></div>`).join('');
+  const flat = (v) => typeof v === 'object' ? Object.entries(v).map(([a, b]) => `${a} ${b}`).join(', ') : String(v);
+  const prevMap = previous ? Object.fromEntries(previous.trace.map((t) => [t.key, flat(t.value)])) : {};
+  $('trace').innerHTML = d.trace.filter((t) => t.key !== 'tasks' && t.key !== 'budget').map((t) => {
+    const v = flat(t.value);
+    const changed = previous && prevMap[t.key] !== v;
+    return `<li class="${changed ? 'changed' : ''}"><span class="k"><b>${esc(t.key)}</b>${esc(v)}</span><span class="why">${esc(t.because)} <em>${t.principles.map((p) => PNAME[p]).join(' · ')}</em></span></li>`;
+  }).join('');
+  setTimeout(() => { for (const li of document.querySelectorAll('#trace li.changed')) li.classList.remove('changed'); }, 1200);
+  previous = d;
+}
+
+// ---------- verified demo
+function renderDemo() {
+  for (const seg of document.querySelectorAll('#verified .seg')) for (const b of seg.querySelectorAll('button')) {
+    b.setAttribute('aria-pressed', String(state[seg.dataset.key] === b.dataset.v));
+    b.disabled = state.version === 'Before' && b.dataset.v === 'dark-1280';
+  }
+  const [theme, width] = state.view.split('-');
+  const r = DEMO.results.find((x) => x.scenario === state.version && x.theme === theme && String(x.width) === width) || DEMO.results.find((x) => x.scenario === state.version && String(x.width) === width);
+  const marks = r.findings.filter((f) => f.rect && f.rect.w).slice(0, 40).map((f) => `<span class="mark ${f.tier}" title="${esc(f.rule + ': ' + f.message)}" style="left:${f.rect.x / r.width * 100}%;top:${f.rect.y / r.screenshot.height * 100}%;width:${f.rect.w / r.width * 100}%;height:${f.rect.h / r.screenshot.height * 100}%"></span>`).join('');
+  $('shot').className = 'shot' + (r.width < 600 ? ' phone' : '');
+  $('shot').innerHTML = `<img src="${DEMO.images[r.screenshot.file]}" alt="${esc(r.scenario)} screen at ${r.width}px, ${r.theme} theme">${marks}`;
+  $('counts').innerHTML = ['floor', 'meaning', 'derivation'].map((t) => `<div><b class="t-${t}">${r.counts[t]}</b><span>${t}</span></div>`).join('');
+  const rows = r.metrics.plannedSalience.map((p) => ({ ...p, planned: true })).concat(r.metrics.topUnplanned.map((p) => ({ ...p, planned: false })));
+  const max = Math.max(...rows.map((x) => x.salience), 1);
+  const label = (s) => s.split(' > ').pop();
+  $('sal').innerHTML = rows.map((x) => `<div class="sal-row ${x.planned ? 'planned' : ''}"><span title="${esc(x.selector)}">${x.planned ? esc(x.task) : 'unplanned: ' + esc(label(x.selector))}</span><span class="bar" style="width:${(x.salience / max) * 100}%"></span><span class="v">${x.salience}</span></div>`).join('');
+  const order = { floor: 0, meaning: 1, derivation: 2 };
+  const seen = new Set();
+  const list = r.findings.slice().sort((a, b) => order[a.tier] - order[b.tier]).filter((f) => { const k = f.rule + f.message; if (seen.has(k)) return false; seen.add(k); return true; });
+  $('findings').innerHTML = list.length ? list.map((f) => `<li><b class="t-${f.tier}">${f.tier}</b> ${esc(f.message)} <span class="p">${esc(PNAME[f.principle] || '')}</span></li>`).join('')
+    : '<li>No findings. The screen says what the model says, at this width and theme.</li>';
+}
+
+$('plist').innerHTML = PREMISES.map((p) => `<details><summary><b>${esc(p.name)}</b><span>Decides: ${esc(p.decides)}</span></summary><div class="body"><span>${esc(p.statement)}</span><span><b>Uses:</b> ${esc(p.numbers)}</span><span class="tertiary">${esc(p.source)}</span></div></details>`).join('');
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.seg button');
+  if (!b || b.disabled) return;
+  state[b.parentElement.dataset.key] = b.dataset.v;
+  if (b.closest('#verified')) { if (state.version === 'Before' && state.view === 'dark-1280') state.view = 'light-1280'; renderDemo(); } else renderExplorer();
+});
+document.getElementById('inputs').addEventListener('input', renderExplorer);
+renderExplorer();
+renderDemo();
+</script>

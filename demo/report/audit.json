@@ -1,0 +1,2794 @@
+{
+  "generatedAt": "2026-11-15T05:38:47.590Z",
+  "browser": "chrome.exe",
+  "product": {
+    "name": "Workbench",
+    "purpose": "Let a developer hand coding work to an agent, stay in control of what it runs, and accept or reject what it changed."
+  },
+  "derivation": {
+    "model": {
+      "product": {
+        "name": "Workbench",
+        "purpose": "Let a developer hand coding work to an agent, stay in control of what it runs, and accept or reject what it changed."
+      },
+      "density": "compact",
+      "themes": [
+        "light",
+        "dark"
+      ]
+    },
+    "type": {
+      "sizes": {
+        "meta": 11,
+        "body": 13,
+        "heading": 15
+      },
+      "weights": {
+        "regular": 400,
+        "strong": 600
+      },
+      "leading": {
+        "body": 1.4,
+        "heading": 1.25
+      },
+      "measure": "68ch",
+      "ratio": 1.15,
+      "body": 13
+    },
+    "space": {
+      "control": 4,
+      "related": 6,
+      "group": 10,
+      "section": 16,
+      "region": 26
+    },
+    "target": {
+      "min": 24,
+      "control": 30,
+      "touch": 44
+    },
+    "radius": {
+      "control": 6,
+      "container": 10
+    },
+    "color": {
+      "light": {
+        "surface-canvas": "#f4f7fb",
+        "surface-base": "#fefeff",
+        "surface-sunken": "#edf0f4",
+        "ink-primary": "#202428",
+        "ink-secondary": "#484e54",
+        "ink-tertiary": "#646a70",
+        "edge-separator": "#dbdfe4",
+        "edge-control": "#81868b",
+        "accent": "#006cba",
+        "on-accent": "#ffffff",
+        "accent-hover": "#005da3",
+        "focus": "#006cba",
+        "selection": "#ddedff",
+        "state-running": "#0f6bb4",
+        "state-waiting": "#8e5f00",
+        "state-error": "#af463e",
+        "state-success": "#007935"
+      },
+      "dark": {
+        "surface-canvas": "#111315",
+        "surface-base": "#171a1c",
+        "surface-sunken": "#0b0d10",
+        "ink-primary": "#eaf0f6",
+        "ink-secondary": "#adb3ba",
+        "ink-tertiary": "#898f95",
+        "edge-separator": "#2d3134",
+        "edge-control": "#6d7277",
+        "accent": "#52aafe",
+        "on-accent": "#0b1723",
+        "accent-hover": "#76baff",
+        "focus": "#52aafe",
+        "selection": "#192837",
+        "state-running": "#4394e1",
+        "state-waiting": "#c28300",
+        "state-error": "#de6f65",
+        "state-success": "#3fa25c"
+      }
+    },
+    "motion": {
+      "state": 90,
+      "element": 140,
+      "region": 200
+    },
+    "response": {
+      "feedbackMs": 100,
+      "progressMs": 1000,
+      "cancelMs": 10000
+    },
+    "tasks": [
+      {
+        "id": "decide",
+        "does": "Approve or deny a command the agent wants to run",
+        "kind": "act",
+        "frequency": "constant",
+        "consequence": "high",
+        "tier": "primary",
+        "treatment": [
+          "most salient thing on its screen; the one accent-filled action",
+          "irreversible but frequent: the control itself is the confirmation, so it states exactly what will happen; no extra dialog, which would become a reflex and protect nothing",
+          "keyboard shortcut, shown next to the label"
+        ]
+      },
+      {
+        "id": "follow",
+        "does": "Follow what the agent is doing and why",
+        "kind": "read",
+        "frequency": "constant",
+        "consequence": "low",
+        "tier": "secondary",
+        "treatment": [
+          "always visible, updates in place; no action needed to see it"
+        ]
+      },
+      {
+        "id": "review",
+        "does": "See what changed (files, +/- lines)",
+        "kind": "read",
+        "frequency": "frequent",
+        "consequence": "medium",
+        "tier": "secondary",
+        "treatment": [
+          "always visible, updates in place; no action needed to see it"
+        ]
+      },
+      {
+        "id": "ask",
+        "does": "Send the next instruction",
+        "kind": "act",
+        "frequency": "frequent",
+        "consequence": "low",
+        "tier": "secondary",
+        "treatment": [
+          "visible, quiet styling",
+          "act immediately; offer undo instead of asking first",
+          "keyboard shortcut, shown next to the label"
+        ]
+      },
+      {
+        "id": "switch",
+        "does": "Switch to another running chat",
+        "kind": "act",
+        "frequency": "frequent",
+        "consequence": "low",
+        "tier": "secondary",
+        "treatment": [
+          "visible, quiet styling",
+          "act immediately; offer undo instead of asking first",
+          "keyboard shortcut, shown next to the label"
+        ]
+      },
+      {
+        "id": "trust",
+        "does": "Always allow a command class",
+        "kind": "act",
+        "frequency": "occasional",
+        "consequence": "high",
+        "tier": "tertiary",
+        "treatment": [
+          "visible as a text button, or in context where it applies",
+          "reversible but costly: state the consequence in the control, keep undo available"
+        ]
+      },
+      {
+        "id": "configure",
+        "does": "Change model or permission mode",
+        "kind": "act",
+        "frequency": "occasional",
+        "consequence": "medium",
+        "tier": "tertiary",
+        "treatment": [
+          "visible as a text button, or in context where it applies",
+          "act immediately; offer undo instead of asking first"
+        ]
+      },
+      {
+        "id": "start",
+        "does": "Start a new chat",
+        "kind": "act",
+        "frequency": "occasional",
+        "consequence": "low",
+        "tier": "tertiary",
+        "treatment": [
+          "visible as a text button, or in context where it applies",
+          "act immediately; offer undo instead of asking first"
+        ]
+      }
+    ],
+    "budget": {
+      "primaryPerView": 1,
+      "visibleActionsPerGroup": 4,
+      "groupsPerLevel": 4
+    },
+    "elevation": {
+      "overlay": "0 8px 24px rgba(0,0,0,0.18), 0 1px 3px rgba(0,0,0,0.10)"
+    },
+    "z": {
+      "base": 0,
+      "sticky": 10,
+      "overlay": 200,
+      "modal": 300,
+      "toast": 400
+    },
+    "trace": [
+      {
+        "key": "density",
+        "value": "compact",
+        "because": "Experts in long, daily sessions gain more from seeing more at once (less scrolling, less to remember) than they lose to tighter spacing; they already know the layout.",
+        "principles": [
+          "memory",
+          "grouping"
+        ],
+        "inputs": {
+          "expertise": "expert",
+          "frequency": "daily",
+          "sessionLength": "hours"
+        }
+      },
+      {
+        "key": "type.body",
+        "value": 13,
+        "because": "Desktop text is read at 50-70 cm; 13-16 px is legible, and denser layouts sit at the low end.",
+        "principles": [
+          "legibility"
+        ],
+        "inputs": {
+          "primaryDevice": "desktop",
+          "density": "compact"
+        }
+      },
+      {
+        "key": "type.ratio",
+        "value": 1.15,
+        "because": "Adjacent ranks must differ by at least ~15% in size to be read as different ranks rather than inconsistency; denser layouts use the smallest step that is still distinct.",
+        "principles": [
+          "encoding",
+          "salience"
+        ],
+        "inputs": {
+          "density": "compact"
+        }
+      },
+      {
+        "key": "type.sizes",
+        "value": {
+          "meta": 11,
+          "body": 13,
+          "heading": 15
+        },
+        "because": "One size per text rank the information actually has (3): meta, body, heading. No other sizes exist, so every size difference means a rank difference. Smaller ranks are clamped to 11 px.",
+        "principles": [
+          "encoding",
+          "legibility"
+        ],
+        "inputs": {
+          "ranks": [
+            "meta",
+            "body",
+            "heading"
+          ],
+          "ratio": 1.15,
+          "body": 13
+        }
+      },
+      {
+        "key": "type.weights",
+        "value": {
+          "regular": 400,
+          "strong": 600
+        },
+        "because": "Two weights: weight is a second channel for rank when size steps are small. A third weight would be a difference people cannot reliably name.",
+        "principles": [
+          "encoding"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "type.leading",
+        "value": {
+          "body": 1.4,
+          "heading": 1.25
+        },
+        "because": "Body line height of 1.4-1.5 lets the eye find the next line; headings are short, so tighter leading keeps them one unit.",
+        "principles": [
+          "legibility",
+          "grouping"
+        ],
+        "inputs": {
+          "density": "compact"
+        }
+      },
+      {
+        "key": "type.measure",
+        "value": "68ch",
+        "because": "Running text is limited to about 68 characters per line, inside the 45-75 range where reading speed and return sweeps are best.",
+        "principles": [
+          "legibility"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "space",
+        "value": {
+          "control": 4,
+          "related": 6,
+          "group": 10,
+          "section": 16,
+          "region": 26
+        },
+        "because": "Five relatedness levels: inside a control, between related items, between groups, between sections, between regions. Each is at least 1.5x the level inside it, so proximity alone tells people what belongs together. Base: half the body size (6.5px); grid: 2 px.",
+        "principles": [
+          "grouping",
+          "encoding"
+        ],
+        "inputs": {
+          "body": 13,
+          "step": 1.6
+        }
+      },
+      {
+        "key": "target.min",
+        "value": 24,
+        "because": "With a mouse, 24 px is the floor below which pointing time and errors rise sharply.",
+        "principles": [
+          "pointing"
+        ],
+        "inputs": {
+          "input": [
+            "mouse",
+            "keyboard",
+            "touch"
+          ]
+        }
+      },
+      {
+        "key": "target.touch",
+        "value": 44,
+        "because": "Touch is also an input, so layouts used with a finger (coarse pointer or phone width) switch to 44 px targets.",
+        "principles": [
+          "pointing"
+        ],
+        "inputs": {
+          "input": [
+            "mouse",
+            "keyboard",
+            "touch"
+          ]
+        }
+      },
+      {
+        "key": "target.control",
+        "value": 30,
+        "because": "Control height = one line of body text (18px) plus control padding on both sides, but never below the minimum target.",
+        "principles": [
+          "pointing",
+          "grouping"
+        ],
+        "inputs": {
+          "lineH": 18
+        }
+      },
+      {
+        "key": "radius.control",
+        "value": 6,
+        "because": "Rounded corners mark a thing as one pickable object. A small radius proportional to control height reads as a control without competing with content.",
+        "principles": [
+          "convention",
+          "encoding"
+        ],
+        "inputs": {
+          "controlHeight": 30
+        }
+      },
+      {
+        "key": "radius.container",
+        "value": 10,
+        "because": "Containers that hold controls use the control radius plus the inner gap, so the inner and outer curves stay concentric and read as one shape.",
+        "principles": [
+          "grouping"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "color.hue",
+        "value": 250,
+        "because": "No brand color given: blue, the long-standing convention for interactive and selected things.",
+        "principles": [
+          "convention"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "color.surfaces",
+        "value": "canvas, base, sunken",
+        "because": "Three surfaces, one per region role: the app canvas, content that sits on it, and inset wells. They differ by a small lightness step so regions separate without borders.",
+        "principles": [
+          "grouping",
+          "encoding"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "color.ink",
+        "value": "primary 13:1, secondary 7:1, tertiary 4.5:1",
+        "because": "Three text emphasis ranks, each solved to an exact contrast against the lightest/darkest surface it sits on. The lowest rank is still above the 4.5:1 reading floor; each step roughly halves contrast so the ranks are distinct.",
+        "principles": [
+          "legibility",
+          "encoding",
+          "salience"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "color.edges",
+        "value": "separator 1.25:1, control 3:1",
+        "because": "Two edge meanings: a separator (only where spacing cannot show the grouping) is faint; a control boundary must reach 3:1 so people can find the thing to click.",
+        "principles": [
+          "legibility",
+          "grouping",
+          "encoding"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "color.accent",
+        "value": "one accent",
+        "because": "One accent hue means one thing: the primary action and the current selection. A second accent would be a second meaning competing for the same attention.",
+        "principles": [
+          "salience",
+          "encoding"
+        ],
+        "inputs": {
+          "hue": 250
+        }
+      },
+      {
+        "key": "color.states",
+        "value": "running, waiting, error, success",
+        "because": "One color per state the information actually has (4). States not in the model get no color. Each is solved to 4.5:1 so it can be used as text.",
+        "principles": [
+          "encoding",
+          "legibility"
+        ],
+        "inputs": {
+          "states": [
+            "running",
+            "waiting",
+            "error",
+            "success"
+          ]
+        }
+      },
+      {
+        "key": "motion.state",
+        "value": 90,
+        "because": "In-place state changes (color, opacity) need just enough time to read as a change rather than a flicker.",
+        "principles": [
+          "motion"
+        ],
+        "inputs": {
+          "expert": true
+        }
+      },
+      {
+        "key": "motion.element",
+        "value": 140,
+        "because": "An element appearing, leaving or expanding: long enough to be seen as one object transforming, short enough not to wait for.",
+        "principles": [
+          "motion",
+          "response"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "motion.region",
+        "value": 200,
+        "because": "A panel or sidebar crossing a large distance needs the most time to stay readable as movement, and stays under 250 ms.",
+        "principles": [
+          "motion",
+          "response"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "motion.easing",
+        "value": "decelerate in, accelerate out",
+        "because": "Things entering slow down into place (they arrive under control); things leaving speed up (they get out of the way). Overshoot would add motion that means nothing.",
+        "principles": [
+          "motion",
+          "encoding"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "response",
+        "value": {
+          "feedbackMs": 100,
+          "progressMs": 1000,
+          "cancelMs": 10000
+        },
+        "because": "Every input shows a visible result within 100 ms. Work over 1 s shows progress. Work over 10 s can be cancelled.",
+        "principles": [
+          "response"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "tasks",
+        "value": "decide: primary; follow: secondary; review: secondary; ask: secondary; switch: secondary; trust: tertiary; configure: tertiary; start: tertiary",
+        "because": "Tasks are ranked by how often they happen, then by how much a mistake costs. Rank decides salience; frequency decides visibility and target size; consequence decides friction.",
+        "principles": [
+          "salience",
+          "choice",
+          "pointing",
+          "consequence"
+        ],
+        "inputs": {}
+      },
+      {
+        "key": "budget",
+        "value": {
+          "primaryPerView": 1,
+          "visibleActionsPerGroup": 4,
+          "groupsPerLevel": 4
+        },
+        "because": "One primary per view (one thing is seen first). About four visible actions per group and four groups competing at each level, the size of working memory.",
+        "principles": [
+          "salience",
+          "memory",
+          "choice"
+        ],
+        "inputs": {}
+      }
+    ]
+  },
+  "results": [
+    {
+      "scenario": "Before",
+      "url": "before.html",
+      "theme": "light",
+      "width": 1280,
+      "screenshot": {
+        "file": "before-light-1280.png",
+        "height": 860
+      },
+      "metrics": {
+        "fontSizes": [
+          10,
+          11,
+          11.5,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18.7,
+          19,
+          21,
+          26,
+          30,
+          34
+        ],
+        "spacingValues": [
+          1,
+          3,
+          6,
+          9,
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          18,
+          18.7,
+          20,
+          21,
+          22,
+          26,
+          28,
+          30,
+          36
+        ],
+        "colors": 14,
+        "emphasisRatio": 0.79,
+        "plannedSalience": [
+          {
+            "selector": ".perm",
+            "task": "decide",
+            "salience": 92,
+            "rect": {
+              "x": 384,
+              "y": 535,
+              "w": 820,
+              "h": 172
+            }
+          },
+          {
+            "selector": ".msg p",
+            "task": "follow",
+            "salience": 42,
+            "rect": {
+              "x": 384,
+              "y": 315,
+              "w": 820,
+              "h": 51
+            }
+          },
+          {
+            "selector": ".composer",
+            "task": "ask",
+            "salience": 72,
+            "rect": {
+              "x": 365,
+              "y": 748,
+              "w": 858,
+              "h": 51
+            }
+          },
+          {
+            "selector": ".chat-item",
+            "task": "switch",
+            "salience": 61,
+            "rect": {
+              "x": 57,
+              "y": 244,
+              "w": 226,
+              "h": 58
+            }
+          }
+        ],
+        "topUnplanned": [
+          {
+            "selector": "html > body > div.hero",
+            "salience": 609,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "w": 1280,
+              "h": 149
+            }
+          },
+          {
+            "selector": "body > div.hero > h1",
+            "salience": 169,
+            "rect": {
+              "x": 36,
+              "y": 40,
+              "w": 1208,
+              "h": 48
+            }
+          },
+          {
+            "selector": "div.stats > div.stat.card > b",
+            "salience": 119,
+            "rect": {
+              "x": 399,
+              "y": 443,
+              "w": 231,
+              "h": 37
+            }
+          }
+        ],
+        "actions": [
+          {
+            "selector": "#approve",
+            "frequency": "constant",
+            "area": 5796
+          },
+          {
+            "selector": ".btn-ghost",
+            "frequency": "frequent",
+            "area": 4942
+          },
+          {
+            "selector": ".composer .btn",
+            "frequency": "frequent",
+            "area": 4046
+          },
+          {
+            "selector": "#toggle",
+            "frequency": "occasional",
+            "area": 400
+          }
+        ]
+      },
+      "focus": {
+        "reached": 5,
+        "invisible": 2
+      },
+      "steps": [
+        {
+          "name": "Show command details",
+          "clickToPaintMs": 160,
+          "handlerMs": 140,
+          "motionMs": 600,
+          "animations": 5
+        }
+      ],
+      "perf": {
+        "cls": 0,
+        "longTasks": [
+          140
+        ]
+      },
+      "findings": [
+        {
+          "rule": "primary-not-first",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".perm\" (decide) should be seen first, but 5 unplanned element(s) draw more attention.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 535,
+            "w": 820,
+            "h": 172
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (609) than the top task (92) without serving a task.",
+          "selector": "html > body > div.hero",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 1280,
+            "h": 149
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (169) than the top task (92) without serving a task.",
+          "selector": "body > div.hero > h1",
+          "rect": {
+            "x": 36,
+            "y": 40,
+            "w": 1208,
+            "h": 48
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (119) than the top task (92) without serving a task.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 399,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (116) than the top task (92) without serving a task.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 678,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "salience-inversion",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".composer\" (72) is louder than higher-priority \".msg p\" (42).",
+          "selector": "div.layout > main.card > div.composer",
+          "rect": {
+            "x": 365,
+            "y": 748,
+            "w": 858,
+            "h": 51
+          }
+        },
+        {
+          "rule": "salience-inversion",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".chat-item\" (61) is louder than higher-priority \".msg p\" (42).",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 244,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "underived-size",
+          "tier": "derivation",
+          "principle": "encoding",
+          "message": "Font sizes on screen that the derivation never produced: 10, 11.5, 12, 14, 16, 17, 18.7, 19, 21, 26, 30, 34px (derived: 11, 13, 15). Each extra size is a rank difference that means nothing.",
+          "selector": "#toggle",
+          "rect": {
+            "x": 946,
+            "y": 667,
+            "w": 20,
+            "h": 20
+          }
+        },
+        {
+          "rule": "underived-space",
+          "tier": "derivation",
+          "principle": "grouping",
+          "message": "Spacing values that are not a relatedness level: 1, 3, 9, 12, 13, 14, 15, 18, 18.7, 20, 21, 22px (levels: 4, 6, 10, 16, 26).",
+          "selector": "#toggle",
+          "rect": {
+            "x": 946,
+            "y": 667,
+            "w": 20,
+            "h": 20
+          }
+        },
+        {
+          "rule": "underived-color",
+          "tier": "derivation",
+          "principle": "encoding",
+          "message": "13 color(s) on screen with no derived meaning, e.g. rgb(139 92 246), rgb(229 231 235), rgb(31 41 55), rgb(238 238 255).",
+          "selector": "body > div.hero > div.eyebrow",
+          "rect": {
+            "x": 36,
+            "y": 28,
+            "w": 1208,
+            "h": 12
+          }
+        },
+        {
+          "rule": "flat-emphasis",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "79% of text is emphasized, so emphasis no longer marks anything.",
+          "selector": null,
+          "rect": null
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 244,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 312,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 380,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 448,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > main.card > div.card",
+          "rect": {
+            "x": 365,
+            "y": 218,
+            "w": 858,
+            "h": 508
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 2). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 384,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "decorative-color",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Gradient-filled text: a color change that encodes nothing.",
+          "selector": "body > div.hero > h1",
+          "rect": {
+            "x": 36,
+            "y": 40,
+            "w": 1208,
+            "h": 48
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "body > div.layout > aside.card",
+          "rect": {
+            "x": 30,
+            "y": 179,
+            "w": 280,
+            "h": 647
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "body > div.layout > aside.card",
+          "rect": {
+            "x": 30,
+            "y": 179,
+            "w": 280,
+            "h": 647
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "body > div.layout > main.card",
+          "rect": {
+            "x": 338,
+            "y": 179,
+            "w": 912,
+            "h": 647
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "body > div.layout > main.card",
+          "rect": {
+            "x": 338,
+            "y": 179,
+            "w": 912,
+            "h": 647
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "div.layout > main.card > div.card",
+          "rect": {
+            "x": 365,
+            "y": 218,
+            "w": 858,
+            "h": 508
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "div.layout > main.card > div.card",
+          "rect": {
+            "x": 365,
+            "y": 218,
+            "w": 858,
+            "h": 508
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 384,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 384,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "decorative-color",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Gradient-filled text: a color change that encodes nothing.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 399,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 663,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 663,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "decorative-color",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Gradient-filled text: a color change that encodes nothing.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 678,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 943,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 943,
+            "y": 388,
+            "w": 261,
+            "h": 125
+          }
+        },
+        {
+          "rule": "decorative-color",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Gradient-filled text: a color change that encodes nothing.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 958,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 535,
+            "w": 820,
+            "h": 172
+          }
+        },
+        {
+          "rule": "decorative-motion",
+          "tier": "meaning",
+          "principle": "motion",
+          "message": "Endless animation \"glow\": motion that reports no change.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 535,
+            "w": 820,
+            "h": 172
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "2400ms of motion; the derived maximum is 200ms.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 535,
+            "w": 820,
+            "h": 172
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "450ms of motion; the derived maximum is 200ms.",
+          "selector": "#approve",
+          "rect": {
+            "x": 622,
+            "y": 658,
+            "w": 170,
+            "h": 34
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "450ms of motion; the derived maximum is 200ms.",
+          "selector": "div.card > div.card.perm > button.btn.btn-ghost",
+          "rect": {
+            "x": 797,
+            "y": 658,
+            "w": 145,
+            "h": 34
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "450ms of motion; the derived maximum is 200ms.",
+          "selector": "main.card > div.composer > button.btn.btn-primary",
+          "rect": {
+            "x": 1008,
+            "y": 755,
+            "w": 109,
+            "h": 37
+          }
+        },
+        {
+          "rule": "decorative-symbol",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "13 emoji in interface text: symbols that don't map to a state or object.",
+          "selector": null,
+          "rect": null
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "body > div.hero > div.eyebrow",
+          "rect": {
+            "x": 36,
+            "y": 28,
+            "w": 1208,
+            "h": 12
+          }
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "body > div.hero > h1",
+          "rect": {
+            "x": 36,
+            "y": 40,
+            "w": 1208,
+            "h": 48
+          }
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "body > div.hero > p",
+          "rect": {
+            "x": 36,
+            "y": 98,
+            "w": 1208,
+            "h": 23
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 4.17:1, needs 4.5:1: \"Your Workspace\"",
+          "selector": "div.layout > aside.card > div.eyebrow",
+          "rect": {
+            "x": 57,
+            "y": 206,
+            "w": 226,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"2 minutes ago\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 101,
+            "y": 276,
+            "w": 107,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"1 hour ago\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 105,
+            "y": 344,
+            "w": 143,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"Yesterday\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 106,
+            "y": 412,
+            "w": 142,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"Start fresh!\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 106,
+            "y": 480,
+            "w": 73,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 4.17:1, needs 4.5:1: \"Active Session\"",
+          "selector": "div.layout > main.card > div.eyebrow",
+          "rect": {
+            "x": 365,
+            "y": 206,
+            "w": 858,
+            "h": 12
+          }
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 399,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.56:1, needs 4.5:1: \"Files Analyzed\"",
+          "selector": "div.stats > div.stat.card > span",
+          "rect": {
+            "x": 470,
+            "y": 482,
+            "w": 90,
+            "h": 15
+          }
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "div.stats > div.stat.card > b",
+          "rect": {
+            "x": 678,
+            "y": 443,
+            "w": 231,
+            "h": 37
+          }
+        },
+        {
+          "rule": "small-target",
+          "tier": "floor",
+          "principle": "pointing",
+          "message": "20x20px target; the minimum here is 24px.",
+          "selector": "#toggle",
+          "rect": {
+            "x": 946,
+            "y": 667,
+            "w": 20,
+            "h": 20
+          }
+        },
+        {
+          "rule": "unlabelled-field",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Form field with no label.",
+          "selector": "main.card > div.composer > input",
+          "rect": {
+            "x": 365,
+            "y": 748,
+            "w": 631,
+            "h": 51
+          }
+        },
+        {
+          "rule": "invisible-focus",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "No visible focus on \"INPUT\".",
+          "rect": {
+            "x": 365,
+            "y": 748,
+            "w": 631,
+            "h": 51
+          }
+        },
+        {
+          "rule": "invisible-focus",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "No visible focus on \"Send ✨\".",
+          "rect": {
+            "x": 1008,
+            "y": 755,
+            "w": 109,
+            "h": 37
+          }
+        },
+        {
+          "rule": "slow-response",
+          "tier": "floor",
+          "principle": "response",
+          "message": "\"Show command details\" took 160ms to show a result; people stop feeling the click caused it past 100ms."
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "\"Show command details\" started 600ms of motion; the derived maximum is 200ms."
+        },
+        {
+          "rule": "long-task",
+          "tier": "floor",
+          "principle": "response",
+          "message": "1 long main-thread task(s): 140ms."
+        }
+      ],
+      "counts": {
+        "floor": 29,
+        "meaning": 27,
+        "derivation": 3,
+        "finish": 0
+      }
+    },
+    {
+      "scenario": "Before",
+      "url": "before.html",
+      "theme": "light",
+      "width": 390,
+      "screenshot": {
+        "file": "before-light-390.png",
+        "height": 1010
+      },
+      "metrics": {
+        "fontSizes": [
+          11,
+          11.5,
+          15,
+          16,
+          17,
+          19,
+          21,
+          34
+        ],
+        "spacingValues": [
+          10,
+          12,
+          13,
+          14,
+          15,
+          18,
+          20,
+          21,
+          22,
+          26,
+          28,
+          30,
+          36
+        ],
+        "colors": 7,
+        "emphasisRatio": 0.9,
+        "plannedSalience": [
+          {
+            "selector": ".perm",
+            "task": "decide",
+            "salience": 0,
+            "rect": {
+              "x": 384,
+              "y": 666,
+              "w": 368,
+              "h": 193
+            }
+          },
+          {
+            "selector": ".msg p",
+            "task": "follow",
+            "salience": 39,
+            "rect": {
+              "x": 384,
+              "y": 403,
+              "w": 368,
+              "h": 77
+            }
+          },
+          {
+            "selector": ".composer",
+            "task": "ask",
+            "salience": 0,
+            "rect": {
+              "x": 365,
+              "y": 900,
+              "w": 406,
+              "h": 53
+            }
+          },
+          {
+            "selector": ".chat-item",
+            "task": "switch",
+            "salience": 59,
+            "rect": {
+              "x": 57,
+              "y": 332,
+              "w": 226,
+              "h": 58
+            }
+          }
+        ],
+        "topUnplanned": [
+          {
+            "selector": "html > body > div.hero",
+            "salience": 424,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "w": 390,
+              "h": 237
+            }
+          },
+          {
+            "selector": "body > div.hero > h1",
+            "salience": 168,
+            "rect": {
+              "x": 36,
+              "y": 40,
+              "w": 318,
+              "h": 96
+            }
+          },
+          {
+            "selector": "div.card > div.msg > h3",
+            "salience": 71,
+            "rect": {
+              "x": 384,
+              "y": 346,
+              "w": 368,
+              "h": 36
+            }
+          }
+        ],
+        "actions": []
+      },
+      "focus": {
+        "reached": 5,
+        "invisible": 2
+      },
+      "steps": [
+        {
+          "name": "Show command details",
+          "clickToPaintMs": 160,
+          "handlerMs": 140,
+          "motionMs": 600,
+          "animations": 5
+        }
+      ],
+      "perf": {
+        "cls": 0,
+        "longTasks": [
+          140
+        ]
+      },
+      "findings": [
+        {
+          "rule": "primary-not-first",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".perm\" (decide) should be seen first, but 17 unplanned element(s) draw more attention.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 666,
+            "w": 368,
+            "h": 193
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (424) than the top task (0) without serving a task.",
+          "selector": "html > body > div.hero",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "w": 390,
+            "h": 237
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (168) than the top task (0) without serving a task.",
+          "selector": "body > div.hero > h1",
+          "rect": {
+            "x": 36,
+            "y": 40,
+            "w": 318,
+            "h": 96
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (71) than the top task (0) without serving a task.",
+          "selector": "div.card > div.msg > h3",
+          "rect": {
+            "x": 384,
+            "y": 346,
+            "w": 368,
+            "h": 36
+          }
+        },
+        {
+          "rule": "unearned-salience",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "Draws more attention (71) than the top task (0) without serving a task.",
+          "selector": "div.layout > aside.card > div.side-title",
+          "rect": {
+            "x": 57,
+            "y": 306,
+            "w": 226,
+            "h": 26
+          }
+        },
+        {
+          "rule": "salience-inversion",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".msg p\" (39) is louder than higher-priority \".perm\" (0).",
+          "selector": "div.card > div.msg > p",
+          "rect": {
+            "x": 384,
+            "y": 403,
+            "w": 368,
+            "h": 77
+          }
+        },
+        {
+          "rule": "salience-inversion",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".chat-item\" (59) is louder than higher-priority \".perm\" (0).",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 332,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "salience-inversion",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".chat-item\" (59) is louder than higher-priority \".msg p\" (39).",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 332,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "salience-inversion",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "\".chat-item\" (59) is louder than higher-priority \".composer\" (0).",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 332,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "underived-size",
+          "tier": "derivation",
+          "principle": "encoding",
+          "message": "Font sizes on screen that the derivation never produced: 11.5, 16, 17, 19, 21, 34px (derived: 11, 13, 15). Each extra size is a rank difference that means nothing.",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 101,
+            "y": 364,
+            "w": 107,
+            "h": 12
+          }
+        },
+        {
+          "rule": "underived-space",
+          "tier": "derivation",
+          "principle": "grouping",
+          "message": "Spacing values that are not a relatedness level: 12, 13, 14, 15, 18, 20, 21, 22, 28, 30, 36px (levels: 4, 6, 10, 16, 26).",
+          "selector": "div.layout > main.card > div.composer",
+          "rect": {
+            "x": 365,
+            "y": 900,
+            "w": 406,
+            "h": 53
+          }
+        },
+        {
+          "rule": "underived-color",
+          "tier": "derivation",
+          "principle": "encoding",
+          "message": "6 color(s) on screen with no derived meaning, e.g. rgb(139 92 246), rgb(229 231 235), rgb(31 41 55), rgb(238 238 255).",
+          "selector": "body > div.hero > div.eyebrow",
+          "rect": {
+            "x": 36,
+            "y": 28,
+            "w": 318,
+            "h": 12
+          }
+        },
+        {
+          "rule": "flat-emphasis",
+          "tier": "meaning",
+          "principle": "salience",
+          "message": "90% of text is emphasized, so emphasis no longer marks anything.",
+          "selector": null,
+          "rect": null
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 332,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 400,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 468,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > aside.card > div.chat-item",
+          "rect": {
+            "x": 57,
+            "y": 536,
+            "w": 226,
+            "h": 58
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 1). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.layout > main.card > div.card",
+          "rect": {
+            "x": 365,
+            "y": 306,
+            "w": 406,
+            "h": 572
+          }
+        },
+        {
+          "rule": "redundant-enclosure",
+          "tier": "meaning",
+          "principle": "grouping",
+          "message": "A box inside a box (depth 2). An enclosure says \"this is a group\"; nesting says it twice.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 384,
+            "y": 501,
+            "w": 111,
+            "h": 143
+          }
+        },
+        {
+          "rule": "decorative-color",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Gradient-filled text: a color change that encodes nothing.",
+          "selector": "body > div.hero > h1",
+          "rect": {
+            "x": 36,
+            "y": 40,
+            "w": 318,
+            "h": 96
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "body > div.layout > aside.card",
+          "rect": {
+            "x": 30,
+            "y": 267,
+            "w": 280,
+            "h": 713
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "body > div.layout > aside.card",
+          "rect": {
+            "x": 30,
+            "y": 267,
+            "w": 280,
+            "h": 713
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "body > div.layout > main.card",
+          "rect": {
+            "x": 338,
+            "y": 267,
+            "w": 460,
+            "h": 713
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "body > div.layout > main.card",
+          "rect": {
+            "x": 338,
+            "y": 267,
+            "w": 460,
+            "h": 713
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "div.layout > main.card > div.card",
+          "rect": {
+            "x": 365,
+            "y": 306,
+            "w": 406,
+            "h": 572
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "div.layout > main.card > div.card",
+          "rect": {
+            "x": 365,
+            "y": 306,
+            "w": 406,
+            "h": 572
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 384,
+            "y": 501,
+            "w": 111,
+            "h": 143
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "500ms of motion; the derived maximum is 200ms.",
+          "selector": "div.card > div.stats > div.stat.card",
+          "rect": {
+            "x": 384,
+            "y": 501,
+            "w": 111,
+            "h": 143
+          }
+        },
+        {
+          "rule": "decorative-depth",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "Backdrop blur: depth with no layering meaning.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 666,
+            "w": 368,
+            "h": 193
+          }
+        },
+        {
+          "rule": "decorative-motion",
+          "tier": "meaning",
+          "principle": "motion",
+          "message": "Endless animation \"glow\": motion that reports no change.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 666,
+            "w": 368,
+            "h": 193
+          }
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "2400ms of motion; the derived maximum is 200ms.",
+          "selector": "main.card > div.card > div.card.perm",
+          "rect": {
+            "x": 384,
+            "y": 666,
+            "w": 368,
+            "h": 193
+          }
+        },
+        {
+          "rule": "decorative-symbol",
+          "tier": "meaning",
+          "principle": "encoding",
+          "message": "13 emoji in interface text: symbols that don't map to a state or object.",
+          "selector": null,
+          "rect": null
+        },
+        {
+          "rule": "horizontal-scroll",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Page scrolls sideways at 390px.",
+          "selector": null,
+          "rect": null
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "body > div.hero > div.eyebrow",
+          "rect": {
+            "x": 36,
+            "y": 28,
+            "w": 318,
+            "h": 12
+          }
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "body > div.hero > h1",
+          "rect": {
+            "x": 36,
+            "y": 40,
+            "w": 318,
+            "h": 96
+          }
+        },
+        {
+          "rule": "text-on-gradient",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Text on a gradient: contrast varies across it and cannot be guaranteed.",
+          "selector": "body > div.hero > p",
+          "rect": {
+            "x": 36,
+            "y": 146,
+            "w": 318,
+            "h": 63
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 4.17:1, needs 4.5:1: \"Your Workspace\"",
+          "selector": "div.layout > aside.card > div.eyebrow",
+          "rect": {
+            "x": 57,
+            "y": 294,
+            "w": 226,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"2 minutes ago\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 101,
+            "y": 364,
+            "w": 107,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"1 hour ago\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 105,
+            "y": 432,
+            "w": 143,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"Yesterday\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 106,
+            "y": 500,
+            "w": 142,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 2.08:1, needs 4.5:1: \"Start fresh!\"",
+          "selector": "div.chat-item > div > small",
+          "rect": {
+            "x": 106,
+            "y": 568,
+            "w": 73,
+            "h": 12
+          }
+        },
+        {
+          "rule": "low-contrast",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Contrast 4.17:1, needs 4.5:1: \"Active Session\"",
+          "selector": "div.layout > main.card > div.eyebrow",
+          "rect": {
+            "x": 365,
+            "y": 294,
+            "w": 406,
+            "h": 12
+          }
+        },
+        {
+          "rule": "unlabelled-field",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "Form field with no label.",
+          "selector": "main.card > div.composer > input",
+          "rect": {
+            "x": 365,
+            "y": 901,
+            "w": 236,
+            "h": 51
+          }
+        },
+        {
+          "rule": "invisible-focus",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "No visible focus on \"INPUT\".",
+          "rect": {
+            "x": 365,
+            "y": 901,
+            "w": 236,
+            "h": 51
+          }
+        },
+        {
+          "rule": "invisible-focus",
+          "tier": "floor",
+          "principle": "legibility",
+          "message": "No visible focus on \"Send ✨\".",
+          "rect": {
+            "x": 613,
+            "y": 900,
+            "w": 86,
+            "h": 53
+          }
+        },
+        {
+          "rule": "slow-response",
+          "tier": "floor",
+          "principle": "response",
+          "message": "\"Show command details\" took 160ms to show a result; people stop feeling the click caused it past 100ms."
+        },
+        {
+          "rule": "slow-motion",
+          "tier": "floor",
+          "principle": "response",
+          "message": "\"Show command details\" started 600ms of motion; the derived maximum is 200ms."
+        },
+        {
+          "rule": "long-task",
+          "tier": "floor",
+          "principle": "response",
+          "message": "1 long main-thread task(s): 140ms."
+        }
+      ],
+      "counts": {
+        "floor": 21,
+        "meaning": 24,
+        "derivation": 3,
+        "finish": 0
+      }
+    },
+    {
+      "scenario": "After",
+      "url": "after.html",
+      "theme": "light",
+      "width": 1280,
+      "screenshot": {
+        "file": "after-light-1280.png",
+        "height": 860
+      },
+      "metrics": {
+        "fontSizes": [
+          11,
+          13,
+          15
+        ],
+        "spacingValues": [
+          4,
+          6,
+          10,
+          16,
+          26
+        ],
+        "colors": 14,
+        "emphasisRatio": 0.14,
+        "plannedSalience": [
+          {
+            "selector": ".request",
+            "task": "decide",
+            "salience": 99,
+            "rect": {
+              "x": 512,
+              "y": 252,
+              "w": 505,
+              "h": 165
+            }
+          },
+          {
+            "selector": ".turn p",
+            "task": "follow",
+            "salience": 32,
+            "rect": {
+              "x": 512,
+              "y": 140,
+              "w": 477,
+              "h": 56
+            }
+          },
+          {
+            "selector": ".composer-box",
+            "task": "ask",
+            "salience": 27,
+            "rect": {
+              "x": 512,
+              "y": 750,
+              "w": 505,
+              "h": 94
+            }
+          },
+          {
+            "selector": ".chat[aria-current]",
+            "task": "switch",
+            "salience": 32,
+            "rect": {
+              "x": 6,
+              "y": 75,
+              "w": 236,
+              "h": 30
+            }
+          }
+        ],
+        "topUnplanned": [
+          {
+            "selector": "div.main > header.topbar > h1",
+            "salience": 50,
+            "rect": {
+              "x": 264,
+              "y": 10,
+              "w": 114,
+              "h": 19
+            }
+          },
+          {
+            "selector": "#sidebar > div.sidebar-head > span.project",
+            "salience": 43,
+            "rect": {
+              "x": 12,
+              "y": 16,
+              "w": 99,
+              "h": 18
+            }
+          },
+          {
+            "selector": "header.topbar > div.diffstat > span.add",
+            "salience": 38,
+            "rect": {
+              "x": 1222,
+              "y": 12,
+              "w": 18,
+              "h": 15
+            }
+          }
+        ],
+        "actions": [
+          {
+            "selector": ".request .primary",
+            "frequency": "constant",
+            "area": 3247
+          },
+          {
+            "selector": ".request [data-action=deny]",
+            "frequency": "frequent",
+            "area": 2187
+          },
+          {
+            "selector": ".composer button[type=submit]",
+            "frequency": "frequent",
+            "area": 1804
+          },
+          {
+            "selector": ".request [data-action=always]",
+            "frequency": "occasional",
+            "area": 2605
+          },
+          {
+            "selector": "#why-toggle",
+            "frequency": "occasional",
+            "area": 1583
+          }
+        ]
+      },
+      "focus": {
+        "reached": 12,
+        "invisible": 0
+      },
+      "steps": [
+        {
+          "name": "Show command details",
+          "clickToPaintMs": 16,
+          "handlerMs": 1,
+          "motionMs": 140,
+          "animations": 4
+        }
+      ],
+      "perf": {
+        "cls": 0,
+        "longTasks": []
+      },
+      "findings": [],
+      "counts": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 0,
+        "finish": 0
+      }
+    },
+    {
+      "scenario": "After",
+      "url": "after.html",
+      "theme": "light",
+      "width": 390,
+      "screenshot": {
+        "file": "after-light-390.png",
+        "height": 844
+      },
+      "metrics": {
+        "fontSizes": [
+          11,
+          13,
+          15
+        ],
+        "spacingValues": [
+          4,
+          6,
+          10,
+          16,
+          26
+        ],
+        "colors": 10,
+        "emphasisRatio": 0.18,
+        "plannedSalience": [
+          {
+            "selector": ".request",
+            "task": "decide",
+            "salience": 128,
+            "rect": {
+              "x": 10,
+              "y": 315,
+              "w": 370,
+              "h": 235
+            }
+          },
+          {
+            "selector": ".turn p",
+            "task": "follow",
+            "salience": 33,
+            "rect": {
+              "x": 10,
+              "y": 184,
+              "w": 370,
+              "h": 56
+            }
+          },
+          {
+            "selector": ".composer-box",
+            "task": "ask",
+            "salience": 27,
+            "rect": {
+              "x": 10,
+              "y": 726,
+              "w": 370,
+              "h": 108
+            }
+          }
+        ],
+        "topUnplanned": [
+          {
+            "selector": "div.main > header.topbar > h1",
+            "salience": 50,
+            "rect": {
+              "x": 66,
+              "y": 23,
+              "w": 114,
+              "h": 19
+            }
+          },
+          {
+            "selector": "header.topbar > div.diffstat > span.add",
+            "salience": 38,
+            "rect": {
+              "x": 338,
+              "y": 24,
+              "w": 18,
+              "h": 15
+            }
+          },
+          {
+            "selector": "header.topbar > div.diffstat > span.del",
+            "salience": 36,
+            "rect": {
+              "x": 362,
+              "y": 24,
+              "w": 18,
+              "h": 15
+            }
+          }
+        ],
+        "actions": [
+          {
+            "selector": ".request .primary",
+            "frequency": "constant",
+            "area": 5217
+          },
+          {
+            "selector": ".request [data-action=deny]",
+            "frequency": "frequent",
+            "area": 5217
+          },
+          {
+            "selector": ".composer button[type=submit]",
+            "frequency": "frequent",
+            "area": 2646
+          },
+          {
+            "selector": ".request [data-action=always]",
+            "frequency": "occasional",
+            "area": 3821
+          },
+          {
+            "selector": "#why-toggle",
+            "frequency": "occasional",
+            "area": 2321
+          }
+        ]
+      },
+      "focus": {
+        "reached": 12,
+        "invisible": 0
+      },
+      "steps": [
+        {
+          "name": "Show command details",
+          "clickToPaintMs": 16,
+          "handlerMs": 0,
+          "motionMs": 140,
+          "animations": 4
+        }
+      ],
+      "perf": {
+        "cls": 0,
+        "longTasks": []
+      },
+      "findings": [],
+      "counts": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 0,
+        "finish": 0
+      }
+    },
+    {
+      "scenario": "After",
+      "url": "after.html",
+      "theme": "dark",
+      "width": 1280,
+      "screenshot": {
+        "file": "after-dark-1280.png",
+        "height": 860
+      },
+      "metrics": {
+        "fontSizes": [
+          11,
+          13,
+          15
+        ],
+        "spacingValues": [
+          4,
+          6,
+          10,
+          16,
+          26
+        ],
+        "colors": 14,
+        "emphasisRatio": 0.14,
+        "plannedSalience": [
+          {
+            "selector": ".request",
+            "task": "decide",
+            "salience": 109,
+            "rect": {
+              "x": 512,
+              "y": 252,
+              "w": 505,
+              "h": 165
+            }
+          },
+          {
+            "selector": ".turn p",
+            "task": "follow",
+            "salience": 34,
+            "rect": {
+              "x": 512,
+              "y": 140,
+              "w": 477,
+              "h": 56
+            }
+          },
+          {
+            "selector": ".composer-box",
+            "task": "ask",
+            "salience": 28,
+            "rect": {
+              "x": 512,
+              "y": 750,
+              "w": 505,
+              "h": 94
+            }
+          },
+          {
+            "selector": ".chat[aria-current]",
+            "task": "switch",
+            "salience": 33,
+            "rect": {
+              "x": 6,
+              "y": 75,
+              "w": 236,
+              "h": 30
+            }
+          }
+        ],
+        "topUnplanned": [
+          {
+            "selector": "div.main > header.topbar > h1",
+            "salience": 54,
+            "rect": {
+              "x": 264,
+              "y": 10,
+              "w": 114,
+              "h": 19
+            }
+          },
+          {
+            "selector": "#sidebar > div.sidebar-head > span.project",
+            "salience": 48,
+            "rect": {
+              "x": 12,
+              "y": 16,
+              "w": 99,
+              "h": 18
+            }
+          },
+          {
+            "selector": "header.topbar > div.diffstat > span.del",
+            "salience": 40,
+            "rect": {
+              "x": 1246,
+              "y": 12,
+              "w": 18,
+              "h": 15
+            }
+          }
+        ],
+        "actions": [
+          {
+            "selector": ".request .primary",
+            "frequency": "constant",
+            "area": 3247
+          },
+          {
+            "selector": ".request [data-action=deny]",
+            "frequency": "frequent",
+            "area": 2187
+          },
+          {
+            "selector": ".composer button[type=submit]",
+            "frequency": "frequent",
+            "area": 1804
+          },
+          {
+            "selector": ".request [data-action=always]",
+            "frequency": "occasional",
+            "area": 2605
+          },
+          {
+            "selector": "#why-toggle",
+            "frequency": "occasional",
+            "area": 1583
+          }
+        ]
+      },
+      "focus": {
+        "reached": 12,
+        "invisible": 0
+      },
+      "steps": [
+        {
+          "name": "Show command details",
+          "clickToPaintMs": 16,
+          "handlerMs": 0,
+          "motionMs": 140,
+          "animations": 4
+        }
+      ],
+      "perf": {
+        "cls": 0,
+        "longTasks": []
+      },
+      "findings": [],
+      "counts": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 0,
+        "finish": 0
+      }
+    },
+    {
+      "scenario": "After",
+      "url": "after.html",
+      "theme": "dark",
+      "width": 390,
+      "screenshot": {
+        "file": "after-dark-390.png",
+        "height": 844
+      },
+      "metrics": {
+        "fontSizes": [
+          11,
+          13,
+          15
+        ],
+        "spacingValues": [
+          4,
+          6,
+          10,
+          16,
+          26
+        ],
+        "colors": 10,
+        "emphasisRatio": 0.18,
+        "plannedSalience": [
+          {
+            "selector": ".request",
+            "task": "decide",
+            "salience": 142,
+            "rect": {
+              "x": 10,
+              "y": 315,
+              "w": 370,
+              "h": 235
+            }
+          },
+          {
+            "selector": ".turn p",
+            "task": "follow",
+            "salience": 35,
+            "rect": {
+              "x": 10,
+              "y": 184,
+              "w": 370,
+              "h": 56
+            }
+          },
+          {
+            "selector": ".composer-box",
+            "task": "ask",
+            "salience": 28,
+            "rect": {
+              "x": 10,
+              "y": 726,
+              "w": 370,
+              "h": 108
+            }
+          }
+        ],
+        "topUnplanned": [
+          {
+            "selector": "div.main > header.topbar > h1",
+            "salience": 54,
+            "rect": {
+              "x": 66,
+              "y": 23,
+              "w": 114,
+              "h": 19
+            }
+          },
+          {
+            "selector": "header.topbar > div.diffstat > span.del",
+            "salience": 40,
+            "rect": {
+              "x": 362,
+              "y": 24,
+              "w": 18,
+              "h": 15
+            }
+          },
+          {
+            "selector": "header.topbar > div.diffstat > span.add",
+            "salience": 36,
+            "rect": {
+              "x": 338,
+              "y": 24,
+              "w": 18,
+              "h": 15
+            }
+          }
+        ],
+        "actions": [
+          {
+            "selector": ".request .primary",
+            "frequency": "constant",
+            "area": 5217
+          },
+          {
+            "selector": ".request [data-action=deny]",
+            "frequency": "frequent",
+            "area": 5217
+          },
+          {
+            "selector": ".composer button[type=submit]",
+            "frequency": "frequent",
+            "area": 2646
+          },
+          {
+            "selector": ".request [data-action=always]",
+            "frequency": "occasional",
+            "area": 3821
+          },
+          {
+            "selector": "#why-toggle",
+            "frequency": "occasional",
+            "area": 2321
+          }
+        ]
+      },
+      "focus": {
+        "reached": 12,
+        "invisible": 0
+      },
+      "steps": [
+        {
+          "name": "Show command details",
+          "clickToPaintMs": 16,
+          "handlerMs": 1,
+          "motionMs": 140,
+          "animations": 4
+        }
+      ],
+      "perf": {
+        "cls": 0,
+        "longTasks": []
+      },
+      "findings": [],
+      "counts": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 0,
+        "finish": 0
+      }
+    }
+  ]
+}

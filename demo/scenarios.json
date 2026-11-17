@@ -1,0 +1,29 @@
+{
+  "model": "model.json",
+  "widths": [1280, 390],
+  "themes": ["light"],
+  "scenarios": [
+    {
+      "name": "Before",
+      "url": "before.html",
+      "screen": "session",
+      "plan": {
+        "salience": [
+          { "selector": ".perm", "task": "decide" },
+          { "selector": ".msg p", "task": "follow" },
+          { "selector": ".composer", "task": "ask" },
+          { "selector": ".chat-item", "task": "switch" }
+        ],
+        "actions": [
+          { "selector": "#approve", "task": "decide", "frequency": "constant" },
+          { "selector": ".btn-ghost", "task": "decide", "frequency": "frequent" },
+          { "selector": ".composer .btn", "task": "ask", "frequency": "frequent" },
+          { "selector": "#toggle", "task": "decide", "frequency": "occasional" }
+        ],
+        "groups": [{ "name": "request actions", "members": ["#approve", ".btn-ghost", "#toggle"] }]
+      },
+      "steps": [{ "name": "Show command details", "click": "#toggle" }]
+    },
+    { "name": "After", "url": "after.html", "screen": "session", "themes": ["light", "dark"], "steps": [{ "name": "Show command details", "click": "#why-toggle" }] }
+  ]
+}
