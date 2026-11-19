@@ -9,7 +9,7 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const main = $('main');
-  const state = { view: 'overview', width: {}, open: new Set(), pf: { principle: '', layer: '', level: '', plan: 'plan', changed: false } };
+  const state = { view: 'sites', cards: new Map(), open: new Set(), pf: { principle: '', layer: '', level: '', plan: 'plan', changed: false } };
 
   // ---------- sources (the unmodified sites, or a run) ----------
   const sources = [];
@@ -108,48 +108,138 @@
 
   // ---------- sites ----------
   function shot(src, site, surface, width) {
-    if (!src) return '<div class="noshot">—</div>';
     const from = src.original ? (src.shotsFrom || {})[site] : src.slug;
     const file = `${slug(surface)}-${width}-light.png`;
     if (!from || !((src.shots || {})[site] || []).includes(file)) return '<div class="noshot">No screenshot</div>';
     return `<img loading="lazy" src="../runs/${esc(from)}/shots/${esc(site)}/${esc(file)}" alt="${esc(site)}, ${esc(surface)}, ${width} px">`;
   }
+
+  const comparedSources = () => same() ? [A()] : [A(), Bs()];
+  const surfaceName = (surface) => surface === 'page' ? 'Main page' : surface;
+  function cardState(site) {
+    if (!state.cards.has(site)) state.cards.set(site, { surface: 'page', width: '1280', expanded: false });
+    return state.cards.get(site);
+  }
+
+  function problems(regionId, site, defs, expanded) {
+    if (!defs.length) return '<p class="no-problems muted">No problems listed for this surface.</p>';
+    const sides = comparedSources().filter((src) => src.sites && !src.original);
+    const rows = (list) => list.map((d) => {
+      const meta = [d.principle, d.layer, d.expect?.length ? `rules: ${d.expect.join(', ')}` : '', d.note].filter(Boolean).join(' · ');
+      const statuses = sides.map((src) => `<div><span class="meta">${esc(nameOf(src))}</span>${st(siteStatus(src, site, d))}</div>`).join('');
+      return `<li class="problem">
+        <div>${esc(d.what)}<div class="meta">${esc(meta)}</div></div>
+        ${statuses ? `<div class="problem-statuses">${statuses}</div>` : ''}
+      </li>`;
+    }).join('');
+    const extra = defs.slice(4);
+    let h = `<ul class="problem-list">${rows(defs.slice(0, 4))}</ul>`;
+    if (extra.length) {
+      const label = `Show ${extra.length} more`;
+      h += `<button type="button" class="show-more" data-more="${label}" aria-controls="${regionId}" aria-expanded="${expanded}">${expanded ? 'Show fewer' : label}</button>
+        <div id="${regionId}" class="more-problems" aria-hidden="${!expanded}"${expanded ? '' : ' inert'}>
+          <ul class="problem-list">${rows(extra)}</ul>
+        </div>`;
+    }
+    return h;
+  }
+
+  async function updateShot(frame, markup) {
+    frame.querySelector('.pending')?.remove();
+    const next = document.createElement('div');
+    next.className = 'shot-layer pending';
+    next.setAttribute('aria-hidden', 'true');
+    next.innerHTML = markup;
+    frame.append(next);
+    const img = next.querySelector('img');
+    if (img) {
+      img.loading = 'eager';
+      try {
+        await img.decode();
+      } catch {
+        if (!img.naturalWidth) next.innerHTML = '<div class="noshot">No screenshot</div>';
+      }
+    }
+    if (!next.isConnected) return;
+    frame.querySelector('.leaving')?.remove();
+    const current = frame.firstElementChild;
+    current.setAttribute('aria-hidden', 'true');
+    current.classList.remove('entering');
+    current.classList.add('leaving');
+    next.removeAttribute('aria-hidden');
+    next.classList.replace('pending', 'entering');
+  }
+
+  function updateCardShots(card, surface, width) {
+    const sides = comparedSources();
+    card.querySelectorAll('.shot-frame').forEach((frame, i) => updateShot(frame, shot(sides[i], card.dataset.site, surface, width)));
+  }
+
+  function selectSurface(card, surface) {
+    const site = card.dataset.site;
+    const chosen = cardState(site);
+    chosen.surface = surface;
+    for (const button of card.querySelectorAll('[data-surface]')) {
+      button.setAttribute('aria-pressed', String(button.dataset.surface === surface));
+    }
+    card.querySelector('.surface-select').value = surface;
+    const defs = defectsOf(site).filter((d) => d.surface === surface);
+    card.querySelector('.site-problems').innerHTML = problems(`more-${card.dataset.index}`, site, defs, chosen.expanded);
+    updateCardShots(card, surface, chosen.width);
+  }
+
   function sitesView() {
     const sites = siteList();
     if (!sites.length) return '<p class="note">No generated-site results in this selection.</p>';
     const a = A(), b = Bs();
-    let h = `<p class="lede">${sites.length} sites. Open one to see its screens and problems.</p><div class="list">`;
-    for (const site of sites) {
-      const t = truthOf(site) || {};
+    const sides = comparedSources();
+    let h = '<div class="site-list">';
+    for (const [index, site] of sites.entries()) {
+      const t = truthOf(site);
       const defs = defectsOf(site);
+      const bySurface = new Map([['page', []]]);
+      for (const src of [b, a]) for (const surface of src.truth[site]?.surfaces || []) {
+        if (!bySurface.has(surface.name)) bySurface.set(surface.name, []);
+      }
+      for (const d of defs) {
+        if (!bySurface.has(d.surface)) bySurface.set(d.surface, []);
+        bySurface.get(d.surface).push(d);
+      }
       const changed = !same() && a && b && a.siteVersions && b.siteVersions && a.siteVersions[site] && b.siteVersions[site] && a.siteVersions[site] !== b.siteVersions[site];
       const ca = caughtCount(a, site, defs), cb = caughtCount(b, site, defs);
-      const summary = `<span class="name">${esc(site)}</span><span class="meta">${esc(t.builder || '')}</span><span class="facts">${defs.length} problems · caught ${pair(ca, cb)}${changed ? ' · <span class="tag">page changed</span>' : ''}</span>`;
-      const w = state.width[site] || '1280';
-      const surfaces = ['page', ...((t.surfaces || []).map((s) => s.name))];
-      let body = `<p class="brief">${esc(t.brief || '')}${t.reviewer ? ` <span class="meta">Reviewed by ${esc(t.reviewer)}.</span>` : ''}</p>`;
-      body += `<div class="seg" role="group" aria-label="Screenshot width"><button type="button" data-site="${esc(site)}" data-width="1280" aria-pressed="${w === '1280'}">Desktop</button><button type="button" data-site="${esc(site)}" data-width="390" aria-pressed="${w === '390'}">Phone</button></div>`;
-      for (const surf of surfaces) {
-        const sd = defs.filter((d) => d.surface === surf);
-        const sa = caughtCount(a, site, sd), sb = caughtCount(b, site, sd);
-        const sum = `<span class="name">${esc(surf === 'page' ? 'Main page' : surf)}</span><span class="facts">${sd.length} problem${sd.length === 1 ? '' : 's'}${sd.length ? ` · caught ${pair(sa, sb)}` : ''}</span>`;
-        let inner = `<div class="shots${same() ? ' one' : ''}">`;
-        inner += `<figure><figcaption>${esc(nameOf(a))}</figcaption>${shot(a, site, surf, w)}</figure>`;
-        if (!same()) inner += `<figure><figcaption>${esc(nameOf(b))}</figcaption>${shot(b, site, surf, w)}</figure>`;
-        inner += '</div>';
-        if (sd.length) {
-          const sides = (same() ? [b] : [a, b]).filter((x) => x && !x.original);
-          inner += `<table class="defects"><thead><tr><th>Problem</th>${sides.map((x) => `<th>${esc(sides.length > 1 ? nameOf(x) : 'Tools: ' + nameOf(x))}</th>`).join('')}</tr></thead><tbody>`;
-          for (const d of sd) {
-            const x = siteStatus(a, site, d), y = siteStatus(b, site, d);
-            const moved = !same() && x !== y && x !== 'found' && y !== 'found';
-            inner += `<tr${moved ? ' class="moved"' : ''}><td>${esc(d.what)}<div class="meta">${esc(d.principle)} · ${esc(d.layer)}${d.expect && d.expect.length ? ` · rules: ${esc(d.expect.join(', '))}` : ''}${d.note ? ` · ${esc(d.note)}` : ''}</div></td>${sides.map((src) => `<td>${st(siteStatus(src, site, d))}</td>`).join('')}</tr>`;
-          }
-          inner += '</tbody></table>';
-        } else inner += '<p class="muted">No problems listed for this surface.</p>';
-        body += det(`s:${site}:${surf}`, 'surface', sum, inner);
-      }
-      h += det(`s:${site}`, 'site', summary, body);
+      const facts = `${defs.length} problem${defs.length === 1 ? '' : 's'}${ca !== null || cb !== null ? ` · caught ${pair(ca, cb)}` : ''}${changed ? ' · page changed' : ''}`;
+      const { surface, width, expanded } = cardState(site);
+      const selected = bySurface.has(surface) ? surface : 'page';
+      const surfaces = [...bySurface].map(([name, list]) => ({
+        name: esc(name), label: `${esc(surfaceName(name))} (${list.length})`, selected: name === selected,
+      }));
+      h += `<article class="site-card" data-site="${esc(site)}" data-index="${index}" aria-labelledby="site-${index}">
+        <header>
+          <div class="site-heading">
+            <h2 id="site-${index}">${esc(site)}</h2>
+            <span class="meta">${esc(t.builder)}</span>
+            <span class="site-facts">${facts}</span>
+          </div>
+          ${t.brief ? `<p class="brief meta">${esc(t.brief)}</p>` : ''}
+          ${t.reviewer ? `<p class="brief meta">Reviewed by ${esc(t.reviewer)}.</p>` : ''}
+        </header>
+        <div class="site-controls">
+          <div class="surface-buttons" role="group" aria-label="Surface">
+            ${surfaces.map((s) => `<button type="button" data-surface="${s.name}" aria-pressed="${s.selected}">${s.label}</button>`).join('')}
+          </div>
+          <select class="surface-select" aria-label="Surface">
+            ${surfaces.map((s) => `<option value="${s.name}"${s.selected ? ' selected' : ''}>${s.label}</option>`).join('')}
+          </select>
+          <div class="width-buttons" role="group" aria-label="Screenshot width">
+            <button type="button" data-width="1280" aria-pressed="${width === '1280'}">Desktop</button>
+            <button type="button" data-width="390" aria-pressed="${width === '390'}">Phone</button>
+          </div>
+        </div>
+        <div class="shots${same() ? ' one' : ''}">
+          ${sides.map((src) => `<figure><figcaption>${esc(nameOf(src))}</figcaption><div class="shot-frame" data-axiomatic="specimen"><div class="shot-layer">${shot(src, site, selected, width)}</div></div></figure>`).join('')}
+        </div>
+        <div class="site-problems">${problems(`more-${index}`, site, bySurface.get(selected), expanded)}</div>
+      </article>`;
     }
     return h + '</div>';
   }
@@ -203,18 +293,52 @@
   }
 
   // ---------- render + events ----------
-  function render() {
+  function render(animate = false) {
     for (const b of document.querySelectorAll('.tabs button')) b.setAttribute('aria-pressed', String(b.dataset.view === state.view));
-    main.innerHTML = state.view === 'sites' ? sitesView() : state.view === 'planted' ? plantedView() : overview();
+    const html = state.view === 'sites' ? sitesView() : state.view === 'planted' ? plantedView() : overview();
+    main.innerHTML = animate ? `<div class="view-enter">${html}</div>` : html;
   }
-  document.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { state.view = b.dataset.view; render(); } });
-  aSel.addEventListener('change', render);
-  bSel.addEventListener('change', render);
+  document.querySelector('.tabs').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b || b.dataset.view === state.view) return;
+    state.view = b.dataset.view;
+    render(true);
+  });
+  for (const picker of [aSel, bSel]) picker.addEventListener('change', () => render());
+  main.addEventListener('error', (e) => {
+    if (!e.target.matches('.shot-layer:not(.pending) img')) return;
+    e.target.outerHTML = '<div class="noshot">No screenshot</div>';
+  }, true);
   main.addEventListener('click', (e) => {
-    const b = e.target.closest('button[data-width]');
-    if (b) { state.width[b.dataset.site] = b.dataset.width; render(); }
+    const b = e.target.closest('button');
+    const card = b?.closest('.site-card');
+    if (!card) return;
+    const site = card.dataset.site;
+    const chosen = cardState(site);
+    if (b.hasAttribute('data-more')) {
+      chosen.expanded = !chosen.expanded;
+      b.setAttribute('aria-expanded', String(chosen.expanded));
+      b.textContent = chosen.expanded ? 'Show fewer' : b.dataset.more;
+      const extra = $(b.getAttribute('aria-controls'));
+      extra.setAttribute('aria-hidden', String(!chosen.expanded));
+      extra.toggleAttribute('inert', !chosen.expanded);
+      return;
+    }
+    if (b.getAttribute('aria-pressed') === 'true') return;
+    if (b.hasAttribute('data-surface')) {
+      selectSurface(card, b.dataset.surface);
+      return;
+    }
+    chosen.width = b.dataset.width;
+    b.parentElement.querySelector('[aria-pressed="true"]').setAttribute('aria-pressed', 'false');
+    b.setAttribute('aria-pressed', 'true');
+    updateCardShots(card, card.querySelector('.surface-select').value, chosen.width);
   });
   main.addEventListener('change', (e) => {
+    if (e.target.matches('.surface-select')) {
+      selectSurface(e.target.closest('.site-card'), e.target.value);
+      return;
+    }
     const k = e.target.dataset && e.target.dataset.f;
     if (!k) return;
     state.pf[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
