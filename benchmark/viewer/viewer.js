@@ -60,7 +60,9 @@
     const seen = new Map();
     for (const s of [A(), Bs()]) for (const d of ((s && s.truth[site]) || {}).defects || []) {
       const k = `${d.surface}|${d.what}`;
-      if (!seen.has(k)) seen.set(k, d);
+      const first = seen.get(k);
+      if (!first) seen.set(k, d);
+      else if (!first.selector && d.selector) seen.set(k, { ...first, selector: d.selector });
     }
     return [...seen.values()];
   }
@@ -111,37 +113,86 @@
     const from = src.original ? (src.shotsFrom || {})[site] : src.slug;
     const file = `${slug(surface)}-${width}-light.png`;
     if (!from || !((src.shots || {})[site] || []).includes(file)) return '<div class="noshot">No screenshot</div>';
-    return `<img loading="lazy" src="../runs/${esc(from)}/shots/${esc(site)}/${esc(file)}" alt="${esc(site)}, ${esc(surface)}, ${width} px">`;
+    return `<img loading="lazy" data-shot="${esc(file)}" src="../runs/${esc(from)}/shots/${esc(site)}/${esc(file)}" alt="${esc(site)}, ${esc(surface)}, ${width} px">
+      <span class="shot-annotation" aria-hidden="true"><span class="shot-region"></span></span>`;
   }
 
   const comparedSources = () => same() ? [A()] : [A(), Bs()];
   const surfaceName = (surface) => surface === 'page' ? 'Main page' : surface;
+  const sameProblem = (a, b) => a?.surface === b?.surface && a?.what === b?.what;
   function cardState(site) {
-    if (!state.cards.has(site)) state.cards.set(site, { surface: 'page', width: '1280', expanded: false });
+    if (!state.cards.has(site)) state.cards.set(site, { surface: 'page', width: '1280', problem: null });
     return state.cards.get(site);
   }
 
-  function problems(regionId, site, defs, expanded) {
+  function problems(site, defs) {
+    const chosen = cardState(site);
+    chosen.problem = defs.find((d) => sameProblem(d, chosen.problem)) || null;
     if (!defs.length) return '<p class="no-problems muted">No problems listed for this surface.</p>';
     const sides = comparedSources().filter((src) => src.sites && !src.original);
-    const rows = (list) => list.map((d) => {
+    const sortSource = Bs().original ? A() : Bs();
+    const order = { caught: 0, norule: 1, silent: 2 };
+    const rank = (d) => order[siteStatus(sortSource, site, d)] ?? 3;
+    const sorted = sortSource.original ? defs : defs.slice().sort((a, b) => rank(a) - rank(b));
+    const rows = sorted.map((d) => {
       const meta = [d.principle, d.layer, d.expect?.length ? `rules: ${d.expect.join(', ')}` : '', d.note].filter(Boolean).join(' · ');
-      const statuses = sides.map((src) => `<div><span class="meta">${esc(nameOf(src))}</span>${st(siteStatus(src, site, d))}</div>`).join('');
+      const statuses = sides.map((src) => `<span><span class="meta">${esc(nameOf(src))}</span>${st(siteStatus(src, site, d))}</span>`).join('');
       return `<li class="problem">
-        <div>${esc(d.what)}<div class="meta">${esc(meta)}</div></div>
-        ${statuses ? `<div class="problem-statuses">${statuses}</div>` : ''}
+        <button type="button" class="problem-row" data-problem="${esc(d.what)}" aria-pressed="${d === chosen.problem}">
+          <span>${esc(d.what)}<span class="meta">${esc(meta)}</span>${d.selector ? '' : '<span class="meta">No single region</span>'}</span>
+          ${statuses ? `<span class="problem-statuses">${statuses}</span>` : ''}
+        </button>
       </li>`;
     }).join('');
-    const extra = defs.slice(4);
-    let h = `<ul class="problem-list">${rows(defs.slice(0, 4))}</ul>`;
-    if (extra.length) {
-      const label = `Show ${extra.length} more`;
-      h += `<button type="button" class="show-more" data-more="${label}" aria-controls="${regionId}" aria-expanded="${expanded}">${expanded ? 'Show fewer' : label}</button>
-        <div id="${regionId}" class="more-problems" aria-hidden="${!expanded}"${expanded ? '' : ' inert'}>
-          <ul class="problem-list">${rows(extra)}</ul>
-        </div>`;
-    }
-    return h;
+    return `<ul class="problem-list">${rows}</ul>`;
+  }
+
+  const activeShot = (frame) => frame.querySelector('.shot-layer:not(.pending):not(.leaving)');
+  const highlightRects = new WeakMap();
+  function positionHighlight(frame) {
+    const layer = activeShot(frame);
+    const box = layer.querySelector('.shot-region');
+    const rect = box && highlightRects.get(box);
+    if (!rect) return;
+    const img = layer.querySelector('img');
+    if (!img?.naturalWidth) return;
+    const { width, height } = img.getBoundingClientRect();
+    const scale = Math.min(width / img.naturalWidth, height / img.naturalHeight);
+    if (!scale) return;
+    const [x, y, w, h] = rect.map((value) => `${value * scale}px`);
+    Object.assign(box.parentElement.style, { width: `${img.naturalWidth * scale}px`, height: `${img.naturalHeight * scale}px` });
+    Object.assign(box.style, { left: x, top: y, width: w, height: h });
+    box.classList.add('visible');
+  }
+
+  const highlightObserver = new ResizeObserver((entries) => {
+    for (const { target } of entries) positionHighlight(target);
+  });
+
+  function updateHighlights(card) {
+    const site = card.dataset.site;
+    const defect = cardState(site).problem;
+    const sides = comparedSources();
+    card.querySelectorAll('.shots figure').forEach((figure, i) => {
+      const src = sides[i];
+      const frame = figure.querySelector('.shot-frame');
+      const layer = activeShot(frame);
+      const file = layer.querySelector('img')?.dataset.shot;
+      const selector = defect?.selector && (src.truth[site]?.defects?.find((d) => sameProblem(d, defect))?.selector || defect.selector);
+      const rect = selector && src.rects?.[site]?.[file]?.[selector];
+      const box = layer.querySelector('.shot-region');
+      if (box && rect) {
+        highlightRects.set(box, rect);
+        positionHighlight(frame);
+      } else if (box) {
+        highlightRects.delete(box);
+        box.classList.remove('visible');
+      }
+      const note = figure.querySelector('.shot-highlight-note');
+      const message = rect ? `Highlighted: ${defect.what}` : selector ? 'Not on this page' : '';
+      note.classList.toggle('sr-only', Boolean(rect));
+      if (note.textContent !== message) note.textContent = message;
+    });
   }
 
   async function updateShot(frame, markup) {
@@ -170,9 +221,16 @@
     next.classList.replace('pending', 'entering');
   }
 
-  function updateCardShots(card, surface, width) {
+  function updateCardShots(card) {
+    const site = card.dataset.site;
+    const { surface, width } = cardState(site);
     const sides = comparedSources();
-    card.querySelectorAll('.shot-frame').forEach((frame, i) => updateShot(frame, shot(sides[i], card.dataset.site, surface, width)));
+    updateHighlights(card);
+    card.querySelectorAll('.shot-frame').forEach((frame, i) => {
+      updateShot(frame, shot(sides[i], site, surface, width)).then(() => {
+        if (card.isConnected) updateHighlights(card);
+      });
+    });
   }
 
   function selectSurface(card, surface) {
@@ -184,8 +242,8 @@
     }
     card.querySelector('.surface-select').value = surface;
     const defs = defectsOf(site).filter((d) => d.surface === surface);
-    card.querySelector('.site-problems').innerHTML = problems(`more-${card.dataset.index}`, site, defs, chosen.expanded);
-    updateCardShots(card, surface, chosen.width);
+    card.querySelector('.site-problems').innerHTML = problems(site, defs);
+    updateCardShots(card);
   }
 
   function sitesView() {
@@ -208,12 +266,13 @@
       const changed = !same() && a && b && a.siteVersions && b.siteVersions && a.siteVersions[site] && b.siteVersions[site] && a.siteVersions[site] !== b.siteVersions[site];
       const ca = caughtCount(a, site, defs), cb = caughtCount(b, site, defs);
       const facts = `${defs.length} problem${defs.length === 1 ? '' : 's'}${ca !== null || cb !== null ? ` · caught ${pair(ca, cb)}` : ''}${changed ? ' · page changed' : ''}`;
-      const { surface, width, expanded } = cardState(site);
-      const selected = bySurface.has(surface) ? surface : 'page';
+      const chosen = cardState(site);
+      if (!bySurface.has(chosen.surface)) chosen.surface = 'page';
+      const { surface: selected, width } = chosen;
       const surfaces = [...bySurface].map(([name, list]) => ({
         name: esc(name), label: `${esc(surfaceName(name))} (${list.length})`, selected: name === selected,
       }));
-      h += `<article class="site-card" data-site="${esc(site)}" data-index="${index}" aria-labelledby="site-${index}">
+      h += `<article class="site-card" data-site="${esc(site)}" aria-labelledby="site-${index}">
         <header>
           <div class="site-heading">
             <h2 id="site-${index}">${esc(site)}</h2>
@@ -236,9 +295,9 @@
           </div>
         </div>
         <div class="shots${same() ? ' one' : ''}">
-          ${sides.map((src) => `<figure><figcaption>${esc(nameOf(src))}</figcaption><div class="shot-frame" data-axiomatic="specimen"><div class="shot-layer">${shot(src, site, selected, width)}</div></div></figure>`).join('')}
+          ${sides.map((src) => `<figure><figcaption>${esc(nameOf(src))}<span class="shot-highlight-note" aria-live="polite"></span></figcaption><div class="shot-frame" data-axiomatic="specimen"><div class="shot-layer">${shot(src, site, selected, width)}</div></div></figure>`).join('')}
         </div>
-        <div class="site-problems">${problems(`more-${index}`, site, bySurface.get(selected), expanded)}</div>
+        <div class="site-problems">${problems(site, bySurface.get(selected))}</div>
       </article>`;
     }
     return h + '</div>';
@@ -296,7 +355,10 @@
   function render(animate = false) {
     for (const b of document.querySelectorAll('.tabs button')) b.setAttribute('aria-pressed', String(b.dataset.view === state.view));
     const html = state.view === 'sites' ? sitesView() : state.view === 'planted' ? plantedView() : overview();
+    highlightObserver.disconnect();
     main.innerHTML = animate ? `<div class="view-enter">${html}</div>` : html;
+    for (const frame of main.querySelectorAll('.shot-frame')) highlightObserver.observe(frame);
+    for (const card of main.querySelectorAll('.site-card')) updateHighlights(card);
   }
   document.querySelector('.tabs').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -305,9 +367,14 @@
     render(true);
   });
   for (const picker of [aSel, bSel]) picker.addEventListener('change', () => render());
+  main.addEventListener('load', (e) => {
+    if (e.target.matches('.shot-layer img')) positionHighlight(e.target.closest('.shot-frame'));
+  }, true);
   main.addEventListener('error', (e) => {
-    if (!e.target.matches('.shot-layer:not(.pending) img')) return;
+    if (!e.target.matches('.shot-layer:not(.pending):not(.leaving) img')) return;
+    const card = e.target.closest('.site-card');
     e.target.outerHTML = '<div class="noshot">No screenshot</div>';
+    updateHighlights(card);
   }, true);
   main.addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -315,13 +382,12 @@
     if (!card) return;
     const site = card.dataset.site;
     const chosen = cardState(site);
-    if (b.hasAttribute('data-more')) {
-      chosen.expanded = !chosen.expanded;
-      b.setAttribute('aria-expanded', String(chosen.expanded));
-      b.textContent = chosen.expanded ? 'Show fewer' : b.dataset.more;
-      const extra = $(b.getAttribute('aria-controls'));
-      extra.setAttribute('aria-hidden', String(!chosen.expanded));
-      extra.toggleAttribute('inert', !chosen.expanded);
+    if (b.hasAttribute('data-problem')) {
+      const selected = b.getAttribute('aria-pressed') === 'true';
+      chosen.problem = selected ? null : defectsOf(site).find((d) => d.surface === chosen.surface && d.what === b.dataset.problem);
+      card.querySelector('.problem-row[aria-pressed="true"]')?.setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-pressed', String(!selected));
+      updateHighlights(card);
       return;
     }
     if (b.getAttribute('aria-pressed') === 'true') return;
@@ -332,7 +398,7 @@
     chosen.width = b.dataset.width;
     b.parentElement.querySelector('[aria-pressed="true"]').setAttribute('aria-pressed', 'false');
     b.setAttribute('aria-pressed', 'true');
-    updateCardShots(card, card.querySelector('.surface-select').value, chosen.width);
+    updateCardShots(card);
   });
   main.addEventListener('change', (e) => {
     if (e.target.matches('.surface-select')) {

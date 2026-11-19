@@ -33,6 +33,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "Decorative 157px hero banner with orbit rings repeats the title and pushes the form down",
+      "selector": ".hero",
       "expect": [
         "unearned-salience",
         "primary-not-first"
@@ -43,6 +44,7 @@
       "principle": "grouping",
       "layer": "judgment",
       "what": "Danger zone is a peer of routine sections in the nav",
+      "selector": ".settings-nav [data-section=\"danger\"]",
       "expect": []
     },
     {
@@ -50,6 +52,7 @@
       "principle": "salience",
       "layer": "render",
       "what": "42px title outweighs the fields people came to change; a rare avatar action gets a full panel",
+      "selector": "#page-title, #profile .panel:first-child",
       "expect": [
         "primary-not-first",
         "salience-inversion"
@@ -60,6 +63,7 @@
       "principle": "memory",
       "layer": "judgment",
       "what": "Saving split across a panel button, a floating bar and a status label with different wording",
+      "selector": "#save-status, #save-profile, #change-bar",
       "expect": []
     },
     {
@@ -67,6 +71,7 @@
       "principle": "encoding",
       "layer": "source",
       "what": "Active nav item marked four ways; decorative label styling and tile",
+      "selector": ".settings-nav [data-section=\"profile\"], .settings-nav .nav-label, .workspace-tile",
       "expect": []
     },
     {
@@ -74,6 +79,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "On phone, 38px-high 12px tabs in a 3x2 grid take the first screen",
+      "selector": ".settings-nav",
       "expect": [
         "small-target"
       ]
@@ -92,6 +98,7 @@
       "principle": "convention",
       "layer": "render",
       "what": "Picker opens above its trigger and covers the field label and other inputs",
+      "selector": "#timezone-popover",
       "expect": []
     },
     {
@@ -99,6 +106,7 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "About 400 ungrouped zone names with no offsets; five rows visible",
+      "selector": "#timezone-options",
       "expect": []
     },
     {
@@ -106,6 +114,7 @@
       "principle": "legibility",
       "layer": "judgment",
       "what": "Roles listed without what they can do; current role marked twice",
+      "selector": "#role-menu",
       "expect": []
     },
     {
@@ -113,6 +122,7 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Does not say what happens to the person's content, whether it can be undone, or billing; red trash always visible per row",
+      "selector": "#remove-dialog",
       "expect": []
     },
     {
@@ -120,6 +130,7 @@
       "principle": "consequence",
       "layer": "source",
       "what": "Copy understates a permanent deletion; button looks active before the name is typed",
+      "selector": "#delete-dialog",
       "expect": []
     },
     {
@@ -127,6 +138,7 @@
       "principle": "salience",
       "layer": "render",
       "what": "Toast covers the Save button just clicked, at both widths",
+      "selector": "#toast, #save-profile",
       "expect": []
     },
     {
@@ -134,6 +146,7 @@
       "principle": "legibility",
       "layer": "judgment",
       "what": "Roles unexplained, jargon copy, unclear if an email is sent or a seat billed; dark radios look disabled",
+      "selector": "#invite-dialog",
       "expect": []
     }
   ],

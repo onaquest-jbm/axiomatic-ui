@@ -21,6 +21,7 @@
       "principle": "salience",
       "layer": "render",
       "what": "Current step in the progress bar is drawn faintest; segments unlabeled",
+      "selector": ".progress",
       "expect": []
     },
     {
@@ -28,6 +29,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "Programmatic focus puts a heavy ring on the heading at load",
+      "selector": "#t1",
       "expect": []
     },
     {
@@ -35,6 +37,7 @@
       "principle": "grouping",
       "layer": "render",
       "what": "At 390px the gap between stacked fields is larger than elsewhere; misstated grouping",
+      "selector": "#step-1 .row",
       "expect": [
         "weak-grouping"
       ]
@@ -44,6 +47,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "Exit, the fiscal-year hint and an inline 'Why' link compete; the 'Why' modal hides text that could be inline",
+      "selector": "#exit-btn, #why-btn, #step-1 .hint",
       "expect": []
     },
     {
@@ -51,6 +55,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "Help '?' button 36px and 'Why' link 32px tall, under the phone minimum",
+      "selector": "#help-btn-1, #why-btn",
       "expect": [
         "small-target"
       ]
@@ -60,6 +65,7 @@
       "principle": "purpose",
       "layer": "source",
       "what": "Two overlapping help mechanisms explain the same step",
+      "selector": "#help-btn-1, #why-btn",
       "expect": []
     },
     {
@@ -67,6 +73,7 @@
       "principle": "convention",
       "layer": "source",
       "what": "Back, Skip and Next in three styles; optional steps not marked until an error",
+      "selector": "#nav",
       "expect": []
     },
     {
@@ -83,6 +90,7 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Popover covers the field it explains; no arrow, no close",
+      "selector": "#help-pop-1",
       "expect": []
     },
     {
@@ -90,6 +98,7 @@
       "principle": "encoding",
       "layer": "render",
       "what": "Popover drawn like the card, so in dark mode it blends in",
+      "selector": "#help-pop-1",
       "expect": []
     },
     {
@@ -97,6 +106,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "Muted body copy; no close control; 'Got it' only",
+      "selector": "#why-dialog",
       "expect": [
         "low-contrast"
       ]
@@ -106,6 +116,7 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Harmless 'exit and save' styled as danger, louder than Keep going",
+      "selector": "#exit-stay, #exit-confirm",
       "expect": []
     },
     {
@@ -113,6 +124,7 @@
       "principle": "consequence",
       "layer": "source",
       "what": "Dialog promises progress is saved, but only the step number is",
+      "selector": "#exit-dialog p",
       "expect": []
     },
     {
@@ -120,6 +132,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "Dark mode: white text on salmon fill, weak contrast",
+      "selector": "#exit-confirm",
       "expect": [
         "low-contrast"
       ]

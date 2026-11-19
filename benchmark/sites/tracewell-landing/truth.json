@@ -25,6 +25,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "The main task (book a demo) is a quiet secondary button; the only filled primary just scrolls the page",
+      "selector": ".hero-actions",
       "expect": [
         "primary-not-first",
         "unearned-salience"
@@ -35,6 +36,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "A dark code snippet dominates the fold; the product itself is below it",
+      "selector": "#setup",
       "expect": []
     },
     {
@@ -42,6 +44,7 @@
       "principle": "choice",
       "layer": "render",
       "what": "On phone the main conversion action is hidden inside the collapsed menu",
+      "selector": ".site-header > .nav > [data-demo], #mobile-toggle",
       "expect": [
         "plan-missing"
       ]
@@ -51,6 +54,7 @@
       "principle": "convention",
       "layer": "judgment",
       "what": "'Book a demo' leads to downloading a text file; label, heading and outcome disagree",
+      "selector": "#demo-title, #demo-form button[type=\"submit\"]",
       "expect": []
     },
     {
@@ -58,6 +62,7 @@
       "principle": "legibility",
       "layer": "source",
       "what": "Required and optional fields look the same; small labels; browser-default errors only",
+      "selector": "#demo-form",
       "expect": []
     },
     {
@@ -65,6 +70,7 @@
       "principle": "response",
       "layer": "render",
       "what": "Copy only selects text; the toast is far from the button and confirms nothing",
+      "selector": "#copy-toast, #copy-setup",
       "expect": []
     },
     {
@@ -72,6 +78,7 @@
       "principle": "encoding",
       "layer": "judgment",
       "what": "A loud lime selection colour used nowhere else, hard to read on the snippet",
+      "selector": "#setup-scroll",
       "expect": []
     },
     {
@@ -88,6 +95,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "Dropdown hides three in-page anchors and mixes navigation levels",
+      "selector": "#product-menu",
       "expect": []
     },
     {
@@ -95,6 +103,7 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Large empty heading column; faint toggle far from the question",
+      "selector": ".faq-grid",
       "expect": []
     },
     {

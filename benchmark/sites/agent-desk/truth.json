@@ -34,6 +34,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "Pending approval (blocking, constant) sits below the fold; only a small badge shows at load",
+      "selector": "#head-badge",
       "expect": [
         "primary-not-first",
         "salience-inversion"
@@ -44,6 +45,7 @@
       "principle": "salience",
       "layer": "render",
       "what": "Solid accent 'New chat' is the loudest element, louder than Approve; accent reused for logo, send, avatar, selection",
+      "selector": "#new-chat",
       "expect": [
         "competing-primaries",
         "unearned-salience"
@@ -54,6 +56,7 @@
       "principle": "choice",
       "layer": "source",
       "what": "About nine header icon buttons, mostly rare and duplicated in More; seven sidebar nav items ahead of the chat list",
+      "selector": ".head .actions, .side-actions",
       "expect": []
     },
     {
@@ -77,6 +80,7 @@
       "principle": "encoding",
       "layer": "source",
       "what": "Chat status by small low-contrast dot colour alone; waiting chats not grouped above idle",
+      "selector": "#chats",
       "expect": []
     },
     {
@@ -93,6 +97,7 @@
       "principle": "salience",
       "layer": "render",
       "what": "On phone the approval card is even further below the fold; send button wraps to its own row",
+      "selector": "#send-btn",
       "expect": [
         "primary-not-first"
       ]
@@ -102,6 +107,7 @@
       "principle": "legibility",
       "layer": "judgment",
       "what": "On phone the 'waiting for you' badge is hidden, title truncated, goal bar wraps awkwardly",
+      "selector": "#chat-title, #head-badge, #goal-bar",
       "expect": []
     },
     {
@@ -109,6 +115,7 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "'Full auto' is one click away in a plain list with no warning or confirmation",
+      "selector": "#perm-menu [data-v=\"Full auto\"]",
       "expect": []
     },
     {
@@ -116,6 +123,7 @@
       "principle": "encoding",
       "layer": "source",
       "what": "Permission mode is a tiny muted pill with an unexplained coloured dot; menu offset hard-coded on phone",
+      "selector": "#perm-btn, #perm-menu",
       "expect": []
     },
     {
@@ -123,6 +131,7 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "Model, effort and permission are three near-identical peer pills; effort loses its label on phone",
+      "selector": "#model-btn, #effort-btn, #perm-btn",
       "expect": []
     },
     {
@@ -130,6 +139,7 @@
       "principle": "consequence",
       "layer": "source",
       "what": "'Stop agent' sits under 'Export transcript' with only red text, no separator or confirmation",
+      "selector": "#more-menu [data-act=\"export\"], #more-menu [data-act=\"stop\"]",
       "expect": []
     },
     {
@@ -137,6 +147,7 @@
       "principle": "consequence",
       "layer": "source",
       "what": "Delete removes a chat immediately with no confirmation or undo; kebab invisible until hover",
+      "selector": "#ctx-menu [data-act=\"delete\"]",
       "expect": []
     },
     {
@@ -144,6 +155,7 @@
       "principle": "grouping",
       "layer": "judgment",
       "what": "Toggles, select and read-only usage stats in one list with identical separators",
+      "selector": "#settings-dialog .db",
       "expect": []
     },
     {
@@ -151,6 +163,7 @@
       "principle": "convention",
       "layer": "source",
       "what": "Focus lands on the X with a heavy ring; both X and Cancel; no pending-change state",
+      "selector": "#settings-dialog .dh button, #settings-dialog .df",
       "expect": [],
       "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
     },
@@ -159,6 +172,7 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Toast covers the composer's effort and permission controls and duplicates in-button feedback",
+      "selector": "#toast, #effort-btn, #perm-btn",
       "expect": []
     }
   ],

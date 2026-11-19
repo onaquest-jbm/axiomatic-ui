@@ -33,6 +33,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "10px timestamps and chips, 11.5px snippets in faint grey in a list read all day",
+      "selector": ".message-row:first-child .row-copy",
       "expect": [
         "low-contrast"
       ]
@@ -42,6 +43,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "Star and more buttons about 26px; more invisible until hover",
+      "selector": ".message-row:first-child .row-actions",
       "expect": [
         "small-target"
       ]
@@ -51,6 +53,7 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "Archive and delete, the main triage actions, are not on rows",
+      "selector": ".message-row:first-child",
       "expect": []
     },
     {
@@ -58,6 +61,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "Reply sits at the end of the message in secondary style",
+      "selector": ".reply-button",
       "expect": []
     },
     {
@@ -72,6 +76,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "Account avatar and message count each shown two or three times",
+      "selector": ".top-actions .avatar, .sidebar .account .avatar",
       "expect": []
     },
     {
@@ -79,6 +84,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "On phone, row buttons, Compose and toolbar buttons about 33px",
+      "selector": ".mailbox .compose-open, .message-row:first-child .row-actions, #reader-tools",
       "expect": [
         "small-target"
       ]
@@ -88,6 +94,7 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Discard draft is a bare trash icon next to a close X that saves; no visible difference",
+      "selector": "#discard-draft, #compose-window .dialog-close",
       "expect": []
     },
     {
@@ -95,6 +102,7 @@
       "principle": "convention",
       "layer": "judgment",
       "what": "Compose is modal, blocking the message being replied to; no Cc, Bcc or attach",
+      "selector": "#compose-window",
       "expect": []
     },
     {
@@ -102,6 +110,7 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "Order reverses frequency; duplicates the toolbar",
+      "selector": "#message-menu",
       "expect": []
     },
     {
@@ -109,6 +118,7 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Delete directly under Archive with no gap; unclear if permanent",
+      "selector": "#message-menu [data-action=\"archive\"], #message-menu [data-action=\"delete\"]",
       "expect": []
     },
     {
@@ -116,6 +126,7 @@
       "principle": "encoding",
       "layer": "judgment",
       "what": "Icons switch meaning; focus lands on the close X",
+      "selector": "#snooze-picker",
       "expect": [],
       "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
     },
@@ -124,6 +135,7 @@
       "principle": "response",
       "layer": "render",
       "what": "Toast covers content, does not say which message, small Undo",
+      "selector": "#archive-toast",
       "expect": [
         "small-target"
       ]
@@ -133,6 +145,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "Omits frequent triage shortcuts; help shown on touch phones",
+      "selector": "#shortcuts-dialog",
       "expect": []
     },
     {
@@ -140,6 +153,7 @@
       "principle": "convention",
       "layer": "judgment",
       "what": "Unlabeled opener; popover covers headers; missing common filters",
+      "selector": "#advanced-search",
       "expect": [
         "unlabelled-field"
       ]

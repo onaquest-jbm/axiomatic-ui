@@ -15,24 +15,36 @@ const runs = [];
 if (fs.existsSync(RUNS)) for (const d of fs.readdirSync(RUNS)) {
   const dir = path.join(RUNS, d), meta = readJSON(path.join(dir, 'run.json'));
   if (!meta) continue;
-  const truth = {}, shots = {};
+  const truth = {}, shots = {}, rects = {};
   const td = path.join(dir, 'truth');
   if (fs.existsSync(td)) for (const f of fs.readdirSync(td)) if (f.endsWith('.json')) truth[f.slice(0, -5)] = readJSON(path.join(td, f));
   const sd = path.join(dir, 'shots');
-  if (fs.existsSync(sd)) for (const s of fs.readdirSync(sd)) shots[s] = fs.readdirSync(path.join(sd, s)).filter((f) => f.endsWith('.png'));
-  runs.push(Object.assign({}, meta, { slug: d, planted: readJSON(path.join(dir, 'planted.json')), sites: readJSON(path.join(dir, 'sites.json')), truth, shots }));
+  if (fs.existsSync(sd)) for (const s of fs.readdirSync(sd)) {
+    const siteDir = path.join(sd, s);
+    shots[s] = fs.readdirSync(siteDir).filter((f) => f.endsWith('.png'));
+    rects[s] = {};
+    for (const f of shots[s]) {
+      const data = readJSON(path.join(siteDir, f.replace(/\.png$/, '.rects.json')));
+      if (data) rects[s][f] = data;
+    }
+  }
+  runs.push(Object.assign({}, meta, { slug: d, planted: readJSON(path.join(dir, 'planted.json')), sites: readJSON(path.join(dir, 'sites.json')), truth, shots, rects }));
 }
 runs.sort((a, b) => String(a.createdAt).localeCompare(String(b.createdAt)));
 
 // The unmodified sites: truth from sites/, screenshots from the earliest run that has the same page.
-const original = { slug: 'original', label: 'Unmodified sites', original: true, note: 'The sites as the models built them, with the problems the blind review found. No tool results.', siteVersions: {}, truth: {}, shots: {}, shotsFrom: {} };
+const original = { slug: 'original', label: 'Unmodified sites', original: true, note: 'The sites as the models built them, with the problems the blind review found. No tool results.', siteVersions: {}, truth: {}, shots: {}, rects: {}, shotsFrom: {} };
 if (fs.existsSync(SITES)) for (const s of fs.readdirSync(SITES)) {
   const idx = path.join(SITES, s, 'index.html'), t = readJSON(path.join(SITES, s, 'truth.json'));
   if (!fs.existsSync(idx) || !t) continue;
   original.siteVersions[s] = hash(idx);
   original.truth[s] = t;
   const from = runs.find((r) => r.siteVersions && r.siteVersions[s] === original.siteVersions[s] && r.shots[s]);
-  if (from) { original.shots[s] = from.shots[s]; original.shotsFrom[s] = from.slug; }
+  if (from) {
+    original.shots[s] = from.shots[s];
+    original.rects[s] = from.rects[s];
+    original.shotsFrom[s] = from.slug;
+  }
 }
 
 fs.writeFileSync(path.join(__dirname, 'data.js'), 'window.BENCH = ' + JSON.stringify({ builtAt: new Date().toISOString(), original, runs }) + ';\n');

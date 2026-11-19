@@ -25,6 +25,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "Default sort by updated scatters SLA-breaching tickets; 'SLA at risk' is a quiet fifth tab",
+      "selector": "#views [data-view=\"breach\"], #thead [data-sort=\"updated\"]",
       "expect": []
     },
     {
@@ -32,6 +33,7 @@
       "principle": "encoding",
       "layer": "judgment",
       "what": "Priority and status are look-alike coloured pills with overlapping hues",
+      "selector": "#tbody tr:first-child .badge",
       "expect": []
     },
     {
@@ -39,6 +41,7 @@
       "principle": "encoding",
       "layer": "render",
       "what": "Identical avatars and bold subjects everywhere: emphasis distinguishes nothing",
+      "selector": "#tbody tr:first-child .subj, #tbody tr:first-child .av",
       "expect": [
         "flat-emphasis"
       ]
@@ -48,6 +51,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "11px uppercase headers, 12px mono IDs and disabled pager arrows are low contrast",
+      "selector": "#thead, #tbody tr:first-child .id, #pager :disabled",
       "expect": [
         "low-contrast"
       ]
@@ -57,6 +61,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "16px checkboxes, 28px kebab and pager buttons; under 44px on phone",
+      "selector": "#tbody tr:first-child .rowchk, #tbody tr:first-child .kebab, #pager .pg",
       "expect": [
         "small-target"
       ]
@@ -66,6 +71,7 @@
       "principle": "convention",
       "layer": "render",
       "what": "At 390px the table is cut off with no cue, tabs clipped, buttons collapse to unlabeled icons",
+      "selector": "#views, .toolbar, .tablewrap",
       "expect": [
         "horizontal-scroll",
         "text-overflow"
@@ -76,6 +82,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "'New ticket' is the most saturated element on a triage screen where it is rarely used",
+      "selector": "#newTicket",
       "expect": [
         "unearned-salience"
       ]
@@ -85,6 +92,7 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "Three steps per filter that duplicate the tabs; no quick filters",
+      "selector": "#filterPop",
       "expect": []
     },
     {
@@ -92,6 +100,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "Odd 'Is' label; popover covers headers; no match preview",
+      "selector": "#filterPop",
       "expect": []
     },
     {
@@ -99,6 +108,7 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "Frequent actions (assign to me, resolve) hidden behind a 28px kebab; rare 'Open details' leads",
+      "selector": "#rowMenu",
       "expect": []
     },
     {
@@ -106,6 +116,7 @@
       "principle": "consequence",
       "layer": "source",
       "what": "Delete sits two rows under Merge with a hairline; no undo for resolve or assign",
+      "selector": "#rowMenu [data-act=\"merge\"], #rowMenu [data-act=\"delete\"]",
       "expect": []
     },
     {
@@ -113,6 +124,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "Column picker serves almost no triage task and takes prime toolbar space",
+      "selector": "#colBtn",
       "expect": []
     },
     {
@@ -120,6 +132,7 @@
       "principle": "convention",
       "layer": "render",
       "what": "On phone toggling hidden columns does nothing, so the menu misstates what shows",
+      "selector": "#colMenu",
       "expect": []
     },
     {
@@ -127,6 +140,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "No reply box; resolve is emphasised before any response is written",
+      "selector": "#pResolve",
       "expect": []
     },
     {
@@ -134,6 +148,7 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Labels far from values; SLA due drawn like created/updated",
+      "selector": "#pBody .meta",
       "expect": []
     },
     {
@@ -141,6 +156,7 @@
       "principle": "response",
       "layer": "source",
       "what": "Scrim blocks the list; no next/previous, so close-and-reopen per ticket",
+      "selector": "#panel",
       "expect": []
     }
   ],

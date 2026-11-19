@@ -15,10 +15,31 @@ const OUT = path.join(__dirname, 'build', 'shots');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const VIEWS = [{ w: 1280, theme: 'light' }, { w: 1280, theme: 'dark' }, { w: 390, theme: 'light' }];
 
+function measureRects(selectors) {
+  const { width, height } = window.visualViewport;
+  return Object.fromEntries(selectors.map((selector) => {
+    let left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+    for (const el of document.querySelectorAll(selector)) {
+      const rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height || getComputedStyle(el).visibility !== 'visible') continue;
+      left = Math.min(left, rect.left);
+      top = Math.min(top, rect.top);
+      right = Math.max(right, rect.right);
+      bottom = Math.max(bottom, rect.bottom);
+    }
+    left = Math.max(0, left);
+    top = Math.max(0, top);
+    right = Math.min(width, right);
+    bottom = Math.min(height, bottom);
+    return [selector, right > left && bottom > top ? [left, top, right - left, bottom - top] : null];
+  }));
+}
+
 async function main() {
   const only = process.argv.slice(2);
   const sites = fs.readdirSync(SITES).filter((s) => fs.existsSync(path.join(SITES, s, 'truth.json')) && (!only.length || only.includes(s)));
   const { browser, close } = await launch({ headless: true });
+  const missing = [];
   try {
     for (const s of sites) {
       const truth = JSON.parse(fs.readFileSync(path.join(SITES, s, 'truth.json'), 'utf8'));
@@ -41,11 +62,19 @@ async function main() {
         const shot = await page.send('Page.captureScreenshot', { format: 'png' });
         const file = path.join(dir, `${t.name.replace(/[^a-z0-9]+/gi, '-')}-${v.w}-${v.theme}.png`);
         fs.writeFileSync(file, Buffer.from(shot.data, 'base64'));
+        const selectors = [...new Set((truth.defects || []).filter((d) => d.surface === t.name && d.selector).map((d) => d.selector))];
+        const rects = await page.evaluate(`(${measureRects})(${JSON.stringify(selectors)})`);
+        fs.writeFileSync(file.replace(/\.png$/, '.rects.json'), JSON.stringify(rects, null, 2) + '\n');
+        if (v.w === 1280 && v.theme === 'light') {
+          for (const selector of selectors) if (rects[selector] === null) missing.push(`${s} / ${t.name}: ${selector}`);
+        }
         if (note) process.stdout.write(`${s} / ${t.name}: ${note}\n`);
         await browser.send('Target.closeTarget', { targetId: page.targetId });
       }
       process.stdout.write(`${s}: ${targets.length * VIEWS.length} shots\n`);
     }
   } finally { await close(); }
+  console.log(`1280-light: ${missing.length} selectors without a visible rectangle`);
+  for (const item of missing) console.log(`  ${item}`);
 }
 main().catch((e) => { console.error(e.stack || e.message); process.exit(2); });

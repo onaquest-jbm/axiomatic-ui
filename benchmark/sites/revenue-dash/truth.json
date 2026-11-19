@@ -29,6 +29,7 @@
       "principle": "salience",
       "layer": "judgment",
       "what": "Share is the only filled control and the loudest thing, though the main task is reading the trend",
+      "selector": "#shareBtn",
       "expect": [
         "unearned-salience",
         "primary-not-first"
@@ -39,6 +40,7 @@
       "principle": "encoding",
       "layer": "source",
       "what": "Colours have no stable meaning: plan colours reuse the MRR/accent blue, each sparkline an arbitrary hue",
+      "selector": "#kpis svg, #donutSvg, #legend",
       "expect": []
     },
     {
@@ -46,6 +48,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "Cohort heatmap labels fail contrast in light and especially dark mode",
+      "selector": "#cohort",
       "expect": [
         "low-contrast"
       ]
@@ -62,6 +65,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "On phone the toolbar wraps into uneven rows and KPI trend context is dropped",
+      "selector": ".toolbar, #kpis .foot",
       "expect": []
     },
     {
@@ -69,6 +73,7 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Quick ranges wrap unevenly and are out of order; popover covers the KPIs it changes",
+      "selector": "#datePop",
       "expect": []
     },
     {
@@ -76,6 +81,7 @@
       "principle": "response",
       "layer": "source",
       "what": "Quick ranges apply instantly but custom range needs Apply; reversed range swapped silently",
+      "selector": "#datePop",
       "expect": []
     },
     {
@@ -83,6 +89,7 @@
       "principle": "grouping",
       "layer": "judgment",
       "what": "Immediate downloads and a persistent schedule setup in one flat list; focus ring reads as selection",
+      "selector": "#exportPop",
       "expect": [],
       "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
     },
@@ -91,6 +98,7 @@
       "principle": "pointing",
       "layer": "render",
       "what": "Close button 34px, under the 44px touch minimum; no outside-tap exit on phone",
+      "selector": "#drawerClose",
       "expect": [
         "small-target"
       ]
@@ -100,6 +108,7 @@
       "principle": "purpose",
       "layer": "judgment",
       "what": "Drawer padded with made-up rows and a status that never varies; no action",
+      "selector": "#dBody",
       "expect": []
     },
     {
@@ -107,6 +116,7 @@
       "principle": "consequence",
       "layer": "source",
       "what": "'Remove' is an option inside the role select and applies immediately with no confirmation or undo",
+      "selector": "#people",
       "expect": []
     },
     {
@@ -114,6 +124,7 @@
       "principle": "legibility",
       "layer": "render",
       "what": "Link field opens scrolled to the end; small grey access text; unlabeled toggles",
+      "selector": "#shareLink, #shareDialog .sw",
       "expect": [
         "low-contrast",
         "unlabelled-field"
@@ -124,6 +135,7 @@
       "principle": "encoding",
       "layer": "judgment",
       "what": "Tooltip repeats legend figures; hover earns little",
+      "selector": "#mixTip, #legend",
       "expect": []
     },
     {
@@ -131,6 +143,7 @@
       "principle": "encoding",
       "layer": "judgment",
       "what": "Delta badges contradict the chart, and arrow direction and colour are read two ways",
+      "selector": "#kpis .delta",
       "expect": []
     }
   ],

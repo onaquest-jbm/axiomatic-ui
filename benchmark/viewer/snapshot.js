@@ -19,7 +19,7 @@ const resDir = path.join(BENCH, 'results');
 const copied = [];
 if (fs.existsSync(resDir)) for (const f of fs.readdirSync(resDir)) if (f.endsWith('.json')) { fs.copyFileSync(path.join(resDir, f), path.join(out, f)); copied.push(f); }
 
-// sites: truth.json, page hash, screenshots (1280-light and 390-light only)
+// sites: truth.json, page hash, screenshots and rectangles (1280-light and 390-light only)
 const sitesDir = path.join(BENCH, 'sites'), shotsDir = path.join(BENCH, 'build', 'shots');
 const siteVersions = {}; let nShots = 0, bytes = 0;
 fs.mkdirSync(path.join(out, 'truth'), { recursive: true });
@@ -33,10 +33,11 @@ if (fs.existsSync(sitesDir)) for (const s of fs.readdirSync(sitesDir)) {
   if (fs.existsSync(t)) fs.copyFileSync(t, path.join(out, 'truth', s + '.json'));
   const sd = path.join(shotsDir, s);
   if (fs.existsSync(sd)) for (const f of fs.readdirSync(sd)) {
-    if (!/-(1280|390)-light\.png$/.test(f)) continue;
+    if (!/-(1280|390)-light\.(png|rects\.json)$/.test(f)) continue;
     fs.mkdirSync(path.join(out, 'shots', s), { recursive: true });
     fs.copyFileSync(path.join(sd, f), path.join(out, 'shots', s, f));
-    nShots++; bytes += fs.statSync(path.join(sd, f)).size;
+    if (f.endsWith('.png')) nShots++;
+    bytes += fs.statSync(path.join(sd, f)).size;
   }
 }
 let gitCommit = null;
