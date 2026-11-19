@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Console</title>
+<style>
+:root{
+  --bg:#f6f7f9;--panel:#fff;--panel2:#f0f2f5;--line:#e3e6eb;--text:#161a22;--muted:#5f6877;--accent:#3b5bdb;--accent-ink:#fff;
+  --run:#1b7f4b;--run-bg:#e2f5ea;--wait:#a15c00;--wait-bg:#fdf0d5;--fail:#c0292b;--fail-bg:#fde4e4;--done:#4b5563;--done-bg:#e8ebef;
+  --code:#f0f2f5;--shadow:0 10px 40px rgba(20,30,50,.18);--scrim:rgba(15,20,30,.45);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#0e1116;--panel:#161b22;--panel2:#1d232c;--line:#2a313c;--text:#e6e9ee;--muted:#9aa4b2;--accent:#7b93ff;--accent-ink:#0b1020;
+  --run:#4cc38a;--run-bg:#12301f;--wait:#f0b44c;--wait-bg:#3a2a0c;--fail:#ff7b7d;--fail-bg:#3d1618;--done:#a0aab8;--done-bg:#232a34;
+  --code:#0e1116;--shadow:0 10px 40px rgba(0,0,0,.6);--scrim:rgba(0,0,0,.6);
+}}
+:root[data-theme=dark]{
+  --bg:#0e1116;--panel:#161b22;--panel2:#1d232c;--line:#2a313c;--text:#e6e9ee;--muted:#9aa4b2;--accent:#7b93ff;--accent-ink:#0b1020;
+  --run:#4cc38a;--run-bg:#12301f;--wait:#f0b44c;--wait-bg:#3a2a0c;--fail:#ff7b7d;--fail-bg:#3d1618;--done:#a0aab8;--done-bg:#232a34;
+  --code:#0e1116;--shadow:0 10px 40px rgba(0,0,0,.6);--scrim:rgba(0,0,0,.6);
+}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12.5px}
+.app{display:grid;grid-template-rows:56px 1fr;height:100%}
+header{display:flex;align-items:center;gap:10px;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.logo{width:22px;height:22px;border-radius:6px;background:var(--accent);display:grid;place-items:center;color:var(--accent-ink);font-size:13px}
+.search{flex:1;max-width:460px;margin-left:12px;position:relative}
+.search input{width:100%;height:36px;padding:0 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+.spacer{flex:1}
+.btn{height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--panel);font-weight:600}
+.btn:hover{background:var(--panel2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ok{background:var(--run);border-color:var(--run);color:#fff}
+.btn.danger{color:var(--fail);border-color:var(--fail)}
+.btn.icon{width:36px;padding:0;font-size:18px;line-height:1}
+.only-mobile{display:none}
+.main{display:grid;grid-template-columns:230px minmax(320px,420px) 1fr;min-height:0;position:relative}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:12px 8px;overflow:auto}
+aside h2,.listhead h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 10px 8px}
+.proj{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:0;background:none;border-radius:8px;text-align:left}
+.proj:hover{background:var(--panel2)}
+.proj[aria-pressed=true]{background:var(--panel2);font-weight:600;box-shadow:inset 3px 0 var(--accent)}
+.count{font-size:12px;color:var(--muted);background:var(--panel2);border-radius:99px;padding:0 8px;min-width:24px;text-align:center}
+.proj[aria-pressed=true] .count{background:var(--bg)}
+.list{background:var(--bg);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.listhead{padding:12px 12px 8px;display:flex;flex-direction:column;gap:8px;background:var(--panel);border-bottom:1px solid var(--line)}
+.listhead .row{display:flex;justify-content:space-between;align-items:center}
+.listhead h2{margin:0}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:3px 10px;font-size:12.5px;white-space:nowrap}
+.chip[aria-pressed=true]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.items{overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
+.session{display:block;width:100%;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.session:hover{border-color:var(--muted)}
+.session[aria-current=true]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.session .t{font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.session .m{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:12.5px;margin-top:6px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.badge.running{color:var(--run);background:var(--run-bg)}
+.badge.running::before{animation:pulse 1.4s infinite}
+.badge.waiting{color:var(--wait);background:var(--wait-bg)}
+.badge.failed{color:var(--fail);background:var(--fail-bg)}
+.badge.done{color:var(--done);background:var(--done-bg)}
+@keyframes pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.badge::before{animation:none!important}*{transition:none!important}}
+.empty{color:var(--muted);text-align:center;padding:40px 16px}
+.detail{background:var(--panel);display:flex;flex-direction:column;min-height:0;min-width:0}
+.dhead{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+.dhead h1{font-size:17px;margin:0 0 6px;letter-spacing:-.01em}
+.dmeta{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted);font-size:13px;align-items:center}
+.dhead .grow{flex:1;min-width:0}
+.back{display:none}
+.menuwrap{position:relative}
+.menu{position:absolute;right:0;top:42px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);min-width:180px;padding:4px;z-index:20}
+.menu[hidden]{display:none}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:6px}
+.menu button:hover{background:var(--panel2)}
+.transcript{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:760px}
+.msg .who{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:3px}
+.msg.user .body{background:var(--panel2);border-radius:10px;padding:10px 12px}
+.tool{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:8px 10px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.approval{margin:0 18px 16px;border:1px solid var(--wait);background:var(--wait-bg);border-radius:12px;padding:12px 14px}
+.approval h3{margin:0 0 6px;font-size:13px;color:var(--wait)}
+.approval .tool{margin:8px 0;background:var(--panel)}
+.approval .acts{display:flex;gap:8px}
+.noselect{display:grid;place-items:center;flex:1;color:var(--muted);padding:20px;text-align:center}
+.cmd{border-top:1px solid var(--line);padding:10px 18px;display:flex;gap:8px}
+.cmd input{flex:1;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);padding:0 12px;min-width:0}
+/* dialog */
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);box-shadow:var(--shadow);padding:0;width:min(480px,calc(100vw - 24px))}
+dialog::backdrop{background:var(--scrim)}
+dialog form{padding:20px;display:flex;flex-direction:column;gap:14px}
+dialog h2{margin:0;font-size:18px}
+label{display:flex;flex-direction:column;gap:5px;font-weight:600;font-size:13px}
+label select,label textarea,label input{border:1px solid var(--line);border-radius:8px;background:var(--panel2);padding:8px 10px;font-weight:400}
+label textarea{min-height:96px;resize:vertical}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:0;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+fieldset legend{font-weight:600;font-size:13px;padding:0 4px}
+.chk{flex-direction:row;align-items:center;gap:8px;font-weight:400}
+.chk input{width:auto;padding:0}
+.hint{color:var(--muted);font-weight:400;font-size:12.5px}
+.err{color:var(--fail);font-weight:400;font-size:12.5px;min-height:0}
+.dacts{display:flex;justify-content:flex-end;gap:8px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:30;display:none}
+@media (max-width:1000px){
+  .main{grid-template-columns:200px 1fr}
+  .detail{position:fixed;inset:56px 0 0 0;z-index:25;transform:translateX(100%);transition:transform .2s;visibility:hidden}
+  .detail.open{transform:none;visibility:visible}
+  .back{display:inline-grid}
+}
+@media (max-width:700px){
+  .main{grid-template-columns:1fr}
+  aside{position:fixed;top:56px;bottom:0;left:0;width:260px;max-width:85vw;z-index:40;transform:translateX(-100%);transition:transform .2s;box-shadow:var(--shadow);visibility:hidden}
+  aside.open{transform:none;visibility:visible}
+  .scrim.show{display:block}
+  .only-mobile{display:inline-grid}
+  .brand span.n{display:none}
+  .search{margin-left:0;min-width:0}
+  header{padding:0 10px;gap:8px}
+  .btn.newb .lbl{display:none}
+  .btn.newb{width:36px;padding:0;font-size:18px}
+  .dhead,.transcript{padding-left:14px;padding-right:14px}
+  .approval{margin:0 14px 14px}
+  .approval .acts .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <button class="btn icon only-mobile" id="menuBtn" aria-label="Open projects" aria-expanded="false" aria-controls="sidebar">&#9776;</button>
+  <div class="brand"><div class="logo" aria-hidden="true">&#9670;</div><span class="n">Agent Console</span></div>
+  <div class="search"><input id="search" type="search" placeholder="Search sessions, tasks, models" aria-label="Search sessions"></div>
+  <div class="spacer" style="flex:0"></div>
+  <button class="btn icon" id="settingsBtn" aria-label="Settings" aria-haspopup="dialog">&#9881;</button>
+  <button class="btn primary newb" id="newBtn" aria-label="New session"><span aria-hidden="true">+</span><span class="lbl"> New session</span></button>
+</header>
+<div class="main">
+  <aside id="sidebar" aria-label="Projects"><h2>Projects</h2><div id="projects"></div></aside>
+  <section class="list" aria-label="Sessions">
+    <div class="listhead">
+      <div class="row"><h2 id="listTitle">All sessions</h2><span class="count" id="listCount"></span></div>
+      <div class="chips" id="chips" role="group" aria-label="Filter by status"></div>
+    </div>
+    <div class="items" id="items"></div>
+  </section>
+  <section class="detail" id="detail" aria-label="Session detail"></section>
+</div>
+</div>
+<div class="scrim" id="scrim"></div>
+
+<dialog id="newDialog" aria-labelledby="ndTitle">
+  <form method="dialog" id="newForm" novalidate>
+    <h2 id="ndTitle">New session</h2>
+    <label>Project<select id="nProject" required></select></label>
+    <label>Model<select id="nModel"><option>claude-sonnet-5-5</option><option>claude-opus-4-5</option><option>gpt-5-codex</option><option>gemini-3-pro</option></select></label>
+    <label>Task description<textarea id="nTask" placeholder="e.g. Add rate limiting to the public API"></textarea><span class="err" id="nErr" role="alert"></span></label>
+    <div class="dacts"><button type="button" class="btn" id="nCancel">Cancel</button><button type="submit" class="btn primary">Start session</button></div>
+  </form>
+</dialog>
+<dialog id="settingsDialog" aria-labelledby="sdTitle">
+  <form method="dialog" id="settingsForm" novalidate>
+    <h2 id="sdTitle">Settings</h2>
+    <label>Default model<select id="sModel"><option>claude-sonnet-5-5</option><option>claude-opus-4-5</option><option>gpt-5-codex</option><option>gemini-3-pro</option></select></label>
+    <label>Theme<select id="sTheme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    <fieldset><legend>Notifications</legend>
+      <label class="chk"><input type="checkbox" id="sNApprove">Approval requests</label>
+      <label class="chk"><input type="checkbox" id="sNDone">Session finished</label>
+      <label class="chk"><input type="checkbox" id="sNFail">Session failed</label>
+    </fieldset>
+    <fieldset><legend>API keys</legend>
+      <label>Anthropic<input type="password" id="kAnthropic" autocomplete="off" placeholder="sk-ant-..."></label>
+      <label>OpenAI<input type="password" id="kOpenai" autocomplete="off" placeholder="sk-..."></label>
+      <label>Google<input type="password" id="kGoogle" autocomplete="off" placeholder="AIza..."></label>
+      <span class="hint">Stored only in this browser (localStorage).</span>
+    </fieldset>
+    <div class="dacts"><button type="button" class="btn" id="sCancel">Cancel</button><button type="submit" class="btn primary">Save settings</button></div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+var projects=["web-app","api-gateway","mobile-client","infra","docs-site","data-pipeline"];
+var S=[
+["Migrate auth middleware to JWT rotation","api-gateway","claude-opus-4-5","running",1520,4.82],
+["Fix flaky checkout e2e tests","web-app","claude-sonnet-5-5","waiting",640,1.35],
+["Upgrade Terraform modules to v1.9","infra","claude-sonnet-5-5","waiting",2210,3.1],
+["Add dark mode to settings screen","mobile-client","gpt-5-codex","running",410,0.88],
+["Refactor ETL job scheduler","data-pipeline","claude-opus-4-5","failed",3300,9.4],
+["Write quickstart guide for SDK","docs-site","claude-sonnet-5-5","done",930,1.12],
+["Reduce bundle size of dashboard route","web-app","gemini-3-pro","done",1780,2.46],
+["Implement pagination on /v2/orders","api-gateway","claude-sonnet-5-5","done",1240,1.97],
+["Investigate memory leak in worker pool","data-pipeline","claude-opus-4-5","running",5120,12.7],
+["Set up preview environments per PR","infra","gpt-5-codex","failed",760,1.64],
+["Push notification deep links","mobile-client","claude-sonnet-5-5","waiting",300,0.52],
+["Replace moment.js with date-fns","web-app","claude-sonnet-5-5","done",2050,2.9],
+["Fix broken links in API reference","docs-site","gemini-3-pro","done",280,0.21],
+["Add retry with backoff to webhook sender","api-gateway","claude-opus-4-5","running",880,2.05],
+["Offline cache for iOS feed","mobile-client","claude-opus-4-5","failed",4400,11.3]
+].map(function(a,i){return{id:i+1,title:a[0],project:a[1],model:a[2],status:a[3],secs:a[4],cost:a[5]}});
+var approvals={2:{tool:"Bash",cmd:"rm -rf node_modules/.cache && npx playwright test checkout.spec.ts --retries=3",why:"Clear stale cache before re-running the flaky spec."},
+ 3:{tool:"Bash",cmd:"terraform apply -target=module.vpc -auto-approve",why:"Apply the upgraded VPC module in the staging workspace."},
+ 11:{tool:"Edit",cmd:"ios/App/Info.plist  +CFBundleURLTypes (scheme: acme)",why:"Register the custom URL scheme for deep links."}};
+var state={proj:"all",status:"all",q:"",sel:null};
+var $=function(s){return document.querySelector(s)};
+function fmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+"h "+m+"m":m+"m "+(s%60)+"s"}
+function label(s){return{running:"Running",waiting:"Needs approval",failed:"Failed",done:"Done"}[s]}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function transcript(x){
+  var t=[["user","Task: "+x.title+". Keep changes small and add tests."],
+   ["agent","I'll start by reading the relevant code in <b>"+esc(x.project)+"</b> to understand the current structure."],
+   ["tool","$ grep -rn \"TODO\\|FIXME\" src | head -20\nsrc/core/handler.ts:42: // TODO: handle edge case\nsrc/core/util.ts:8: // FIXME: remove after migration"],
+   ["agent","Found the entry point. I'll make the change in two steps: update the implementation, then cover it with tests."],
+   ["tool","edit src/core/handler.ts  (+38 -12)\nedit src/core/handler.test.ts  (+54 -0)"]];
+  if(x.status=="failed")t.push(["tool","$ npm test\nFAIL src/core/handler.test.ts\n  Expected: 200\n  Received: 500\nExit code 1"],["agent","The tests are failing and my last three attempts did not resolve it. Stopping with the error for review."]);
+  else if(x.status=="done")t.push(["tool","$ npm test\nPASS 142 tests (4.1s)"],["agent","All tests pass. Summary: implementation updated, tests added, no public API changes. Ready for review."]);
+  else if(x.status=="waiting")t.push(["agent","I need to run a command that modifies local state. Requesting your approval below."]);
+  else t.push(["agent","Tests are running now. I'll report back once they finish."]);
+  return t}
+function visible(){var q=state.q.toLowerCase();return S.filter(function(x){
+  return(state.proj=="all"||x.project==state.proj)&&(state.status=="all"||x.status==state.status)&&(!q||(x.title+x.project+x.model+label(x.status)).toLowerCase().indexOf(q)>-1)})}
+function renderProjects(){
+  var h='<button class="proj" data-p="all" aria-pressed="'+(state.proj=="all")+'">All projects<span class="count">'+S.length+'</span></button>';
+  projects.forEach(function(p){var n=S.filter(function(x){return x.project==p}).length;
+    h+='<button class="proj" data-p="'+p+'" aria-pressed="'+(state.proj==p)+'"><span class="mono">'+p+'</span><span class="count">'+n+'</span></button>'});
+  $("#projects").innerHTML=h}
+function renderChips(){
+  var base=S.filter(function(x){return state.proj=="all"||x.project==state.proj});
+  var h=["all","running","waiting","failed","done"].map(function(s){
+    var n=s=="all"?base.length:base.filter(function(x){return x.status==s}).length;
+    return'<button class="chip" data-s="'+s+'" aria-pressed="'+(state.status==s)+'">'+(s=="all"?"All":label(s))+" "+n+"</button>"}).join("");
+  $("#chips").innerHTML=h}
+function renderList(){
+  var v=visible();$("#listTitle").textContent=state.proj=="all"?"All sessions":state.proj;$("#listCount").textContent=v.length;
+  $("#items").innerHTML=v.length?v.map(function(x){
+    return'<button class="session" data-id="'+x.id+'" aria-current="'+(state.sel==x.id)+'"><span class="t">'+esc(x.title)+'</span><span class="m"><span class="badge '+x.status+'">'+label(x.status)+'</span><span class="mono">'+x.model+'</span><span>'+fmt(x.secs)+'</span><span>$'+x.cost.toFixed(2)+'</span></span></button>'}).join(""):'<div class="empty">No sessions match your filters.</div>'}
+function renderDetail(){
+  var d=$("#detail"),x=S.filter(function(s){return s.id==state.sel})[0];
+  if(!x){d.innerHTML='<div class="noselect">Select a session to see its transcript.</div>';return}
+  var ap=x.status=="waiting"&&approvals[x.id];
+  d.innerHTML='<div class="dhead"><button class="btn icon back" id="back" aria-label="Back to sessions">&larr;</button><div class="grow"><h1>'+esc(x.title)+'</h1><div class="dmeta"><span class="badge '+x.status+'">'+label(x.status)+'</span><span class="mono">'+esc(x.project)+'</span><span class="mono">'+x.model+'</span><span>'+fmt(x.secs)+'</span><span>$'+x.cost.toFixed(2)+'</span></div></div>'+
+   '<div class="menuwrap"><button class="btn icon" id="moreBtn" aria-label="Session actions" aria-haspopup="menu" aria-expanded="false">&#8942;</button><div class="menu" id="moreMenu" role="menu" hidden><button role="menuitem" data-a="copy">Copy session ID</button><button role="menuitem" data-a="stop">Stop session</button><button role="menuitem" data-a="rerun">Re-run with same task</button></div></div></div>'+
+   '<div class="transcript">'+transcript(x).map(function(m){return m[0]=="tool"?'<div class="msg"><div class="tool mono">'+esc(m[1])+'</div></div>':'<div class="msg '+m[0]+'"><div class="who">'+(m[0]=="user"?"You":"Agent")+'</div><div class="body">'+(m[0]=="user"?esc(m[1]):m[1])+'</div></div>'}).join("")+'</div>'+
+   (ap?'<div class="approval" id="approval" role="group" aria-label="Pending approval"><h3>Approval requested: '+ap.tool+'</h3><div>'+esc(ap.why)+'</div><div class="tool mono">'+esc(ap.cmd)+'</div><div class="acts"><button class="btn ok" data-d="approve">Approve</button><button class="btn danger" data-d="deny">Deny</button></div></div>':'')+
+   '<div class="cmd"><input aria-label="Message to agent" placeholder="Send a message to the agent" '+(x.status=="done"||x.status=="failed"?"":"")+'><button class="btn" id="send">Send</button></div>';
+  $(".transcript").scrollTop=1e5}
+function render(){renderProjects();renderChips();renderList();renderDetail()}
+var tt;function toast(m){var t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("show")},2800)}
+function closeDrawer(){$("#sidebar").classList.remove("open");$("#scrim").classList.remove("show");$("#menuBtn").setAttribute("aria-expanded","false")}
+function closeMenu(){var m=$("#moreMenu");if(m){m.hidden=true;$("#moreBtn").setAttribute("aria-expanded","false")}}
+document.addEventListener("click",function(e){
+  var t=e.target,c;
+  if(c=t.closest(".proj")){state.proj=c.dataset.p;closeDrawer();render();return}
+  if(c=t.closest(".chip")){state.status=c.dataset.s;render();return}
+  if(c=t.closest(".session")){state.sel=+c.dataset.id;render();$("#detail").classList.add("open");return}
+  if(t.closest("#back")){$("#detail").classList.remove("open");return}
+  if(t.closest("#moreBtn")){var m=$("#moreMenu");m.hidden=!m.hidden;$("#moreBtn").setAttribute("aria-expanded",String(!m.hidden));return}
+  if(c=t.closest("#moreMenu [data-a]")){var a=c.dataset.a,x=S.filter(function(s){return s.id==state.sel})[0];closeMenu();
+    if(a=="copy")toast("Copied session ID ses_"+(1000+x.id));
+    if(a=="stop"){if(x.status=="running"||x.status=="waiting"){x.status="done";render();toast("Session stopped")}else toast("Session is not active")}
+    if(a=="rerun")toast("Re-run queued for "+x.project);return}
+  if(c=t.closest("[data-d]")){var x2=S.filter(function(s){return s.id==state.sel})[0],ok=c.dataset.d=="approve";
+    delete approvals[x2.id];x2.status=ok?"running":"failed";render();toast(ok?"Approved. Agent resumed.":"Denied. Agent stopped.");return}
+  if(t.closest("#send")){var i=$(".cmd input");if(i.value.trim()){i.value="";toast("Message sent")}return}
+  if(!t.closest(".menuwrap"))closeMenu();
+});
+$("#menuBtn").onclick=function(){var o=$("#sidebar").classList.toggle("open");$("#scrim").classList.toggle("show",o);this.setAttribute("aria-expanded",String(o))};
+$("#scrim").onclick=closeDrawer;
+$("#search").oninput=function(){state.q=this.value;renderList()};
+var SK="agentConsoleSettings",defs={model:"claude-sonnet-5-5",theme:"system",nApprove:true,nDone:true,nFail:true,kAnthropic:"",kOpenai:"",kGoogle:""};
+function loadSet(){var o={};try{o=JSON.parse(localStorage.getItem(SK)||"{}")}catch(e){}for(var k in defs)if(!(k in o))o[k]=defs[k];return o}
+var cfg=loadSet();
+function applyTheme(){var r=document.documentElement;if(cfg.theme=="system")r.removeAttribute("data-theme");else r.setAttribute("data-theme",cfg.theme)}
+applyTheme();
+var sdlg=$("#settingsDialog");
+$("#settingsBtn").onclick=function(){$("#sModel").value=cfg.model;$("#sTheme").value=cfg.theme;$("#sNApprove").checked=cfg.nApprove;$("#sNDone").checked=cfg.nDone;$("#sNFail").checked=cfg.nFail;$("#kAnthropic").value=cfg.kAnthropic;$("#kOpenai").value=cfg.kOpenai;$("#kGoogle").value=cfg.kGoogle;sdlg.showModal()};
+$("#sCancel").onclick=function(){sdlg.close()};
+sdlg.addEventListener("click",function(e){if(e.target===sdlg)sdlg.close()});
+$("#settingsForm").addEventListener("submit",function(e){e.preventDefault();
+  cfg={model:$("#sModel").value,theme:$("#sTheme").value,nApprove:$("#sNApprove").checked,nDone:$("#sNDone").checked,nFail:$("#sNFail").checked,kAnthropic:$("#kAnthropic").value.trim(),kOpenai:$("#kOpenai").value.trim(),kGoogle:$("#kGoogle").value.trim()};
+  var ok=true;try{localStorage.setItem(SK,JSON.stringify(cfg))}catch(x){ok=false}
+  applyTheme();sdlg.close();toast(ok?"Settings saved":"Settings applied (could not persist)")});
+var dlg=$("#newDialog");
+$("#newBtn").onclick=function(){$("#nProject").innerHTML=projects.map(function(p){return"<option>"+p+"</option>"}).join("");if(state.proj!="all")$("#nProject").value=state.proj;$("#nModel").value=cfg.model;$("#nTask").value="";$("#nErr").textContent="";dlg.showModal();$("#nTask").focus()};
+$("#nCancel").onclick=function(){dlg.close()};
+dlg.addEventListener("click",function(e){if(e.target===dlg)dlg.close()});
+$("#newForm").addEventListener("submit",function(e){e.preventDefault();
+  var task=$("#nTask").value.trim();if(!task){$("#nErr").textContent="Describe the task so the agent knows what to do.";$("#nTask").focus();return}
+  var s={id:S.length+1,title:task.slice(0,80),project:$("#nProject").value,model:$("#nModel").value,status:"running",secs:0,cost:0};
+  S.unshift(s);state.sel=s.id;state.status="all";dlg.close();render();$("#detail").classList.add("open");toast("Session started in "+s.project)});
+document.addEventListener("keydown",function(e){if(e.key=="Escape"){closeMenu();closeDrawer()}});
+setInterval(function(){S.forEach(function(x){if(x.status=="running"){x.secs++;x.cost+=0.0015}});
+  var el=document.querySelector(".dmeta");if(!el)return;
+  document.querySelectorAll(".session").forEach(function(b){var x=S.filter(function(s){return s.id==b.dataset.id})[0],m=b.querySelectorAll(".m span");if(x&&x.status=="running"){m[2].textContent=fmt(x.secs);m[3].textContent="$"+x.cost.toFixed(2)}})},1000);
+state.sel=2;render();
+})();
+</script>
+</body>
+</html>

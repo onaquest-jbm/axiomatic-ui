@@ -1,0 +1,1668 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>Relay — Agent Control Room</title>
+<style>
+:root {
+  font-family: "Inter", "Segoe UI Variable", "Segoe UI", sans-serif;
+  font-synthesis: none;
+  color-scheme: dark;
+  --base:#0b1019; --sidebar:#0e1521; --surface:#101926; --raised:#162132;
+  --hover:#192638; --line:#233144; --line-strong:#30425a; --text:#eef3fb;
+  --muted:#9aaac0; --faint:#7d8fa9; --accent:#69e6e0; --accent-soft:#153138;
+  --green:#76e4a7; --green-bg:#153229; --red:#ffa1aa; --red-bg:#3a232e;
+  --amber:#f6cb87; --amber-bg:#352d23; --blue:#99b9ff; --violet:#c3aafd;
+  --shadow:0 18px 55px #03081290; --mono:"Cascadia Mono", Consolas, monospace;
+}
+[data-theme="light"] {
+  color-scheme:light;
+  --base:#eef3f8; --sidebar:#f8fbff; --surface:#fff; --raised:#f0f5fa;
+  --hover:#e7eff8; --line:#d7e1ed; --line-strong:#c2d0e1; --text:#132339;
+  --muted:#526881; --faint:#5c718a; --accent:#087774; --accent-soft:#d9f3f1;
+  --green:#16754b; --green-bg:#e0f6e9; --red:#aa354e; --red-bg:#fbe9ee;
+  --amber:#8a5817; --amber-bg:#fbf0dd; --blue:#315bb5; --violet:#6843ac;
+  --shadow:0 18px 55px #29436325;
+}
+*,*::before,*::after {box-sizing:border-box}
+body {margin:0;background:var(--base);color:var(--text);font-size:14px;min-height:100vh}
+button,input,textarea {font:inherit;color:inherit}
+button {cursor:pointer}
+button:disabled {cursor:default;opacity:.43}
+button,input,textarea {outline:none}
+:focus-visible {outline:2px solid var(--accent);outline-offset:3px}
+[hidden] {display:none!important}
+svg.icon {width:17px;height:17px;flex:none;display:block}
+button {border:0;background:none}
+button svg {pointer-events:none}
+.layout {display:grid;grid-template-columns:226px minmax(0,1fr);min-height:100vh}
+.sidebar {background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100dvh;padding:23px 15px 14px;z-index:5}
+.brand {display:flex;align-items:center;gap:10px;padding:0 10px;margin-bottom:30px;font-weight:720;font-size:23px;letter-spacing:-.9px}
+.brand-mark {width:33px;height:33px;display:grid;place-items:center;color:#071825;background:#69e6e0;border-radius:9px;box-shadow:0 0 23px #65e5dc31}
+.brand-mark .icon {width:23px;height:23px;stroke-width:1.75}
+.workspace {display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:10px;background:var(--surface);margin:0 1px 26px}
+.workspace-icon {width:31px;height:31px;border-radius:7px;display:grid;place-items:center;color:var(--violet);background:color-mix(in srgb,var(--violet) 13%,var(--surface));flex:none}
+.workspace strong,.profile strong {display:block;font-size:12px;font-weight:650}
+.workspace small,.profile small {display:block;font-size:11px;color:var(--faint);margin-top:2px}
+.side-label {display:flex;justify-content:space-between;align-items:center;margin:0 9px 7px;color:var(--faint);font:10px var(--mono);letter-spacing:1.15px;text-transform:uppercase}
+.side-label .icon-button {width:24px;height:24px;border:0}
+.side-label .icon {width:14px;height:14px}
+.nav-group {display:grid;gap:4px;margin-bottom:22px}
+.nav-button {width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:9px 10px;color:var(--muted);white-space:nowrap;min-height:39px;border:1px solid transparent;border-radius:7px;font-size:13px}
+.nav-button:hover {background:var(--hover);color:var(--text)}
+.nav-button.active {background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 21%,transparent);font-weight:650}
+.nav-button .nav-count {margin-left:auto;font:10px var(--mono);color:var(--accent)}
+.project-symbol {width:21px;height:21px;display:grid;place-items:center;border-radius:5px;flex:none;color:var(--project-color);background:color-mix(in srgb,var(--project-color) 14%,transparent)}
+.project-symbol .icon {width:13px;height:13px}
+.project-nav {overflow:auto;min-height:0}
+.project-nav .nav-button {padding-left:8px}
+.project-nav .nav-button span:last-child {overflow:hidden;text-overflow:ellipsis}
+.sidebar-end {margin-top:auto}
+.profile {display:flex;align-items:center;gap:9px;border-top:1px solid var(--line);margin:12px 0 0;padding:14px 8px 3px}
+.avatar {width:32px;height:32px;display:grid;place-items:center;flex:none;border-radius:50%;color:#d7e9ff;background:linear-gradient(138deg,#3c668f,#364269);font-family:var(--mono);font-size:11px}
+.main {min-width:0}
+.topbar {height:65px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 29px;background:var(--sidebar)}
+.breadcrumbs,.top-actions,.inline {display:flex;align-items:center;gap:10px}
+.breadcrumbs {font-size:13px;color:var(--faint);white-space:nowrap;min-width:0}
+.breadcrumbs strong {color:var(--text);font-weight:620;overflow:hidden;text-overflow:ellipsis}
+.breadcrumbs .icon {width:13px;height:13px}
+.top-actions {flex:none}
+.icon-button,.button {display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:7px;white-space:nowrap;font-weight:620;font-size:12px;background:var(--surface)}
+.icon-button:hover,.button:hover {background:var(--hover);border-color:var(--line-strong)}
+.icon-button {width:34px;height:34px;padding:0;color:var(--muted);position:relative;flex:none}
+.button {min-height:34px;padding:0 11px}
+.button .icon {width:15px;height:15px}
+.primary {background:#6be7e1;border-color:#6be7e1;color:#08252b;box-shadow:0 4px 14px #3eddd326}
+.primary:hover {background:#a5f5ef;border-color:#a5f5ef}
+.danger {background:#b73754;border-color:#b73754;color:#fff}
+.danger:hover {background:#ce4060;border-color:#ce4060}
+.ghost {background:transparent}
+.command-button {color:var(--muted);width:202px;justify-content:flex-start}
+.command-button kbd {margin-left:auto}
+kbd {font:10px var(--mono);color:var(--muted);border:1px solid var(--line-strong);border-radius:4px;padding:2px 4px;white-space:nowrap}
+.notification-dot {position:absolute;right:6px;top:5px;width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 2px var(--surface)}
+#mobile-nav-trigger,#mobile-nav-dismiss {display:none}
+.content {padding:27px 29px 30px;max-width:1570px;margin:auto}
+.hero {position:relative;isolation:isolate;overflow:hidden;min-height:218px;display:flex;align-items:center;border:1px solid #2b4255;border-radius:12px;background:linear-gradient(110deg,#152437,#111f31 52%,#101d2d);color:#f2f7ff}
+.hero::before {content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,transparent 42%,#438e9e0a),repeating-linear-gradient(0deg,transparent 0 23px,#81bac40a 23px 24px),repeating-linear-gradient(90deg,transparent 0 23px,#81bac40a 23px 24px);mask-image:linear-gradient(90deg,transparent 12%,#000 70%)}
+.hero-copy {padding:25px 30px;position:relative;z-index:1}
+.eyebrow {display:flex;align-items:center;gap:8px;color:#7fe6e2;font:10px var(--mono);letter-spacing:1.55px;text-transform:uppercase}
+.eyebrow::before {content:"";width:14px;height:1px;background:currentColor}
+h1,h2,h3,p {margin:0}
+.hero h1 {font-size:clamp(31px,3.3vw,49px);line-height:1.09;letter-spacing:-.057em;margin:10px 0 9px;font-weight:700}
+.hero p {font-size:14px;line-height:1.5;color:#aebed4}
+.hero-cta {display:flex;align-items:center;gap:13px;margin-top:22px}
+.hero-cta .button {min-height:35px;padding-inline:12px}
+.offline-status {display:inline-flex;align-items:center;gap:6px;color:#a0b4ca;font:10px var(--mono);white-space:nowrap}
+.offline-status::before {content:"";width:6px;height:6px;border-radius:50%;background:#72e5bd;box-shadow:0 0 8px #72e5bd88}
+.hero-art {position:absolute;width:56%;height:100%;right:0;top:0;z-index:-1}
+.hero-art canvas {width:100%;height:100%;display:block}
+.stats {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:16px 0 23px}
+.stat {min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 15px 12px;position:relative;min-height:101px}
+.stat-label {display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
+.stat-icon {height:24px;width:24px;display:grid;place-items:center;border-radius:6px;background:color-mix(in srgb,var(--stat-color) 13%,transparent);color:var(--stat-color)}
+.stat-icon .icon {width:14px;height:14px}
+.stat strong {display:block;color:var(--text);font-size:25px;line-height:1.11;letter-spacing:-.65px;margin-top:7px;font-weight:670;font-variant-numeric:tabular-nums}
+.stat small {display:block;margin-top:5px;color:var(--faint);font-size:11px}
+.mini-trend {position:absolute;right:13px;bottom:16px;width:53px;height:24px;opacity:.68;color:var(--stat-color)}
+.mini-trend path {fill:none;stroke:currentColor;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.panel {background:var(--surface);border:1px solid var(--line);border-radius:11px;min-width:0}
+.panel-title {display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px 17px 13px}
+.panel-title h2 {font-weight:680;font-size:19px;letter-spacing:-.35px}
+.panel-title p {color:var(--faint);font-size:12px;margin-top:4px}
+.table-tools {display:flex;align-items:center;gap:8px}
+#project-filter-label {overflow:hidden;text-overflow:ellipsis}
+.input-wrap {display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--base);color:var(--faint);border-radius:7px;padding:0 9px;min-height:34px}
+.input-wrap:focus-within {border-color:var(--accent)}
+.input-wrap .icon {width:15px;height:15px}
+.input-wrap input {width:145px;min-width:0;padding:0;background:none;border:none;color:var(--text);font-size:12px;outline:0}
+input::placeholder,textarea::placeholder {color:var(--faint)}
+.tabs {display:flex;align-items:center;gap:15px;padding:0 17px;border-bottom:1px solid var(--line);overflow:auto}
+.tab {position:relative;display:flex;align-items:center;gap:6px;white-space:nowrap;color:var(--muted);font-weight:610;font-size:12px;padding:9px 1px 10px}
+.tab:hover,.tab.active {color:var(--accent)}
+.tab.active::after {content:"";position:absolute;bottom:0;left:0;right:0;background:var(--accent);height:2px;border-radius:2px 2px 0 0}
+.tab-count {font:10px var(--mono);padding:2px 5px;background:var(--raised);border-radius:4px;color:var(--muted)}
+.tab.active .tab-count {background:var(--accent-soft);color:var(--accent)}
+.bulk {display:flex;align-items:center;gap:7px;padding:8px 15px;border-bottom:1px solid var(--line);background:var(--accent-soft);flex-wrap:wrap}
+.bulk strong {margin-right:auto;font-size:12px;color:var(--accent)}
+.bulk .button {min-height:29px}
+.table-scroll {overflow:auto}
+table {width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}
+.session-table {min-width:747px}
+th {font-size:11px;color:var(--faint);font-weight:640;background:color-mix(in srgb,var(--base) 37%,var(--surface));height:34px}
+th,td {padding:0 11px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child {padding-left:16px}
+td {height:54px;color:var(--muted);font-size:12px}
+tbody tr:last-child td {border-bottom:0}
+tbody tr:hover {background:color-mix(in srgb,var(--hover) 58%,transparent)}
+tr.selected {background:var(--accent-soft)}
+.sel-cell {width:35px;padding-right:4px}
+.session-cell {min-width:225px}
+.session-name {display:flex;align-items:center;gap:9px;text-align:left;padding:0;max-width:100%;border-radius:4px;color:var(--text)}
+.session-name:hover .session-title {color:var(--accent)}
+.session-glyph {width:29px;height:29px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;background:var(--raised);color:var(--muted)}
+.session-glyph .icon {width:15px;height:15px}
+.session-name .session-title {display:block;max-width:clamp(125px,19vw,285px);overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:650;line-height:1.25}
+.session-id {display:block;margin-top:3px;color:var(--faint);font:10px var(--mono)}
+.project-cell {display:flex;align-items:center;gap:7px}
+.model {font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.model::before {content:"";width:6px;height:6px;border-radius:50%;background:var(--model-color)}
+.status-chip {display:inline-flex;align-items:center;gap:5px;line-height:19px;border-radius:5px;padding:0 6px;background:var(--raised);color:var(--muted);font-size:10px;font-weight:640}
+.status-chip::before {content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+.status-running {color:var(--accent);background:var(--accent-soft)}
+.status-running::before {box-shadow:0 0 7px currentColor}
+.status-completed {color:var(--green);background:var(--green-bg)}
+.status-failed {color:var(--red);background:var(--red-bg)}
+.status-stopped {color:var(--amber);background:var(--amber-bg)}
+.time-cell {font:11px var(--mono)}
+.action-cell {width:41px;text-align:right;padding-right:13px}
+.row-menu-trigger {width:28px;height:28px;background:transparent;border-color:transparent}
+.row-menu-trigger .icon {width:16px;height:16px}
+input[type=checkbox] {appearance:none;vertical-align:middle;display:inline-grid;place-items:center;margin:0;width:14px;height:14px;border-radius:4px;border:1px solid var(--line-strong);background:var(--base);cursor:pointer}
+input[type=checkbox]:checked,input[type=checkbox]:indeterminate {background:var(--accent);border-color:var(--accent);color:var(--base)}
+input[type=checkbox]:checked::after {content:"";width:7px;height:4px;border-left:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:translateY(-1px) rotate(-45deg)}
+input[type=checkbox]:indeterminate::after {content:"";width:7px;border-bottom:1.6px solid currentColor}
+.table-footer {display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid var(--line);font-size:11px;color:var(--faint)}
+.table-footer .inline {gap:5px}
+.table-footer .icon {width:13px;height:13px}
+.empty {padding:30px 16px;text-align:center;color:var(--muted)}
+.empty strong {color:var(--text);display:block;margin-bottom:5px}
+.usage-heading {display:flex;justify-content:space-between;align-items:end;margin:3px 0 18px;gap:15px}
+.usage-heading h1 {font-size:35px;letter-spacing:-1.25px;line-height:1.15}
+.usage-heading p {color:var(--muted);margin-top:6px}
+.usage-heading .eyebrow {color:var(--accent);margin-bottom:8px}
+.usage-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.usage-grid .stat {min-height:92px}
+.chart-panel {margin:17px 0}
+.chart-area {padding:0 18px 15px;height:250px}
+.chart-area canvas {width:100%;height:100%;display:block}
+.usage-table {min-width:490px}
+.usage-table td {height:49px}
+.usage-table td:first-child {color:var(--text)}
+.usage-table .project-cell {font-weight:650}
+.usage-table th:last-child,.usage-table td:last-child {padding-right:18px}
+.segmented {display:flex;gap:3px;padding:3px;border:1px solid var(--line);border-radius:7px;background:var(--base)}
+.segmented button {padding:5px 9px;color:var(--muted);font-size:11px;border-radius:4px;white-space:nowrap}
+.segmented button:hover {color:var(--text)}
+.segmented button.active {color:var(--accent);background:var(--accent-soft)}
+.float {position:fixed;z-index:20;min-width:172px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);box-shadow:var(--shadow);padding:5px;max-height:calc(100dvh - 24px);overflow:auto}
+.menu-item {padding:8px 9px;min-height:34px;width:100%;display:flex;align-items:center;gap:9px;text-align:left;color:var(--text);border-radius:5px;font-size:12px}
+.menu-item:hover,.menu-item:focus-visible {background:var(--hover)}
+.menu-item .icon {width:15px;height:15px;color:var(--muted)}
+.menu-item.active,.menu-item.active .icon {color:var(--accent)}
+.menu-item.danger-text,.menu-item.danger-text .icon {color:var(--red)}
+.menu-item .menu-trailing {margin-left:auto}
+.menu-separator {margin:4px 2px;border-top:1px solid var(--line)}
+.notification-popover {width:min(364px,calc(100vw - 24px));padding:0}
+.popover-heading {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 13px;border-bottom:1px solid var(--line)}
+.popover-heading h2 {font-size:15px}
+.link-button {color:var(--accent);padding:3px;font-size:11px;border-radius:3px}
+.link-button:hover {text-decoration:underline}
+.notification-list {max-height:335px;overflow:auto}
+.notification-item,.notification-static {display:flex;align-items:flex-start;width:100%;gap:9px;padding:12px 13px;text-align:left;border-bottom:1px solid var(--line);background:var(--surface)}
+.notification-item:last-child,.notification-static:last-child {border:0}
+.notification-item:hover {background:var(--hover)}
+.notification-item.unread,.notification-static.unread {background:color-mix(in srgb,var(--accent-soft) 42%,var(--surface))}
+.event-icon {width:26px;height:26px;border-radius:6px;display:grid;place-items:center;flex:none;color:var(--accent);background:var(--accent-soft)}
+.event-icon.completed {color:var(--green);background:var(--green-bg)}
+.event-icon.failed {color:var(--red);background:var(--red-bg)}
+.event-icon .icon {width:14px;height:14px}
+.event-copy {flex:1;min-width:0;overflow-wrap:anywhere}
+.event-copy strong {display:block;font-size:12px;margin:0 0 3px}
+.event-copy small {display:block;color:var(--muted);font-size:11px;line-height:1.45}
+.unread-mark {width:6px;height:6px;margin-top:5px;flex:none;border-radius:50%;background:var(--accent)}
+dialog {background:var(--surface);color:var(--text);border:1px solid var(--line-strong);border-radius:13px;padding:0;width:min(515px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:var(--shadow)}
+dialog::backdrop {background:#040914a9;backdrop-filter:blur(3px)}
+dialog[open] {animation:appear .16s ease-out}
+@keyframes appear {from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.dialog-head,.dialog-foot {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid var(--line)}
+.dialog-head h2 {font-size:19px;letter-spacing:-.32px}
+.dialog-head p {color:var(--muted);font-size:12px;margin-top:4px}
+.dialog-foot {justify-content:flex-end;border-bottom:0;border-top:1px solid var(--line)}
+.dialog-body {padding:16px 18px}
+.fields {display:grid;gap:15px}
+.field {display:grid;gap:7px;min-width:0}
+fieldset.field {padding:0;margin:0;border:0}
+.field legend {margin-bottom:7px;padding:0}
+.field-label {font-size:12px;font-weight:650}
+.field-hint {font-size:11px;color:var(--faint);line-height:1.5}
+.text-input {display:block;width:100%;min-height:36px;padding:8px 10px;border:1px solid var(--line);background:var(--base);border-radius:7px;font-size:12px}
+.text-input:focus {border-color:var(--accent);outline:0}
+textarea.text-input {resize:vertical;min-height:67px}
+.choices {display:flex;flex-wrap:wrap;gap:6px}
+.choices label {position:relative;display:inline-flex;min-width:0}
+.choices input {position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.choices label > span {display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.choices input:checked + span {background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 44%,var(--line))}
+.choices input:focus-visible + span {outline:2px solid var(--accent);outline-offset:2px}
+.check-label {display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px;cursor:pointer}
+.notice {background:var(--raised);border-radius:7px;padding:9px 10px;color:var(--muted);font-size:11px;line-height:1.5}
+.form-error {color:var(--red);font-size:12px}
+#delete-dialog {width:min(412px,calc(100vw - 24px))}
+#delete-copy {line-height:1.55;color:var(--muted);overflow-wrap:anywhere}
+.palette {margin-top:min(15vh,115px);width:min(530px,calc(100vw - 24px))}
+.palette-search {border-radius:0;border:0;border-bottom:1px solid var(--line);background:var(--surface);padding:9px 15px;min-height:49px}
+.palette-search input {flex:1;width:100%;font-size:14px}
+.command-list {padding:7px;max-height:min(390px,52vh);overflow:auto}
+.palette-command {display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:6px;text-align:left;color:var(--text);font-size:13px;overflow-wrap:anywhere}
+.palette-command.active,.palette-command:hover {background:var(--hover);color:var(--accent)}
+.palette-command .icon {color:var(--muted)}
+.palette-command small {margin-left:auto;color:var(--faint);white-space:nowrap;font-size:11px}
+.palette-help {padding:9px 15px;border-top:1px solid var(--line);display:flex;gap:14px;color:var(--faint);font-size:11px}
+.palette-help kbd {margin-right:4px}
+.logs-drawer {position:fixed;margin:0 0 0 auto;inset:0 0 0 auto;width:min(620px,100vw);max-width:none;height:100dvh;max-height:none;border-radius:12px 0 0 12px}
+.logs-drawer[open] {display:flex;flex-direction:column}
+.logs-drawer .dialog-head {align-items:flex-start}
+.logs-drawer h2 {overflow-wrap:anywhere}
+.log-meta {display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.log-tools {display:flex;flex-wrap:wrap;gap:9px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.log-tools .input-wrap {flex:1}
+.log-tools .input-wrap input {width:100%}
+.log-levels {overflow:auto}
+.log-lines {margin:0;padding:9px 0;overflow:auto;flex:1;background:var(--base);list-style:none;font:11px/1.6 var(--mono)}
+.log-line {display:grid;grid-template-columns:66px 47px minmax(0,1fr);gap:7px;padding:8px 13px;border-bottom:1px solid var(--line)}
+.log-line time {color:var(--faint)}
+.log-line .level-info {color:var(--blue)}
+.log-line .level-warn {color:var(--amber)}
+.log-line .level-error {color:var(--red)}
+.log-line .level-debug {color:var(--faint)}
+.log-line span:last-child {overflow-wrap:anywhere;white-space:pre-wrap}
+.log-footer {padding:11px 14px;color:var(--faint);font-size:11px;border-top:1px solid var(--line)}
+.toast-region {position:fixed;inset:auto 19px 17px auto;z-index:24;max-width:calc(100vw - 38px);width:340px;margin:0;padding:0;border:0;background:transparent;color:var(--text);overflow:visible;gap:8px;pointer-events:none}
+.toast-region:popover-open {display:grid}
+.toast {pointer-events:auto;display:flex;align-items:flex-start;gap:8px;padding:11px;border:1px solid var(--line-strong);border-radius:9px;background:var(--surface);box-shadow:var(--shadow);animation:appear .17s ease-out}
+.toast .icon-button {width:24px;height:24px;border:0;background:transparent}
+.toast .icon-button:hover {background:var(--hover)}
+.toast .icon-button .icon {width:14px;height:14px}
+.toast .link-button {padding-left:0;margin-top:2px}
+.mobile-overlay {display:none}
+@media(max-width:1080px) {
+  .layout {grid-template-columns:195px minmax(0,1fr)}
+  .topbar {padding-inline:20px}
+  .content {padding-inline:20px}
+  .mini-trend {display:none}
+}
+@media(max-width:800px) {
+  .layout {display:block}
+  .sidebar {position:fixed;inset:0 auto 0 0;width:225px;box-shadow:var(--shadow);transform:translateX(-105%);visibility:hidden;transition:transform .2s,visibility .2s}
+  .sidebar.open {transform:none;visibility:visible;z-index:19}
+  .mobile-overlay:not([hidden]) {display:block;position:fixed;inset:0;background:#040914a9;z-index:18}
+  #mobile-nav-trigger,#mobile-nav-dismiss {display:inline-flex}
+  #mobile-nav-trigger {margin-right:1px}
+  #mobile-nav-dismiss {width:27px;height:27px;margin-left:auto}
+  .breadcrumbs {gap:6px}
+  .content {padding:17px 14px 25px}
+  .topbar {height:55px;padding-inline:14px}
+}
+@media(max-width:550px) {
+  .command-button {width:34px;justify-content:center;padding:0}
+  .command-button span,.command-button kbd,.breadcrumbs > span,.breadcrumbs > .icon {display:none}
+  .hero {min-height:205px}
+  .hero-copy {padding:18px 15px}
+  .hero p {max-width:265px;font-size:13px}
+  .hero-art {width:84%;right:-19%;opacity:.43;mask-image:linear-gradient(90deg,transparent,#000 55%)}
+  .stats {grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:11px 0 15px}
+  .stat {padding:10px;min-height:91px}
+  .panel-title {align-items:flex-start;flex-direction:column;padding:13px 12px 7px}
+  .table-tools {width:100%}
+  .table-tools .input-wrap {flex:1;min-width:0}
+  .table-tools input {width:100%}
+  #project-filter-trigger {max-width:50%}
+  .tabs {gap:10px;padding-inline:12px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+  .tab:not(.active) .tab-count {display:none}
+  .session-table {table-layout:fixed;min-width:0}
+  .session-table :is(th,td):is(:nth-child(3),:nth-child(4),:nth-child(6)) {display:none}
+  .session-table th:nth-child(5) {width:84px}
+  .session-table .sel-cell {width:29px;padding-left:10px}
+  .session-table .action-cell,.session-table th:last-child {width:38px;padding-inline:2px}
+  .session-name > span:last-child {min-width:0}
+  .session-name .session-title {max-width:none}
+  .usage-heading {align-items:start;flex-direction:column;gap:8px}
+  .chart-area {height:205px;padding-inline:7px}
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {animation-duration:0s!important;transition-duration:0s!important}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="navigation-drawer" aria-label="Workspace navigation">
+    <div class="brand"><span class="brand-mark"><i data-icon="relay"></i></span>Relay<button class="icon-button ghost" type="button" id="mobile-nav-dismiss" aria-label="Close navigation"><i data-icon="close"></i></button></div>
+    <div class="workspace">
+      <span class="workspace-icon"><i data-icon="layers"></i></span>
+      <div><strong>Studio workspace</strong><small>Personal workspace</small></div>
+    </div>
+    <div class="side-label">Workspace</div>
+    <nav class="nav-group" aria-label="Views">
+      <button class="nav-button active" id="sessions-link" type="button" aria-controls="sessions-view" aria-current="page"><i data-icon="terminal"></i>Sessions <span class="nav-count" id="running-count"></span></button>
+      <button class="nav-button" id="usage-link" type="button" aria-controls="usage-view"><i data-icon="chart"></i>Usage</button>
+    </nav>
+    <div class="side-label">Projects <button class="icon-button ghost" type="button" id="project-add" title="Add project" aria-label="Add project" aria-haspopup="dialog" aria-controls="project-dialog"><i data-icon="plus"></i></button></div>
+    <nav class="nav-group project-nav" id="project-links" aria-label="Projects"></nav>
+    <div class="sidebar-end">
+      <button class="nav-button" id="settings-trigger" type="button" aria-haspopup="dialog" aria-controls="settings-dialog"><i data-icon="settings"></i>Settings</button>
+      <div class="profile"><span class="avatar" aria-hidden="true">LW</span><div><strong>Local workspace</strong><small>Offline simulator</small></div></div>
+    </div>
+  </aside>
+  <button class="mobile-overlay" type="button" id="mobile-nav-close" aria-label="Close navigation" tabindex="-1" hidden></button>
+  <main class="main">
+    <header class="topbar">
+      <div class="breadcrumbs">
+        <button class="icon-button" id="mobile-nav-trigger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation-drawer"><i data-icon="menu"></i></button>
+        <span>Workspace</span><i data-icon="chevron-right"></i><strong id="breadcrumb">Sessions</strong>
+      </div>
+      <div class="top-actions">
+        <button class="button command-button" id="command-trigger" type="button" aria-label="Open command palette" aria-haspopup="dialog" aria-controls="command-palette"><i data-icon="search"></i><span>Search commands</span><kbd>Ctrl K</kbd></button>
+        <button class="icon-button" id="notification-trigger" type="button" title="Notifications" aria-label="Notifications" aria-expanded="false" aria-controls="notifications-popover"><i data-icon="bell"></i><span class="notification-dot" id="notification-dot" hidden></span></button>
+      </div>
+    </header>
+    <div class="content">
+      <section id="sessions-view" aria-label="Sessions">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-art" aria-hidden="true"><canvas id="hero-canvas"></canvas></div>
+          <div class="hero-copy">
+            <div class="eyebrow">Operations overview</div>
+            <h1 id="hero-title">Agent control room</h1>
+            <p>Launch and monitor coding agents across your projects.</p>
+            <div class="hero-cta">
+              <button class="button primary" id="new-session-trigger" type="button" aria-haspopup="dialog" aria-controls="new-session-dialog"><i data-icon="plus"></i>New session</button>
+              <span class="offline-status" title="Runs, logs, and spend are simulated in this browser">Offline simulator</span>
+            </div>
+          </div>
+        </section>
+        <section class="stats" id="session-stats" aria-label="Workspace activity"></section>
+        <section class="panel" aria-labelledby="sessions-heading">
+          <div class="panel-title">
+            <div><h2 id="sessions-heading">Agent sessions</h2><p id="session-scope">Activity across all projects</p></div>
+            <div class="table-tools">
+              <label class="input-wrap"><i data-icon="search"></i><input id="session-search" type="search" aria-label="Search sessions" placeholder="Search sessions…"></label>
+              <button class="button ghost" id="project-filter-trigger" type="button" aria-expanded="false" aria-controls="project-popover"><i data-icon="filter"></i><span id="project-filter-label">Projects</span><i data-icon="chevron-down"></i></button>
+            </div>
+          </div>
+          <div class="tabs" id="session-tabs" aria-label="Session status"></div>
+          <div class="bulk" id="bulk-actions" hidden>
+            <strong id="bulk-count"></strong>
+            <button class="button ghost" id="bulk-stop" type="button"><i data-icon="stop"></i>Stop</button>
+            <button class="button ghost" id="bulk-archive" type="button"><i data-icon="archive"></i>Archive</button>
+            <button class="button ghost danger-text" id="bulk-delete" type="button" aria-haspopup="dialog" aria-controls="delete-dialog"><i data-icon="trash"></i>Delete</button>
+            <button class="icon-button ghost" id="bulk-clear" type="button" title="Clear selection" aria-label="Clear selection"><i data-icon="close"></i></button>
+          </div>
+          <div class="table-scroll">
+            <table class="session-table" aria-label="Agent sessions">
+              <thead><tr><th class="sel-cell" scope="col"><input id="select-all" type="checkbox" aria-label="Select all visible sessions" aria-controls="bulk-actions"></th><th scope="col">Session</th><th scope="col">Project</th><th scope="col">Model</th><th scope="col">Status</th><th scope="col">Started</th><th scope="col" aria-label="Actions"></th></tr></thead>
+              <tbody id="session-rows"></tbody>
+            </table>
+          </div>
+          <div class="table-footer"><span id="session-count"></span><span class="inline"><i data-icon="hard-drive"></i>Stored locally</span></div>
+        </section>
+      </section>
+      <section id="usage-view" aria-labelledby="usage-title" hidden>
+        <div class="usage-heading">
+          <div><div class="eyebrow">Workspace analytics</div><h1 id="usage-title">Usage &amp; spend</h1><p>Simulated token usage and estimated costs by project.</p></div>
+          <div class="segmented" id="usage-period" aria-label="Usage date range">
+            <button type="button" data-days="7" class="active" aria-pressed="true">7 days</button><button type="button" data-days="30" aria-pressed="false">30 days</button><button type="button" data-days="0" aria-pressed="false">All time</button>
+          </div>
+        </div>
+        <div class="usage-grid" id="usage-stats"></div>
+        <section class="panel chart-panel" aria-labelledby="chart-title">
+          <div class="panel-title">
+            <div><h2 id="chart-title">Usage over time</h2><p id="chart-subtitle">Daily token usage</p></div>
+            <div class="segmented" id="chart-metric" aria-label="Chart metric"><button type="button" data-metric="tokens" class="active" aria-pressed="true">Tokens</button><button type="button" data-metric="cost" aria-pressed="false">Spend</button></div>
+          </div>
+          <div class="chart-area"><canvas id="usage-chart" role="img" aria-label="Daily token usage chart"></canvas></div>
+        </section>
+        <section class="panel" aria-labelledby="project-usage-title">
+          <div class="panel-title"><div><h2 id="project-usage-title">Usage by project</h2><p>Totals for the selected date range</p></div></div>
+          <div class="table-scroll">
+            <table class="usage-table"><thead><tr><th scope="col">Project</th><th scope="col">Runs</th><th scope="col">Tokens</th><th scope="col">Est. spend</th></tr></thead><tbody id="usage-rows"></tbody></table>
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="float" id="session-menu" role="menu" aria-label="Session actions" hidden></div>
+<div class="float" id="project-popover" role="menu" aria-label="Filter sessions by project" hidden></div>
+<section class="float notification-popover" id="notifications-popover" aria-labelledby="notifications-title" hidden>
+  <div class="popover-heading"><h2 id="notifications-title">Notifications</h2><button class="link-button" id="mark-read" type="button">Mark all read</button></div>
+  <div class="notification-list" id="notification-list"></div>
+</section>
+<dialog id="settings-dialog" aria-labelledby="settings-title">
+  <form id="settings-form">
+    <header class="dialog-head"><div><h2 id="settings-title">Settings</h2><p>Set defaults for this workspace.</p></div><button class="icon-button ghost" type="button" data-close aria-label="Close settings"><i data-icon="close"></i></button></header>
+    <div class="dialog-body fields">
+      <fieldset class="field"><legend class="field-label">Default model</legend><div class="choices" id="default-models"></div></fieldset>
+      <fieldset class="field"><legend class="field-label">Theme</legend><div class="choices">
+        <label><input type="radio" name="theme" value="dark"><span><i data-icon="moon"></i>Dark</span></label>
+        <label><input type="radio" name="theme" value="light"><span><i data-icon="sun"></i>Light</span></label>
+        <label><input type="radio" name="theme" value="system"><span><i data-icon="monitor"></i>System</span></label>
+      </div></fieldset>
+      <fieldset class="field"><legend class="field-label">Notifications</legend>
+        <label class="check-label"><input type="checkbox" name="notifyCompleted">Completed sessions</label>
+        <label class="check-label"><input type="checkbox" name="notifyFailed">Failed sessions</label>
+        <label class="check-label"><input type="checkbox" name="showToasts">Show toasts for completed or failed runs</label>
+      </fieldset>
+      <fieldset class="field"><legend class="field-label">API keys</legend>
+        <label class="field"><span class="field-hint">OpenAI</span><input class="text-input" name="openai" type="password" placeholder="Enter an OpenAI key" autocomplete="off" spellcheck="false"></label>
+        <label class="field"><span class="field-hint">Anthropic</span><input class="text-input" name="anthropic" type="password" placeholder="Enter an Anthropic key" autocomplete="off" spellcheck="false"></label>
+        <p class="field-hint">Keys stay in memory until you reload or close this tab. The offline simulator makes no provider requests.</p>
+      </fieldset>
+    </div>
+    <footer class="dialog-foot"><button class="button ghost" type="button" data-close>Cancel</button><button class="button primary" id="settings-save" type="submit">Save settings</button></footer>
+  </form>
+</dialog>
+<dialog id="new-session-dialog" aria-labelledby="new-session-title">
+  <form id="new-session-form">
+    <header class="dialog-head"><div><h2 id="new-session-title">New session</h2><p>Configure an agent run for a project.</p></div><button class="icon-button ghost" type="button" data-close aria-label="Close new session"><i data-icon="close"></i></button></header>
+    <div class="dialog-body fields">
+      <label class="field"><span class="field-label">Session name</span><input class="text-input" name="title" placeholder="e.g. Add pagination to the API" maxlength="80" required autofocus></label>
+      <fieldset class="field"><legend class="field-label">Project</legend><div class="choices" id="run-projects"></div></fieldset>
+      <fieldset class="field"><legend class="field-label">Model</legend><div class="choices" id="run-models"></div></fieldset>
+      <label class="field"><span class="field-label">Task instructions <span class="field-hint">(optional)</span></span><textarea class="text-input" name="prompt" maxlength="1600" placeholder="Describe what the agent should do…"></textarea></label>
+      <fieldset class="field"><legend class="field-label">Simulated outcome</legend><div class="choices">
+        <label><input type="radio" name="outcome" value="completed" checked><span>Complete</span></label><label><input type="radio" name="outcome" value="failed"><span>Fail</span></label>
+      </div><p class="field-hint">Offline runs generate sample logs and usage. They do not execute code or change project files.</p></fieldset>
+    </div>
+    <footer class="dialog-foot"><button class="button ghost" type="button" data-close>Cancel</button><button class="button primary" id="start-session" type="submit"><i data-icon="play"></i>Start session</button></footer>
+  </form>
+</dialog>
+<dialog id="project-dialog" aria-labelledby="project-title">
+  <form id="project-form">
+    <header class="dialog-head"><div><h2 id="project-title">Add project</h2><p>Group related agent sessions and their usage.</p></div><button class="icon-button ghost" type="button" data-close aria-label="Close add project"><i data-icon="close"></i></button></header>
+    <div class="dialog-body fields"><label class="field"><span class="field-label">Project name</span><input class="text-input" name="project" maxlength="40" placeholder="e.g. Developer tools" required autofocus></label><p class="form-error" id="project-error" hidden></p></div>
+    <footer class="dialog-foot"><button class="button ghost" type="button" data-close>Cancel</button><button class="button primary" id="project-save" type="submit">Add project</button></footer>
+  </form>
+</dialog>
+<dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-copy">
+  <form id="delete-form">
+    <header class="dialog-head"><h2 id="delete-title">Delete sessions?</h2><button class="icon-button ghost" type="button" data-close aria-label="Close confirmation"><i data-icon="close"></i></button></header>
+    <div class="dialog-body"><p id="delete-copy"></p></div>
+    <footer class="dialog-foot"><button class="button ghost" type="button" data-close autofocus>Cancel</button><button class="button danger" id="confirm-delete" type="submit">Delete</button></footer>
+  </form>
+</dialog>
+<dialog class="palette" id="command-palette" aria-label="Command palette">
+  <label class="input-wrap palette-search"><i data-icon="search"></i><input id="command-search" type="search" placeholder="Type a command or find a session…" aria-label="Search commands and sessions" autocomplete="off" autofocus><kbd>Esc</kbd></label>
+  <div class="command-list" id="command-list" aria-label="Commands"></div>
+  <footer class="palette-help"><span><kbd>↑</kbd><kbd>↓</kbd> Navigate</span><span><kbd>Enter</kbd> Open</span></footer>
+</dialog>
+<dialog class="logs-drawer" id="logs-drawer" aria-labelledby="logs-title">
+  <header class="dialog-head"><div><h2 id="logs-title">Session logs</h2><div class="log-meta" id="log-meta"></div></div><button class="icon-button ghost" type="button" data-close aria-label="Close logs"><i data-icon="close"></i></button></header>
+  <div class="log-tools">
+    <label class="input-wrap"><i data-icon="search"></i><input id="log-search" type="search" aria-label="Search logs" placeholder="Search logs…"></label>
+    <div class="segmented log-levels" id="log-levels" aria-label="Log level">
+      <button class="active" type="button" data-level="all" aria-pressed="true">All</button><button type="button" data-level="info" aria-pressed="false">Info</button><button type="button" data-level="warn" aria-pressed="false">Warn</button><button type="button" data-level="error" aria-pressed="false">Error</button><button type="button" data-level="debug" aria-pressed="false">Debug</button>
+    </div>
+  </div>
+  <ol class="log-lines" id="log-lines"></ol>
+  <footer class="log-footer" id="log-count"></footer>
+</dialog>
+<div class="toast-region" id="toast-region" popover="manual" role="status" aria-live="polite" aria-atomic="false"></div>
+<script>
+'use strict';
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+const icons = {
+  relay:'<path d="M5 15 10 5h4l-3 6h8l-5 8h-4l3-5H5Z"/><path d="M3 19h3m12-14h3"/>',
+  layers:'<path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/>',
+  terminal:'<rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 9 3 3-3 3m6 0h4"/>',
+  chart:'<path d="M4 3v17h17M8 15l4-4 4 2 4-6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  settings:'<path d="M10.3 3h3.4l.6 2.5 1.5.9 2.5-.7 1.7 3-1.8 1.8v1.9l1.8 1.8-1.7 3-2.5-.7-1.5.9-.6 2.6h-3.4l-.6-2.6-1.5-.9-2.5.7-1.7-3 1.8-1.8v-1.9L4 8.7l1.7-3 2.5.7 1.5-.9.6-2.5Z"/><circle cx="12" cy="11.6" r="2.7"/>',
+  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+  'chevron-right':'<path d="m9 6 6 6-6 6"/>',
+  'chevron-down':'<path d="m6 9 6 6 6-6"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/>',
+  bell:'<path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 8h18c0-1-3-1-3-8m-8 11a2 2 0 0 0 4 0"/>',
+  cpu:'<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 3v3m6-3v3m-6 12v3m6-3v3M3 9h3m-3 6h3m12-6h3m-3 6h3"/>',
+  check:'<path d="m5 12 4 4L19 6"/>',
+  'check-circle':'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+  coins:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v4c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 10v4c0 1.7 3.1 3 7 3s7-1.3 7-3v-4m-14 4v4c0 1.7 3.1 3 7 3s7-1.3 7-3v-4"/>',
+  dollar:'<path d="M12 3v18m5-14H9.5a2.5 2.5 0 0 0 0 5h5a2.5 2.5 0 0 1 0 5H6"/>',
+  filter:'<path d="M4 7h16M7 12h10m-7 5h4"/>',
+  stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',
+  archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8m-9 4h4"/>',
+  trash:'<path d="M4 7h16M10 7V4h4v3m4 0-1 13H7L6 7m4 4v5m4-5v5"/>',
+  close:'<path d="m6 6 12 12M18 6 6 18"/>',
+  'hard-drive':'<path d="m4 12 2-7h12l2 7m-14 0h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2Zm2 3.5h1m3 0h1"/>',
+  play:'<path d="m8 5 11 7-11 7V5Z"/>',
+  moon:'<path d="M20 15A9 9 0 0 1 9 4a8.5 8.5 0 1 0 11 11Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19m0-14-1.5 1.5m-11 11L5 19"/>',
+  monitor:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/>',
+  dots:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  cube:'<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 9 8-4.5M12 12 4 7.5m8 4.5v9"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18m-9-9c-4 4-4 14 0 18 4-4 4-14 0-18Z"/>',
+  zap:'<path d="m13 3-8 11h6l-1 7 9-11h-6l1-7Z"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  activity:'<path d="M2 12h5l3-7 4 14 3-7h5"/>',
+  code:'<path d="m8 7-5 5 5 5m8-10 5 5-5 5M14 5l-4 14"/>',
+  branch:'<circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 7v10m12-10a6 6 0 0 1-6 6H6"/>',
+  file:'<path d="M6 3h8l4 4v14H6V3Zm8 0v5h4m-9 4h6m-6 4h6"/>',
+  restart:'<path d="M3 11a9 9 0 1 1 3 7m-3-1v-6h6"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  arrow:'<path d="M4 12h15m-6-6 6 6-6 6"/>',
+  error:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5m0 4h.01"/>',
+};
+const icon = name => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.folder}</svg>`;
+function hydrateIcons() {
+  $$('[data-icon]').forEach(element => { element.outerHTML = icon(element.dataset.icon); });
+}
+const escapeText = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const models = [
+  {id:'sonnet', name:'Claude Sonnet', color:'var(--amber)', cost:0.000010},
+  {id:'gpt', name:'GPT-5', color:'var(--green)', cost:0.000011},
+  {id:'opus', name:'Claude Opus', color:'var(--violet)', cost:0.000025},
+  {id:'mini', name:'GPT-5 mini', color:'var(--blue)', cost:0.000003},
+];
+const statusNames = {running:'Running',completed:'Completed',failed:'Failed',stopped:'Stopped',ready:'Ready',archived:'Archived'};
+const projectStyles = [
+  {color:'var(--blue)',icon:'cube'},{color:'var(--violet)',icon:'globe'},{color:'var(--amber)',icon:'zap'},
+  {color:'var(--accent)',icon:'folder'},{color:'var(--green)',icon:'code'},
+];
+const timeFormat = new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+const dateFormat = new Intl.DateTimeFormat(undefined,{month:'short',day:'numeric'});
+const numberFormat = new Intl.NumberFormat('en-US');
+const compactFormat = new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:2});
+const moneyFormat = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
+const qty = value => numberFormat.format(value);
+const compact = value => compactFormat.format(value);
+const money = value => moneyFormat.format(value);
+const storageKey = 'relay.workspace.v1';
+const makeLog = (time,level,message) => ({time,level,message});
+function seedState() {
+  const now = Date.now();
+  const samples = [
+    ['1048','Refactor auth middleware','atlas','sonnet','running',4,'code'],
+    ['1047','Build billing dashboard','orbit','gpt','running',12,'terminal'],
+    ['1046','Add webhook retries','atlas','sonnet','completed',38,'branch'],
+    ['1045','Investigate flaky tests','signal','opus','failed',55,'error'],
+    ['1044','Update onboarding flow','orbit','sonnet','running',63,'layers'],
+    ['1043','Generate API documentation','atlas','mini','completed',94,'file'],
+    ['1042','Optimize ingestion worker','signal','gpt','completed',134,'zap'],
+    ['1041','Clean up feature flags','orbit','mini','completed',223,'code'],
+  ];
+  const sessions = samples.map(([id,title,project,model,status,minutes,glyph],index) => {
+    const started = now - minutes * 60000;
+    const logs = [
+      makeLog(started,'info','Offline runner initialized.'),
+      makeLog(started + 400,'debug','Loaded project and model configuration.'),
+      makeLog(started + 1800,'info',`Started simulated task: ${title}`),
+    ];
+    if (index === 3) {
+      logs.push(makeLog(started + 3500,'warn','Simulated test runner did not respond. Retrying.'));
+      logs.push(makeLog(started + 6100,'error','Simulated test runner timed out.'));
+    } else if (status === 'completed') {
+      logs.push(makeLog(started + 6200,'info','Simulation completed and usage recorded.'));
+    } else {
+      logs.push(makeLog(started + 4200,'info','Processing the simulated task.'));
+    }
+    return {id,title,project,model,status,started,glyph,logs,prompt:'',outcome:index === 3 ? 'failed' : 'completed',due:status === 'running' ? now + (100 + index * 23) * 1000 : null,step:2};
+  });
+  const offsets = [8,2,6,12,4,10,9,7,16,22,15,25,30,34,28,39,36,46,38,45];
+  const seedTokens = [144000,98000,205000,182000,260000,165000,341000,280000,346000,459000,120000,173000,225000,194000,180000,137000,201000,158000,185000,216000];
+  const ledger = seedTokens.map((tokens,index) => ({
+    project:['atlas','orbit','signal'][index % 3], tokens, cost:tokens * 0.00001,
+    time:now - offsets[index] * 86400000 + 123000,
+  }));
+  ledger.push(...[156000,102000,131000,117000,129000].map((tokens,index) => ({
+    project:['atlas','orbit','atlas','signal','orbit'][index], tokens, cost:tokens * 0.00001,
+    time:now - index * 720000,
+  })));
+  return {
+    projects:[{id:'atlas',name:'Atlas API',style:0},{id:'orbit',name:'Orbit Web',style:1},{id:'signal',name:'Signal Labs',style:2}],
+    sessions, ledger, nextId:1049,
+    settings:{model:'sonnet',theme:'dark',notifyCompleted:true,notifyFailed:true,showToasts:true},
+    notifications:[
+      {id:'seed-1',session:'1046',status:'completed',title:sessions[2].title,time:now - 34 * 60000,read:false},
+      {id:'seed-2',session:'1045',status:'failed',title:sessions[3].title,time:now - 51 * 60000,read:false},
+      {id:'seed-3',session:'1043',status:'completed',title:sessions[5].title,time:now - 90 * 60000,read:true},
+    ],
+  };
+}
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey));
+    if (saved && Array.isArray(saved.sessions) && Array.isArray(saved.projects) && Array.isArray(saved.notifications) && Array.isArray(saved.ledger) && saved.settings && Number.isInteger(saved.nextId)) return saved;
+  } catch {}
+  return seedState();
+}
+let state = loadState();
+let canStore = true;
+function saveState() {
+  try {
+    localStorage.setItem(storageKey,JSON.stringify(state));
+  } catch {
+    canStore = false;
+  }
+}
+saveState();
+const keys = {openai:'',anthropic:''};
+const ui = {view:'sessions',project:'all',status:'all',query:'',selected:new Set(),days:7,metric:'tokens',logs:null,level:'all',logQuery:'',commandIndex:0,deleteIds:[]};
+const getSession = id => state.sessions.find(session => session.id === id);
+const getProject = id => state.projects.find(project => project.id === id);
+const getModel = id => models.find(model => model.id === id) || models[0];
+function statusChip(status) {
+  return `<span class="status-chip status-${status}">${statusNames[status] || 'Unknown'}</span>`;
+}
+function projectSymbol(project) {
+  const style = projectStyles[project?.style] || projectStyles[0];
+  return `<span class="project-symbol" style="--project-color:${style.color}">${icon(style.icon)}</span>`;
+}
+function relativeTime(time) {
+  if (!time) return '—';
+  const minutes = Math.max(0,Math.floor((Date.now() - time) / 60000));
+  if (minutes === 0) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+  return dateFormat.format(time);
+}
+const themeMedia = matchMedia('(prefers-color-scheme: dark)');
+function applyTheme() {
+  document.documentElement.dataset.theme = state.settings.theme === 'system' ? (themeMedia.matches ? 'dark' : 'light') : state.settings.theme;
+  if (ui.view === 'usage') drawUsageChart();
+}
+themeMedia.addEventListener('change', applyTheme);
+const tabs = [['all','All sessions'],['running','Running'],['completed','Completed'],['failed','Failed'],['archived','Archived']];
+function scopedSessions() {
+  return state.sessions.filter(session => ui.project === 'all' || session.project === ui.project);
+}
+function visibleSessions() {
+  return scopedSessions().filter(session => {
+    if (ui.status === 'all' ? session.status === 'archived' : session.status !== ui.status) return false;
+    const searchable = [session.title,session.id,getProject(session.project)?.name,getModel(session.model).name,statusNames[session.status]].join(' ').toLowerCase();
+    return searchable.includes(ui.query);
+  }).sort((first,second) => Number(second.id) - Number(first.id));
+}
+function renderNavigation() {
+  const currentProject = getProject(ui.project);
+  $('#sessions-link').classList.toggle('active',ui.view === 'sessions' && !currentProject);
+  $('#usage-link').classList.toggle('active',ui.view === 'usage');
+  for (const button of [$('#sessions-link'),$('#usage-link')]) {
+    if (button.classList.contains('active')) button.setAttribute('aria-current','page');
+    else button.removeAttribute('aria-current');
+  }
+  $('#running-count').textContent = `${state.sessions.filter(session => session.status === 'running').length} live`;
+  $('#breadcrumb').textContent = ui.view === 'usage' ? 'Usage' : currentProject?.name || 'Sessions';
+  const activeProject = document.activeElement?.dataset.navProject;
+  $('#project-links').innerHTML = state.projects.map(project => {
+    const active = ui.view === 'sessions' && project.id === ui.project;
+    return `<button class="nav-button${active ? ' active' : ''}" type="button" data-nav-project="${project.id}" aria-controls="sessions-view"${active ? ' aria-current="page"' : ''}>${projectSymbol(project)}<span>${escapeText(project.name)}</span></button>`;
+  }).join('');
+  if (activeProject) $(`[data-nav-project="${activeProject}"]`)?.focus({preventScroll:true});
+}
+let mobileOpen = false;
+function mobileNavigation(open,focus = true) {
+  mobileOpen = open;
+  $('#navigation-drawer').classList.toggle('open',open);
+  $('#mobile-nav-close').hidden = !open;
+  $('.main').inert = open;
+  $('#mobile-nav-trigger').setAttribute('aria-expanded',String(open));
+  $('#mobile-nav-trigger').setAttribute('aria-label',open ? 'Close navigation' : 'Open navigation');
+  if (focus) $(open ? '#sessions-link' : '#mobile-nav-trigger').focus({preventScroll:true});
+}
+matchMedia('(max-width: 800px)').addEventListener('change',event => {
+  if (!event.matches && mobileOpen) mobileNavigation(false,false);
+});
+function showView(view,project = 'all',focus = false) {
+  const fromMobile = mobileOpen;
+  mobileNavigation(false,false);
+  hideFloat();
+  ui.view = view;
+  ui.project = project;
+  ui.status = 'all';
+  ui.query = '';
+  ui.selected.clear();
+  $('#session-search').value = '';
+  $('#sessions-view').hidden = view !== 'sessions';
+  $('#usage-view').hidden = view !== 'usage';
+  renderWorkspace();
+  if (view === 'usage') renderUsage();
+  window.scrollTo(0,0);
+  if (focus || fromMobile) {
+    const heading = $(view === 'usage' ? '#usage-title' : '#hero-title');
+    heading.tabIndex = -1;
+    heading.focus({preventScroll:true});
+  }
+}
+function rollup(entries) {
+  return entries.reduce((sum,entry) => ({tokens:sum.tokens + entry.tokens,cost:sum.cost + entry.cost,runs:sum.runs + 1}),{tokens:0,cost:0,runs:0});
+}
+function dateStart(time,daysBack = 0) {
+  const date = new Date(time);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() - daysBack);
+  return +date;
+}
+function dateEntries(days) {
+  return days ? state.ledger.filter(entry => entry.time >= dateStart(Date.now(),days - 1)) : state.ledger;
+}
+function statCard(label,value,detail,iconName,color,trend = '') {
+  return `<article class="stat" style="--stat-color:${color}">
+    <div class="stat-label"><span class="stat-icon">${icon(iconName)}</span>${label}</div>
+    <strong>${value}</strong><small>${detail}</small>
+    ${trend ? `<svg class="mini-trend" viewBox="0 0 53 24" aria-hidden="true"><path d="${trend}"/></svg>` : ''}
+  </article>`;
+}
+function sparkline(values) {
+  const max = Math.max(1,...values);
+  return values.map((value,index) => `${index === 0 ? 'M' : 'L'}${Math.round(1 + index * 51 / (values.length - 1))} ${Math.round(21 - value * 18 / max)}`).join(' ');
+}
+function renderStats() {
+  const now = Date.now();
+  const sessions = scopedSessions();
+  const running = sessions.filter(session => session.status === 'running');
+  const completed = sessions.filter(session => session.status === 'completed' || session.archivedFrom === 'completed');
+  const entries = dateEntries(7).filter(entry => ui.project === 'all' || ui.project === entry.project);
+  const totals = rollup(entries);
+  const days = Array.from({length:7},(_,index) => rollup(entries.filter(entry => dateStart(entry.time) === dateStart(now,6 - index))));
+  const starts = matching => sparkline(Array.from({length:7},(_,index) =>
+    matching.filter(session => session.started <= now - (6 - index) * 2400000).length
+  ));
+  $('#session-stats').innerHTML = [
+    statCard('Running agents',running.length,'Active sessions','activity','var(--accent)',starts(running)),
+    statCard('Completed',completed.length,'Successful sessions','check-circle','var(--green)',starts(completed)),
+    statCard('Tokens used',compact(totals.tokens),'Last 7 days','coins','var(--violet)',sparkline(days.map(day => day.tokens))),
+    statCard('Est. spend',money(totals.cost),'Last 7 days','dollar','var(--amber)',sparkline(days.map(day => day.cost))),
+  ].join('');
+}
+function renderRows() {
+  const shown = visibleSessions();
+  const scope = scopedSessions();
+  const scopeProject = getProject(ui.project);
+  const active = document.activeElement;
+  const focusSelector = active?.dataset.sessionSelect ? `.session-select[data-session-select="${active.dataset.sessionSelect}"]` :
+    active?.dataset.sessionLogs ? `.session-name[data-session-logs="${active.dataset.sessionLogs}"]` :
+    active?.dataset.rowMenu ? `.row-menu-trigger[data-row-menu="${active.dataset.rowMenu}"]` :
+    active?.dataset.statusTab ? `[data-status-tab="${active.dataset.statusTab}"]` : '';
+  $('#session-scope').textContent = scopeProject ? `Activity in ${scopeProject.name}` : 'Activity across all projects';
+  $('#project-filter-label').textContent = scopeProject?.name || 'Projects';
+  $('#session-tabs').innerHTML = tabs.map(([id,label]) => {
+    const count = scope.filter(session => id === 'all' ? session.status !== 'archived' : session.status === id).length;
+    return `<button type="button" class="tab${ui.status === id ? ' active' : ''}" aria-pressed="${ui.status === id}" data-status-tab="${id}">${label}<span class="tab-count">${count}</span></button>`;
+  }).join('');
+  const rows = shown.map(session => {
+    const project = getProject(session.project);
+    const model = getModel(session.model);
+    return `<tr data-session="${session.id}">
+      <td class="sel-cell"><input type="checkbox" class="session-select" data-session-select="${session.id}" aria-label="Select ${escapeText(session.title)}" aria-controls="bulk-actions"></td>
+      <td class="session-cell"><button class="session-name" type="button" data-session-logs="${session.id}" aria-label="View logs for ${escapeText(session.title)}" aria-haspopup="dialog" aria-controls="logs-drawer"><span class="session-glyph">${icon(session.glyph)}</span><span><span class="session-title">${escapeText(session.title)}</span><span class="session-id">run_${session.id}</span></span></button></td>
+      <td><div class="project-cell">${projectSymbol(project)}${escapeText(project?.name || 'Unassigned')}</div></td>
+      <td><span class="model" style="--model-color:${model.color}">${model.name}</span></td>
+      <td>${statusChip(session.status)}</td>
+      <td class="time-cell">${session.started ? `<time datetime="${new Date(session.started).toISOString()}" title="${escapeText(new Date(session.started).toLocaleString())}">${relativeTime(session.started)}</time>` : '—'}</td>
+      <td class="action-cell"><button class="icon-button row-menu-trigger" type="button" data-row-menu="${session.id}" title="Session actions" aria-label="Actions for ${escapeText(session.title)}" aria-haspopup="menu" aria-expanded="false" aria-controls="session-menu">${icon('dots')}</button></td>
+    </tr>`;
+  });
+  $('#session-rows').innerHTML = rows.join('') || `<tr><td class="empty" colspan="7"><strong>No sessions found</strong>${ui.query ? 'Try a different search.' : ui.status === 'all' ? 'Start a session or choose another project.' : 'Choose another status to see more sessions.'}</td></tr>`;
+  const ruleCount = scope.filter(session => ui.status === 'all' ? session.status !== 'archived' : ui.status === session.status).length;
+  $('#session-count').textContent = `Showing ${shown.length} of ${ruleCount} sessions`;
+  $('#session-count').nextElementSibling.lastChild.textContent = canStore ? 'Stored locally' : 'Stored for this tab';
+  renderSelection(shown);
+  if (focusSelector) $(focusSelector)?.focus({preventScroll:true});
+}
+function renderSelection(shown = visibleSessions()) {
+  const visibleIds = new Set(shown.map(session => session.id));
+  for (const id of ui.selected) {
+    if (!visibleIds.has(id)) ui.selected.delete(id);
+  }
+  const count = ui.selected.size;
+  $('#select-all').checked = shown.length > 0 && count === shown.length;
+  $('#select-all').indeterminate = count > 0 && count < shown.length;
+  $('#select-all').disabled = shown.length === 0;
+  $$('.session-select').forEach(input => {
+    input.checked = ui.selected.has(input.dataset.sessionSelect);
+    input.closest('tr').classList.toggle('selected',input.checked);
+  });
+  $('#bulk-actions').hidden = count === 0;
+  $('#bulk-count').textContent = `${count} selected`;
+  $('#bulk-stop').disabled = !shown.some(session => ui.selected.has(session.id) && session.status === 'running');
+  $('#bulk-archive').disabled = !shown.some(session => ui.selected.has(session.id) && session.status !== 'archived');
+}
+function renderWorkspace() {
+  renderNavigation();
+  renderStats();
+  renderRows();
+  renderNotifications();
+}
+function renderUsage() {
+  const entries = dateEntries(ui.days);
+  const totals = rollup(entries);
+  const period = ui.days ? `Last ${ui.days} days` : 'All time';
+  $('#usage-stats').innerHTML =
+    statCard('Total tokens',qty(totals.tokens),period,'coins','var(--violet)') +
+    statCard('Estimated spend',money(totals.cost),period,'dollar','var(--amber)');
+  $('#usage-rows').innerHTML = state.projects.map(project => {
+    const total = rollup(entries.filter(entry => entry.project === project.id));
+    return `<tr><td><span class="project-cell">${projectSymbol(project)}${escapeText(project.name)}</span></td><td>${qty(total.runs)}</td><td>${qty(total.tokens)}</td><td>${money(total.cost)}</td></tr>`;
+  }).join('');
+  drawUsageChart();
+}
+function canvasContext(canvas) {
+  const {clientWidth:width,clientHeight:height} = canvas;
+  if (!width || !height) return null;
+  const scale = Math.min(window.devicePixelRatio || 1,2);
+  canvas.width = Math.round(width * scale);
+  canvas.height = Math.round(height * scale);
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(scale,0,0,scale,0,0);
+  return {ctx,width,height};
+}
+function drawHero() {
+  const frame = canvasContext($('#hero-canvas'));
+  if (!frame) return;
+  const {ctx,width,height} = frame;
+  const centerX = width * .54;
+  const centerY = height * .51;
+  const scale = Math.min(width / 425,height / 217);
+  ctx.save();
+  ctx.translate(centerX,centerY);
+  ctx.scale(scale,scale);
+  const glow = ctx.createRadialGradient(0,0,14,0,0,143);
+  glow.addColorStop(0,'#55dbe632');
+  glow.addColorStop(.58,'#3cbaca13');
+  glow.addColorStop(1,'#3cbaca00');
+  ctx.fillStyle = glow;
+  ctx.fillRect(-155,-155,310,310);
+  function line(points,color,width = 1) {
+    ctx.beginPath();
+    points.forEach(([x,y],index) => index ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.stroke();
+  }
+  function ring(radius,color,dashes = []) {
+    ctx.beginPath();
+    ctx.setLineDash(dashes);
+    ctx.arc(0,0,radius,0,2 * Math.PI);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  for (const [radius,color,dashes] of [[93,'#8ce4ec3c'],[83,'#8ce4ec38',[2,6]],[69,'#8ce4ec52'],[54,'#94dce927',[2,4]],[42,'#8ce4ec60']]) ring(radius,color,dashes);
+  ctx.setLineDash([3,5]);
+  line([[-132,0],[132,0]],'#8ce4ec36');
+  line([[0,-105],[0,105]],'#8ce4ec36');
+  ctx.setLineDash([]);
+  for (const [rx,ry,rotation,color] of [[121,47,-.41,'#68e7ef80'],[121,45,.48,'#61b4dc62'],[105,31,-1,'#7dd9ff45']]) {
+    ctx.beginPath();
+    ctx.ellipse(0,0,rx,ry,rotation,0,2 * Math.PI);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  const diamond = [[0,-31],[28,-15],[28,15],[0,31],[-28,15],[-28,-15],[0,-31]];
+  ctx.beginPath();
+  diamond.forEach(([x,y],index) => index ? ctx.lineTo(x,y) : ctx.moveTo(x,y));
+  ctx.fillStyle = '#173f4d';
+  ctx.fill();
+  ctx.strokeStyle = '#8af5ef';
+  ctx.lineWidth = 1.15;
+  ctx.shadowColor = '#66e9e8';
+  ctx.shadowBlur = 19;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  line([[-28,-15],[0,0],[28,-15]],'#96f6f0b0');
+  line([[0,0],[0,31]],'#96f6f0b0');
+  line([[-13,-8],[0,-15],[13,-8],[0,-1],[-13,-8]],'#9cffff',1.3);
+  line([[-13,1],[0,8],[13,1]],'#9cffff',1.3);
+  for (const [x,y,r,color] of [[-109,48,3.3,'#77fff0'],[103,-38,3.5,'#83e9fc'],[65,64,2.7,'#97c6ff'],[-50,-48,2.4,'#76e0eb'],[0,93,2.4,'#76e0eb']]) {
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 12;
+    ctx.fill();
+  }
+  ctx.shadowBlur = 0;
+  ctx.font = '9px Consolas, monospace';
+  for (const [x,y,edge,label] of [[-109,48,-183,'TASK QUEUE'],[103,-38,171,'LOCAL RUNNER'],[65,64,160,'EVENT STREAM']]) {
+    const endY = y + (y < 0 ? -14 : 14);
+    const offset = edge < x ? -15 : 15;
+    line([[x,y],[x + offset,endY],[edge,endY]],'#7cd9e054');
+    ctx.textAlign = edge < x ? 'left' : 'right';
+    ctx.fillStyle = '#91b5c7';
+    ctx.fillText(label,edge,endY - 5);
+  }
+  const edges = [-193,193];
+  for (const x of edges) {
+    for (const y of [-90,90]) {
+      line([[x,y + (y > 0 ? -9 : 9)],[x,y],[x + (x > 0 ? -9 : 9),y]],'#79c9da60');
+    }
+  }
+  ctx.restore();
+}
+function chartSeries() {
+  const now = Date.now();
+  const entries = dateEntries(ui.days);
+  const oldestTime = entries.reduce((oldest,entry) => Math.min(oldest,entry.time),now);
+  const earliestDay = ui.days ? dateStart(now,ui.days - 1) : dateStart(oldestTime);
+  const dayCount = Math.round((dateStart(now) - earliestDay) / 86400000) + 1;
+  const binSize = Math.max(1,Math.ceil(dayCount / 35));
+  const count = Math.ceil(dayCount / binSize);
+  const bins = Array.from({length:count},(_,index) => ({date:dateStart(now,dayCount - 1 - index * binSize),value:0}));
+  for (const entry of entries) {
+    const index = Math.floor(Math.round((dateStart(entry.time) - earliestDay) / 86400000) / binSize);
+    if (bins[index]) bins[index].value += entry[ui.metric];
+  }
+  return {bins,binSize};
+}
+function drawUsageChart() {
+  const canvas = $('#usage-chart');
+  const frame = canvasContext(canvas);
+  if (!frame) return;
+  const {ctx,width,height} = frame;
+  const {bins,binSize} = chartSeries();
+  const tokens = ui.metric === 'tokens';
+  const format = tokens ? compact : money;
+  const subtitle = `${binSize === 1 ? 'Daily' : `${binSize}-day`} ${tokens ? 'token usage' : 'estimated spend'}`;
+  $('#chart-subtitle').textContent = subtitle;
+  canvas.setAttribute('aria-label',`${subtitle} chart. ${bins.map(point => `${dateFormat.format(point.date)}: ${format(point.value)}`).join('; ')}.`);
+  const peak = Math.max(tokens ? 10 : .1,...bins.map(point => point.value));
+  const magnitude = 10 ** Math.floor(Math.log10(peak));
+  const max = Math.ceil(peak / magnitude) * magnitude;
+  const {color} = getComputedStyle(document.body);
+  const styles = getComputedStyle(document.documentElement);
+  const lineColor = styles.getPropertyValue('--line');
+  const faint = styles.getPropertyValue('--faint');
+  const seriesColor = styles.getPropertyValue(tokens ? '--accent' : '--amber').trim();
+  const left = width < 500 ? 43 : 58, right = width - 11, top = 14, bottom = height - 28;
+  const step = (right - left) / bins.length;
+  const x = index => left + (index + .5) * step;
+  const y = value => bottom - (value / max) * (bottom - top);
+  ctx.font = '10px Consolas, monospace';
+  ctx.textAlign = 'right';
+  for (let index = 0; index <= 4; index++) {
+    const value = max * index / 4;
+    ctx.beginPath();
+    ctx.moveTo(left,y(value));
+    ctx.lineTo(right,y(value));
+    ctx.strokeStyle = lineColor;
+    ctx.stroke();
+    ctx.fillStyle = faint;
+    ctx.fillText(format(value),left - 7,y(value) + 3);
+  }
+  const gradient = ctx.createLinearGradient(0,top,0,bottom);
+  gradient.addColorStop(0,seriesColor);
+  gradient.addColorStop(1,`${seriesColor}50`);
+  bins.forEach((point,index) => {
+    const barWidth = Math.min(45,step * .57);
+    const barHeight = bottom - y(point.value);
+    if (barHeight > 0) {
+      ctx.beginPath();
+      ctx.roundRect(x(index) - barWidth / 2,bottom - barHeight,barWidth,barHeight,[3,3,0,0]);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    }
+  });
+  ctx.textAlign = 'center';
+  ctx.fillStyle = color;
+  const labelEvery = Math.max(1,Math.ceil(bins.length / (width < 500 ? 4 : 8)));
+  bins.forEach((point,index) => {
+    if (index % labelEvery === 0) ctx.fillText(dateFormat.format(point.date),x(index),height - 8);
+  });
+}
+let floatAnchor = null;
+let openFloat = null;
+function placeFloat() {
+  if (!openFloat || !floatAnchor?.isConnected) return;
+  const anchor = floatAnchor.getBoundingClientRect();
+  const width = openFloat.offsetWidth;
+  const height = openFloat.offsetHeight;
+  const x = Math.max(8,Math.min(innerWidth - width - 8,anchor.right - width));
+  const below = anchor.bottom + 6;
+  const top = below + height <= innerHeight - 8 ? below : Math.max(8,anchor.top - height - 6);
+  openFloat.style.left = `${x}px`;
+  openFloat.style.top = `${top}px`;
+}
+function hideFloat(restoreFocus = false) {
+  if (!openFloat) return;
+  openFloat.hidden = true;
+  floatAnchor?.setAttribute('aria-expanded','false');
+  if (restoreFocus && floatAnchor?.isConnected) floatAnchor.focus();
+  openFloat = null;
+  floatAnchor = null;
+}
+function toggleFloat(selector,anchor) {
+  const popup = $(selector);
+  if (popup === openFloat && anchor === floatAnchor) {
+    hideFloat(true);
+    return;
+  }
+  hideFloat();
+  openFloat = popup;
+  floatAnchor = anchor;
+  anchor.setAttribute('aria-expanded','true');
+  popup.hidden = false;
+  placeFloat();
+  $('button:not(:disabled)',popup)?.focus({preventScroll:true});
+}
+document.addEventListener('pointerdown',event => {
+  if (openFloat && !openFloat.contains(event.target) && !floatAnchor.contains(event.target)) hideFloat();
+});
+window.addEventListener('resize',placeFloat);
+window.addEventListener('scroll',event => {
+  if (openFloat && !(event.target instanceof Node && openFloat.contains(event.target))) hideFloat(true);
+},{capture:true,passive:true});
+function menuItem(attrs,label,glyph,options = {}) {
+  return `<button class="menu-item${options.active ? ' active' : ''}${options.danger ? ' danger-text' : ''}" type="button" role="menuitem" ${attrs}${options.disabled ? ' disabled' : ''}>${icon(glyph)}<span>${label}</span>${options.active ? `<span class="menu-trailing">${icon('check')}</span>` : ''}</button>`;
+}
+function openSessionMenu(button,session) {
+  $('#session-menu').innerHTML = [
+    menuItem(`data-row-action="logs" aria-haspopup="dialog" aria-controls="logs-drawer"`,'View logs','terminal'),
+    '<div class="menu-separator" role="separator"></div>',
+    ...(session.status === 'archived'
+      ? [menuItem('data-row-action="restore"','Restore','archive')]
+      : [
+        menuItem('data-row-action="restart"','Restart','restart'),
+        menuItem('data-row-action="stop"','Stop','stop',{disabled:session.status !== 'running'}),
+      ]),
+    menuItem('data-row-action="duplicate"','Duplicate','copy'),
+    ...(session.status === 'archived' ? [] : [menuItem('data-row-action="archive"','Archive','archive')]),
+    '<div class="menu-separator" role="separator"></div>',
+    menuItem(`data-row-action="delete" aria-haspopup="dialog" aria-controls="delete-dialog"`,'Delete','trash',{danger:true}),
+  ].join('');
+  toggleFloat('#session-menu',button);
+}
+function openProjectFilter(button) {
+  $('#project-popover').innerHTML = [
+    menuItem('data-filter-project="all"','All projects','layers',{active:ui.project === 'all'}),
+    ...state.projects.map(project => menuItem(`data-filter-project="${project.id}"`,escapeText(project.name),projectStyles[project.style].icon,{active:ui.project === project.id})),
+  ].join('');
+  toggleFloat('#project-popover',button);
+}
+function renderNotifications() {
+  const count = state.notifications.filter(event => !event.read).length;
+  $('#notification-dot').hidden = count === 0;
+  $('#notification-trigger').setAttribute('aria-label',count ? `Notifications, ${count} unread` : 'Notifications');
+  $('#mark-read').disabled = count === 0;
+  const focusedId = document.activeElement?.dataset.notificationId;
+  $('#notification-list').innerHTML = state.notifications.map(event => {
+    const exists = Boolean(getSession(event.session));
+    const content = `
+      <span class="event-icon ${event.status}">${icon(event.status === 'failed' ? 'error' : 'check')}</span>
+      <span class="event-copy"><strong>Agent ${event.status}</strong><small>${escapeText(event.title)}</small><small>${relativeTime(event.time)}${exists ? '' : ' · Session deleted'}</small></span>
+      ${event.read ? '' : '<span class="unread-mark" aria-label="Unread"></span>'}`;
+    return exists
+      ? `<button type="button" class="notification-item${event.read ? '' : ' unread'}" data-notification-id="${event.id}" aria-haspopup="dialog" aria-controls="logs-drawer">${content}</button>`
+      : `<div class="notification-static${event.read ? '' : ' unread'}">${content}</div>`;
+  }).join('') || '<p class="empty">No notifications yet.</p>';
+  if (focusedId) $(`[data-notification-id="${focusedId}"]`)?.focus({preventScroll:true});
+}
+const modalReturnFocus = new WeakMap();
+function showDialog(selector,anchor) {
+  const previous = $('dialog[open]');
+  if (previous) previous.close();
+  hideFloat();
+  const dialog = $(selector);
+  if (anchor?.isConnected) modalReturnFocus.set(dialog,anchor);
+  dialog.showModal();
+  syncToasts();
+}
+$$('dialog').forEach(dialog => {
+  dialog.addEventListener('pointerdown',event => {
+    dialog.dataset.backdropDown = event.target === dialog ? 'true' : 'false';
+  });
+  dialog.addEventListener('click',event => {
+    if (event.target !== dialog || dialog.dataset.backdropDown !== 'true') return;
+    const bounds = dialog.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+  });
+  dialog.addEventListener('close',() => {
+    syncToasts();
+    if (dialog.open) return;
+    const anchor = modalReturnFocus.get(dialog);
+    modalReturnFocus.delete(dialog);
+    if (!$('dialog[open]') && !openFloat && document.activeElement === document.body && anchor?.isConnected) anchor.focus({preventScroll:true});
+  });
+});
+function modelChoices(name,current) {
+  return models.map(model => `<label><input type="radio" name="${name}" value="${model.id}"${model.id === current ? ' checked' : ''} required><span><span class="model" style="--model-color:${model.color}">${model.name}</span></span></label>`).join('');
+}
+function openSettings(anchor) {
+  const form = $('#settings-form');
+  $('#default-models').innerHTML = modelChoices('model',state.settings.model);
+  form.elements.theme.value = state.settings.theme;
+  for (const name of ['notifyCompleted','notifyFailed','showToasts']) form.elements[name].checked = state.settings[name];
+  for (const name of Object.keys(keys)) form.elements[name].value = keys[name];
+  showDialog('#settings-dialog',anchor);
+}
+function openNewSession(anchor) {
+  const form = $('#new-session-form');
+  form.reset();
+  form.elements.title.setCustomValidity('');
+  const currentProject = getProject(ui.project)?.id || state.projects[0].id;
+  $('#run-projects').innerHTML = state.projects.map(project =>
+    `<label><input type="radio" name="project" value="${project.id}"${project.id === currentProject ? ' checked' : ''} required><span>${escapeText(project.name)}</span></label>`
+  ).join('');
+  $('#run-models').innerHTML = modelChoices('model',state.settings.model);
+  showDialog('#new-session-dialog',anchor);
+}
+function openProjectDialog(anchor) {
+  $('#project-form').reset();
+  $('#project-error').hidden = true;
+  showDialog('#project-dialog',anchor);
+}
+function openDelete(ids,anchor) {
+  ui.deleteIds = ids.filter(id => getSession(id));
+  if (!ui.deleteIds.length) return;
+  const single = ui.deleteIds.length === 1;
+  $('#delete-title').textContent = single ? 'Delete session?' : `Delete ${ui.deleteIds.length} sessions?`;
+  const subject = single ? `“${getSession(ui.deleteIds[0]).title}” and its logs` : 'The selected sessions and their logs';
+  $('#delete-copy').textContent = `${subject} will be permanently removed. Historical usage totals will be kept.`;
+  showDialog('#delete-dialog',anchor);
+}
+function syncToasts() {
+  const region = $('#toast-region');
+  const host = $('dialog[open]') || document.body;
+  if (typeof region.showPopover !== 'function') {
+    if (region.parentElement !== host) host.append(region);
+    region.style.display = region.childElementCount ? 'grid' : 'none';
+    return;
+  }
+  if (region.parentElement !== host) {
+    if (region.matches(':popover-open')) region.hidePopover();
+    host.append(region);
+  }
+  const expanded = region.matches(':popover-open');
+  if (region.childElementCount && !expanded) region.showPopover();
+  if (!region.childElementCount && expanded) region.hidePopover();
+}
+function dismissToast(card) {
+  card.remove();
+  syncToasts();
+}
+function toast(message,detail,status = 'info',sessionId = null) {
+  const card = document.createElement('div');
+  card.className = 'toast';
+  const glyph = status === 'failed' ? 'error' : status === 'completed' ? 'check' : 'activity';
+  card.innerHTML = `<span class="event-icon ${status}">${icon(glyph)}</span><div class="event-copy"><strong>${escapeText(message)}</strong>
+    ${detail ? `<small>${escapeText(detail)}</small>` : ''}
+    ${sessionId ? `<button class="link-button toast-logs" type="button" data-session-logs="${sessionId}" aria-haspopup="dialog" aria-controls="logs-drawer">View logs</button>` : ''}
+    </div><button class="icon-button" type="button" data-dismiss-toast aria-label="Dismiss notification">${icon('close')}</button>`;
+  const region = $('#toast-region');
+  if (region.children.length >= 4) (Array.from(region.children).find(item => !item.contains(document.activeElement)) || region.firstElementChild).remove();
+  region.append(card);
+  syncToasts();
+  let timeout;
+  function startTimer() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      if (!card.matches(':hover') && !card.contains(document.activeElement)) dismissToast(card);
+    },sessionId ? 11000 : 6500);
+  }
+  card.addEventListener('pointerenter',() => clearTimeout(timeout));
+  card.addEventListener('pointerleave',startTimer);
+  card.addEventListener('focusin',() => clearTimeout(timeout));
+  card.addEventListener('focusout',startTimer);
+  startTimer();
+}
+function openLogs(id,anchor) {
+  const session = getSession(id);
+  if (!session) return;
+  ui.logs = id;
+  ui.level = 'all';
+  ui.logQuery = '';
+  $('#log-search').value = '';
+  setSegment('#log-levels','level','all');
+  showDialog('#logs-drawer',anchor);
+  renderLogs(true);
+}
+function renderLogs(resetScroll = false) {
+  const session = getSession(ui.logs);
+  if (!session) return;
+  $('#logs-title').textContent = session.title;
+  const project = getProject(session.project);
+  $('#log-meta').innerHTML = `<span class="session-id">run_${session.id}</span>${statusChip(session.status)}<span class="model" style="--model-color:${getModel(session.model).color}">${getModel(session.model).name}</span><span class="field-hint">${escapeText(project?.name || 'Unassigned')}</span>`;
+  const all = session.logs;
+  const shown = all.filter(log => (ui.level === 'all' || log.level === ui.level) &&
+    `${log.message} ${log.level} ${timeFormat.format(log.time)}`.toLowerCase().includes(ui.logQuery));
+  const list = $('#log-lines');
+  const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 35;
+  const oldPosition = list.scrollTop;
+  list.innerHTML = shown.map(log =>
+    `<li class="log-line"><time datetime="${new Date(log.time).toISOString()}">${timeFormat.format(log.time)}</time><span class="level-${log.level}">${log.level.toUpperCase()}</span><span>${escapeText(log.message)}</span></li>`
+  ).join('') || `<li class="empty">${all.length ? 'No logs match your search or level filter.' : 'Logs will appear once the session starts.'}</li>`;
+  list.scrollTop = resetScroll ? 0 : nearBottom ? list.scrollHeight : oldPosition;
+  $('#log-count').textContent = `${shown.length} of ${all.length} log entries`;
+}
+function appendLog(session,level,message,time = Date.now()) {
+  session.logs.push(makeLog(time,level,message));
+}
+function createSession({title,project,model,prompt,outcome,glyph = 'terminal'},start = false) {
+  const session = {
+    id:String(state.nextId++),title,project,model,prompt,outcome,glyph,started:null,
+    status:'ready',logs:[],due:null,step:0,
+  };
+  state.sessions.unshift(session);
+  if (start) startRun(session);
+  return session;
+}
+function startRun(session) {
+  const wasRunning = session.status === 'running';
+  const hadRun = Boolean(session.started);
+  const now = Date.now();
+  if (wasRunning) recordUsage(session,now);
+  session.started = now;
+  session.status = 'running';
+  session.due = now + 10000;
+  session.step = 0;
+  appendLog(session,'info',hadRun ? 'Offline run restarted.' : 'Offline runner initialized.',now);
+  appendLog(session,'debug',`Using ${getModel(session.model).name} settings for ${getProject(session.project)?.name || 'this project'}.`,now);
+  if (session.prompt) appendLog(session,'info',`Task instructions: ${session.prompt}`,now);
+}
+function recordUsage(session,time) {
+  const seconds = Math.max(1,(time - session.started) / 1000);
+  const tokens = Math.round(Math.min(180,seconds) * (650 + (Number(session.id) % 31) * 19));
+  state.ledger.push({project:session.project,tokens,cost:tokens * getModel(session.model).cost,time});
+  return tokens;
+}
+function finishRun(session,now) {
+  const outcome = session.outcome;
+  const time = session.due || now;
+  const tokens = recordUsage(session,time);
+  session.status = outcome;
+  session.due = null;
+  appendLog(session,outcome === 'failed' ? 'error' : 'info',outcome === 'failed' ? 'Simulated test runner timed out.' : 'Simulation completed successfully.',time);
+  appendLog(session,'debug',`Recorded ${qty(tokens)} simulated tokens.`,time);
+  if (!state.settings[outcome === 'failed' ? 'notifyFailed' : 'notifyCompleted']) return;
+  state.notifications.unshift({id:`event-${session.id}-${time}`,session:session.id,status:outcome,title:session.title,time,read:false});
+  state.notifications = state.notifications.slice(0,100);
+  if (state.settings.showToasts) toast(`Agent ${outcome}`,session.title,outcome,session.id);
+}
+function runTick() {
+  const now = Date.now();
+  let changed = false;
+  let logsChanged = false;
+  for (const session of state.sessions) {
+    if (session.status !== 'running') continue;
+    if (session.step < 1 && now >= session.started + 2500) {
+      appendLog(session,'info','Processing the simulated task.',session.started + 2500);
+      session.step = 1;
+      logsChanged = true;
+    }
+    if (session.step < 2 && now >= session.started + 5700) {
+      appendLog(session,session.outcome === 'failed' ? 'warn' : 'info',
+        session.outcome === 'failed' ? 'Simulated test runner did not respond. Retrying.' : 'Generated a sample result and ran simulated checks.',session.started + 5700);
+      session.step = 2;
+      logsChanged = true;
+    }
+    if (now >= session.due) {
+      finishRun(session,now);
+      changed = true;
+    }
+  }
+  if (changed) refreshState();
+  else if (logsChanged) {
+    saveState();
+    if ($('#logs-drawer').open) renderLogs();
+  }
+}
+function stopSession(session,reason = 'Run stopped.') {
+  if (session.status !== 'running') return false;
+  recordUsage(session,Date.now());
+  session.status = 'stopped';
+  session.due = null;
+  appendLog(session,'warn',reason);
+  return true;
+}
+function archiveSession(session) {
+  if (session.status === 'archived') return false;
+  stopSession(session,'Run stopped before archiving.');
+  session.archivedFrom = session.status;
+  session.status = 'archived';
+  appendLog(session,'info','Session archived.');
+  return true;
+}
+function refreshState() {
+  saveState();
+  const rowId = openFloat === $('#session-menu') ? floatAnchor.dataset.rowMenu : null;
+  renderWorkspace();
+  if (rowId) {
+    const replacement = $(`[data-row-menu="${rowId}"]`);
+    if (replacement) {
+      floatAnchor = replacement;
+      replacement.setAttribute('aria-expanded','true');
+      $('[data-row-action="stop"]',openFloat)?.toggleAttribute('disabled',getSession(rowId).status !== 'running');
+      placeFloat();
+    } else hideFloat();
+  }
+  if (ui.view === 'usage') renderUsage();
+  if ($('#logs-drawer').open) renderLogs();
+}
+function runRowAction(action,session,anchor) {
+  if (!session) return;
+  hideFloat(true);
+  if (action === 'logs') return openLogs(session.id,anchor);
+  if (action === 'delete') return openDelete([session.id],anchor);
+  if (action === 'restart') {
+    startRun(session);
+    toast('Session restarted',session.title);
+  } else if (action === 'stop' && stopSession(session)) {
+    toast('Session stopped',session.title);
+  } else if (action === 'duplicate') {
+    createSession({...session,title:`${session.title.slice(0,73)} (copy)`});
+    toast('Session duplicated',session.title);
+  } else if (action === 'archive' && archiveSession(session)) {
+    toast('Session archived',session.title);
+  } else if (action === 'restore' && session.status === 'archived') {
+    session.status = session.archivedFrom || 'ready';
+    delete session.archivedFrom;
+    appendLog(session,'info','Session restored.');
+    toast('Session restored',session.title);
+  }
+  refreshState();
+}
+function runBulk(action) {
+  const selected = Array.from(ui.selected,getSession).filter(Boolean);
+  if (!selected.length) return;
+  const change = action === 'stop' ? stopSession : archiveSession;
+  const count = selected.filter(session => change(session)).length;
+  ui.selected.clear();
+  refreshState();
+  if (count) toast(`${count} ${count === 1 ? 'session' : 'sessions'} ${action === 'stop' ? 'stopped' : 'archived'}`);
+  $('#select-all').focus({preventScroll:true});
+}
+const commands = [
+  {id:'new',label:'New session',hint:'Create',icon:'plus',target:'#new-session-dialog'},
+  {id:'sessions',label:'Go to sessions',hint:'Navigate',icon:'terminal',target:'#sessions-view'},
+  {id:'usage',label:'Go to usage',hint:'Navigate',icon:'chart',target:'#usage-view'},
+  {id:'settings',label:'Open settings',hint:'Preferences',icon:'settings',target:'#settings-dialog'},
+  {id:'project',label:'Add project',hint:'Create',icon:'folder',target:'#project-dialog'},
+];
+function renderCommands() {
+  const query = $('#command-search').value.trim().toLowerCase();
+  const matches = commands.filter(command => command.label.toLowerCase().includes(query));
+  if (query) {
+    for (const session of state.sessions) {
+      const project = getProject(session.project)?.name || '';
+      if (`${session.title} ${project} run_${session.id}`.toLowerCase().includes(query)) {
+        matches.push({id:`logs-${session.id}`,label:session.title,hint:project,icon:'terminal',target:'#logs-drawer'});
+      }
+    }
+  }
+  $('#command-list').innerHTML = matches.map((command,index) =>
+    `<button class="palette-command${index === ui.commandIndex ? ' active' : ''}" type="button" data-command="${command.id}" aria-controls="${command.target.slice(1)}"${command.target.endsWith('view') ? '' : ' aria-haspopup="dialog"'}>${icon(command.icon)}<span>${escapeText(command.label)}</span><small>${escapeText(command.hint)}</small></button>`
+  ).join('') || '<p class="empty">No commands or sessions found.</p>';
+}
+function togglePalette() {
+  if ($('#command-palette').open) {
+    $('#command-palette').close();
+    return;
+  }
+  $('#command-search').value = '';
+  ui.commandIndex = 0;
+  renderCommands();
+  showDialog('#command-palette',$('#command-trigger'));
+}
+function runCommand(command) {
+  $('#command-palette').close();
+  const anchor = $('#command-trigger');
+  if (command === 'new') openNewSession(anchor);
+  else if (command === 'settings') openSettings(anchor);
+  else if (command === 'project') openProjectDialog(anchor);
+  else if (command.startsWith('logs-')) openLogs(command.slice(5),anchor);
+  else showView(command,'all',true);
+}
+function setSegment(selector,key,value) {
+  $$('button',$(selector)).forEach(button => {
+    const active = button.dataset[key] === String(value);
+    button.classList.toggle('active',active);
+    button.setAttribute('aria-pressed',String(active));
+  });
+}
+const onClick = (selector,handler) => $(selector).addEventListener('click',handler);
+onClick('#mobile-nav-trigger',() => mobileNavigation(!mobileOpen));
+onClick('#mobile-nav-close',() => mobileNavigation(false));
+onClick('#mobile-nav-dismiss',() => mobileNavigation(false));
+onClick('#sessions-link',() => showView('sessions'));
+onClick('#usage-link',() => showView('usage'));
+onClick('#project-add',event => openProjectDialog(event.currentTarget));
+onClick('#settings-trigger',event => openSettings(event.currentTarget));
+onClick('#new-session-trigger',event => openNewSession(event.currentTarget));
+onClick('#command-trigger',togglePalette);
+onClick('#notification-trigger',event => toggleFloat('#notifications-popover',event.currentTarget));
+onClick('#mark-read',() => {
+  state.notifications.forEach(event => { event.read = true; });
+  saveState();
+  renderNotifications();
+  $('.notification-item')?.focus({preventScroll:true});
+});
+onClick('#project-filter-trigger',event => openProjectFilter(event.currentTarget));
+onClick('#bulk-stop',() => runBulk('stop'));
+onClick('#bulk-archive',() => runBulk('archive'));
+onClick('#bulk-delete',event => openDelete(Array.from(ui.selected),event.currentTarget));
+onClick('#bulk-clear',() => {
+  ui.selected.clear();
+  renderSelection();
+  $('#select-all').focus({preventScroll:true});
+});
+onClick('#project-links',event => {
+  const project = event.target.closest('[data-nav-project]')?.dataset.navProject;
+  if (project) showView('sessions',project);
+});
+onClick('#project-popover',event => {
+  const project = event.target.closest('[data-filter-project]')?.dataset.filterProject;
+  if (!project) return;
+  hideFloat(true);
+  ui.project = project;
+  ui.selected.clear();
+  renderWorkspace();
+});
+onClick('#session-tabs',event => {
+  const status = event.target.closest('[data-status-tab]')?.dataset.statusTab;
+  if (!status) return;
+  ui.status = status;
+  ui.selected.clear();
+  renderRows();
+});
+onClick('#session-rows',event => {
+  const button = event.target.closest('[data-session-logs], [data-row-menu]');
+  if (!button) return;
+  if (button.dataset.sessionLogs) openLogs(button.dataset.sessionLogs,button);
+  else openSessionMenu(button,getSession(button.dataset.rowMenu));
+});
+onClick('#session-menu',event => {
+  const action = event.target.closest('[data-row-action]')?.dataset.rowAction;
+  if (action && floatAnchor) runRowAction(action,getSession(floatAnchor.dataset.rowMenu),floatAnchor);
+});
+onClick('#notification-list',event => {
+  const button = event.target.closest('[data-notification-id]');
+  if (!button) return;
+  const item = state.notifications.find(notification => notification.id === button.dataset.notificationId);
+  if (!item) return;
+  item.read = true;
+  saveState();
+  renderNotifications();
+  openLogs(item.session,$('#notification-trigger'));
+});
+onClick('#toast-region',event => {
+  const button = event.target.closest('button');
+  if (button?.hasAttribute('data-dismiss-toast')) dismissToast(button.closest('.toast'));
+  else if (button?.dataset.sessionLogs) {
+    const session = getSession(button.dataset.sessionLogs);
+    dismissToast(button.closest('.toast'));
+    const anchor = session && $(`.session-name[data-session-logs="${session.id}"]`);
+    if (session) openLogs(session.id,anchor?.getClientRects().length ? anchor : $('#notification-trigger'));
+  }
+});
+onClick('#usage-period',event => {
+  const button = event.target.closest('[data-days]');
+  if (!button) return;
+  ui.days = Number(button.dataset.days);
+  setSegment('#usage-period','days',ui.days);
+  renderUsage();
+});
+onClick('#chart-metric',event => {
+  const button = event.target.closest('[data-metric]');
+  if (!button) return;
+  ui.metric = button.dataset.metric;
+  setSegment('#chart-metric','metric',ui.metric);
+  drawUsageChart();
+});
+onClick('#log-levels',event => {
+  const button = event.target.closest('[data-level]');
+  if (!button) return;
+  ui.level = button.dataset.level;
+  setSegment('#log-levels','level',ui.level);
+  renderLogs(true);
+});
+onClick('#command-list',event => {
+  const button = event.target.closest('[data-command]');
+  if (button) runCommand(button.dataset.command);
+});
+$$('[data-close]').forEach(button => button.addEventListener('click',() => button.closest('dialog').close()));
+$('#session-search').addEventListener('input',event => {
+  ui.query = event.target.value.trim().toLowerCase();
+  ui.selected.clear();
+  renderRows();
+});
+$('#select-all').addEventListener('change',event => {
+  ui.selected = new Set(event.target.checked ? visibleSessions().map(session => session.id) : []);
+  renderSelection();
+});
+$('#session-rows').addEventListener('change',event => {
+  const input = event.target.closest('.session-select');
+  if (!input) return;
+  if (input.checked) ui.selected.add(input.dataset.sessionSelect);
+  else ui.selected.delete(input.dataset.sessionSelect);
+  renderSelection();
+});
+$('#log-search').addEventListener('input',event => {
+  ui.logQuery = event.target.value.trim().toLowerCase();
+  renderLogs(true);
+});
+$('#command-search').addEventListener('input',() => {
+  ui.commandIndex = 0;
+  renderCommands();
+});
+$('#command-palette').addEventListener('keydown',event => {
+  const results = $$('.palette-command');
+  if (!results.length) return;
+  if (event.key === 'Enter' && event.target === $('#command-search')) {
+    event.preventDefault();
+    results[ui.commandIndex].click();
+  } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+    event.preventDefault();
+    const focusedIndex = results.indexOf(document.activeElement);
+    const currentIndex = focusedIndex === -1 ? ui.commandIndex : focusedIndex;
+    const delta = event.key === 'ArrowDown' ? 1 : -1;
+    ui.commandIndex = (currentIndex + delta + results.length) % results.length;
+    results.forEach((button,index) => button.classList.toggle('active',index === ui.commandIndex));
+    if (focusedIndex !== -1) results[ui.commandIndex].focus();
+    else results[ui.commandIndex].scrollIntoView({block:'nearest'});
+  }
+});
+document.addEventListener('keydown',event => {
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+    event.preventDefault();
+    if (!event.repeat) togglePalette();
+    return;
+  }
+  if (openFloat) {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      hideFloat(true);
+    } else if (['ArrowDown','ArrowUp','Home','End'].includes(event.key) && openFloat.contains(event.target)) {
+      const buttons = $$('button:not(:disabled)',openFloat);
+      if (!buttons.length) return;
+      event.preventDefault();
+      const index = buttons.indexOf(document.activeElement);
+      const delta = event.key === 'ArrowDown' ? 1 : -1;
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + delta + buttons.length) % buttons.length;
+      buttons[next].focus();
+    }
+  } else if (event.key === 'Escape' && mobileOpen && !$('dialog[open]')) {
+    mobileNavigation(false);
+  }
+});
+document.addEventListener('focusin',event => {
+  if (openFloat && event.target !== floatAnchor && !openFloat.contains(event.target)) hideFloat();
+});
+$('#settings-form').addEventListener('submit',event => {
+  event.preventDefault();
+  const data = new FormData(event.currentTarget);
+  state.settings = {
+    model:data.get('model'),theme:data.get('theme'),notifyCompleted:data.has('notifyCompleted'),
+    notifyFailed:data.has('notifyFailed'),showToasts:data.has('showToasts'),
+  };
+  for (const name of Object.keys(keys)) keys[name] = String(data.get(name) || '').trim();
+  saveState();
+  applyTheme();
+  $('#settings-dialog').close();
+  toast('Settings saved');
+});
+$('#settings-dialog').addEventListener('close',event => {
+  if (!event.currentTarget.open) $('#settings-form').reset();
+});
+$('#new-session-form').elements.title.addEventListener('input',event => event.target.setCustomValidity(''));
+$('#new-session-form').addEventListener('submit',event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const data = new FormData(form);
+  const title = data.get('title').trim();
+  if (!title) {
+    form.elements.title.setCustomValidity('Enter a name for the session.');
+    form.elements.title.reportValidity();
+    return;
+  }
+  const session = createSession({title,project:data.get('project'),model:data.get('model'),prompt:data.get('prompt').trim(),outcome:data.get('outcome')},true);
+  $('#new-session-dialog').close();
+  showView('sessions',ui.project !== 'all' && ui.project === session.project ? session.project : 'all');
+  refreshState();
+  toast('Session started',session.title);
+});
+$('#project-form').addEventListener('input',() => { $('#project-error').hidden = true; });
+$('#project-form').addEventListener('submit',event => {
+  event.preventDefault();
+  const name = new FormData(event.currentTarget).get('project').trim();
+  const duplicate = state.projects.some(project => project.name.toLowerCase() === name.toLowerCase());
+  if (!name || duplicate) {
+    $('#project-error').textContent = duplicate ? 'A project with this name already exists.' : 'Enter a project name.';
+    $('#project-error').hidden = false;
+    event.currentTarget.elements.project.focus();
+    return;
+  }
+  const project = {id:`project-${Date.now()}-${state.projects.length}`,name,style:state.projects.length % projectStyles.length};
+  state.projects.push(project);
+  $('#project-dialog').close();
+  showView('sessions',project.id);
+  refreshState();
+  toast('Project added',name);
+});
+$('#delete-form').addEventListener('submit',event => {
+  event.preventDefault();
+  const ids = new Set(ui.deleteIds);
+  const targets = state.sessions.filter(session => ids.has(session.id));
+  targets.forEach(session => stopSession(session));
+  state.sessions = state.sessions.filter(session => !ids.has(session.id));
+  ui.deleteIds = [];
+  ui.selected.clear();
+  $$('.toast-logs').forEach(button => { if (ids.has(button.dataset.sessionLogs)) button.remove(); });
+  $('#delete-dialog').close();
+  refreshState();
+  toast(`${targets.length} ${targets.length === 1 ? 'session' : 'sessions'} deleted`);
+  const focusTarget = $('#select-all').disabled ? $('#session-search') : $('#select-all');
+  focusTarget.focus({preventScroll:true});
+});
+hydrateIcons();
+applyTheme();
+renderWorkspace();
+const resizeObserver = new ResizeObserver(() => {
+  drawHero();
+  if (ui.view === 'usage') drawUsageChart();
+});
+resizeObserver.observe($('.hero-art'));
+resizeObserver.observe($('.chart-area'));
+runTick();
+setInterval(runTick,500);
+setInterval(() => {
+  $$('.time-cell time').forEach(time => { time.textContent = relativeTime(Date.parse(time.dateTime)); });
+  if (openFloat === $('#notifications-popover')) renderNotifications();
+},30000);
+</script>
+</body>
+</html>

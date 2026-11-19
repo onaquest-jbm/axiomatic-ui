@@ -8,12 +8,13 @@ Two corpora:
 |---|---|---|---|
 | **Planted** (`cases.js`) | One known defect planted on a copy of the clean demo page (`demo/after.html` plus a clean menu and settings dialog). Controlled: the only difference from the clean control is the defect. | Written in `cases.js` before any check ran: the principle it breaks, the cheapest layer that could detect it, and the rule ids that would count as catching it (`[]` = no rule exists). | `node benchmark/run.js` |
 | **Generated** (`sites/`) | Whole pages built by other models (Claude Sonnet, and gpt-6.2-sol through the Codex CLI) from ordinary product briefs. The builders were not told what the pages were for. | `sites/<site>/truth.json`: an independent reviewer (a separate model that saw only screenshots and source, never the rule list) listed the problems; each was then mapped to the rules that would count as catching it, before the checks ran. | `node benchmark/shots.js` (screenshots for reviewers), `node benchmark/run-sites.js` |
+| **Sweep** (`sweep/`) | One product (a web app for supervising AI coding agents) built many ways: two builders (Sonnet 5.5, gpt-6.2-sol) × three briefs (a one-liner, a detailed spec, "modern, stunning, premium") × two processes (everything at once, or a base plus six "now add X" requests, each in a fresh session; `rounds/` keeps every step). To find which ways of asking produce worse interfaces. | None: it reports what `verify --explore` finds per cell. A few cells get blind reviews as an independent check. | `node benchmark/run-sweep.js [--rounds]` |
 
 Results are written to `results/` (committed). Built pages, screenshots and reports go to `build/` (ignored).
 
 To compare approaches, freeze each one as a run (`node benchmark/viewer/snapshot.js --label "<name>"`, then `node benchmark/viewer/build.js`) and open `benchmark/viewer/index.html`. It shows each run's numbers and, per generated site and surface, before and after screenshots with each defect's status in both runs. Run JSON is committed. Run screenshots (about 7 MB per run) stay local.
 
-Current baseline (v0.3): planted 45 of 70 caught; generated 14 of 118 caught, 79 with no rule at all. See `docs/ROADMAP.md`.
+Baseline (v0.3): planted 45 of 70 caught; generated 14 of 118, 79 with no rule at all. Now (v0.4, surfaces + attach + four new checks): planted 50 of 70; generated 19 of 118, 67 with no rule. See `docs/ROADMAP.md`.
 
 ## How a defect is scored
 
@@ -22,7 +23,7 @@ Current baseline (v0.3): planted 45 of 70 caught; generated 14 of 118 caught, 79
 - **silent**: nothing new fired.
 - **no rule**: ground truth says no rule is designed to catch it. These are not failures of a rule; they are the principles that are stated but never checked.
 
-Rare surfaces (menus, dialogs, popovers, toasts, tooltips) are rendered twice in the planted set: opened by a click step, and already open at load. `verify` probes the page once, before steps, so the difference between the two shows what it cannot reach.
+Rare surfaces (menus, dialogs, popovers, toasts, tooltips) are rendered twice in the planted set: opened by a click step, and already open at load, each diffed against a clean control opened the same way. `verify` checks what each click reveals, so the two should now score alike; any gap between them is something it still cannot reach. On generated sites, surfaces are opened by a click step (`run-sites.js --open-at-load` restores the old scripted opening; right-click openers always use it).
 
 ## Adding cases
 
@@ -34,3 +35,4 @@ Rare surfaces (menus, dialogs, popovers, toasts, tooltips) are rendered twice in
 - The planted cases were written by the same agent that maintains the tools. They test whether a rule works on the problem it targets, not whether the rules cover what real generated pages get wrong; the generated set is for that.
 - The generated pages have no `model.json`, so they are checked against the demo model with no screen plan. Only floor and meaning findings count there; derivation findings would be noise.
 - This measures `lint` and `verify`. The skills (model, plan, critique) are not measured yet.
+- Rules added after a case was written (`destructive-unseparated`, `too-many-peers`, `covers-trigger`, `surface-offscreen`) were mapped onto existing planted cases afterwards, so planted recall flatters them. The generated sites and the sweep are the fairer test.

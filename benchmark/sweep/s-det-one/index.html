@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Console</title>
+<style>
+:root{
+  --bg:#f6f7f9;--surface:#fff;--surface-2:#f0f2f5;--border:#e1e4ea;--text:#171a21;--muted:#5d6675;
+  --accent:#4f46e5;--accent-text:#fff;--accent-soft:#eceafd;
+  --run:#2563eb;--wait:#b45309;--fail:#dc2626;--done:#15803d;
+  --run-bg:#e6efff;--wait-bg:#fdf1dc;--fail-bg:#fde8e8;--done-bg:#e3f5e9;
+  --shadow:0 8px 30px rgba(20,24,40,.14);--code:#f3f4f7;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1115;--surface:#171a21;--surface-2:#1e222b;--border:#2a2f3a;--text:#e8eaf0;--muted:#9aa3b2;
+  --accent:#8b83ff;--accent-text:#0f1115;--accent-soft:#262449;
+  --run:#6ea0ff;--wait:#f2b25c;--fail:#ff7b7b;--done:#58d083;
+  --run-bg:#1b2a47;--wait-bg:#3a2d17;--fail-bg:#3d1f21;--done-bg:#17331f;
+  --shadow:0 8px 30px rgba(0,0,0,.5);--code:#12151b;color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0f1115;--surface:#171a21;--surface-2:#1e222b;--border:#2a2f3a;--text:#e8eaf0;--muted:#9aa3b2;
+  --accent:#8b83ff;--accent-text:#0f1115;--accent-soft:#262449;
+  --run:#6ea0ff;--wait:#f2b25c;--fail:#ff7b7b;--done:#58d083;
+  --run-bg:#1b2a47;--wait-bg:#3a2d17;--fail-bg:#3d1f21;--done-bg:#17331f;
+  --shadow:0 8px 30px rgba(0,0,0,.5);--code:#12151b;color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid var(--border);background:var(--surface);border-radius:8px;min-height:34px;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--fail);border-color:var(--fail)}
+.btn.sm{padding:4px 9px;min-height:28px;font-size:13px}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border:1px solid transparent;background:transparent;border-radius:8px;position:relative}
+.icon-btn:hover{background:var(--surface-2)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=text],input[type=search],input[type=password],select,textarea{width:100%;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;min-height:36px}
+textarea{resize:vertical;min-height:90px}
+label.f{display:block;margin-bottom:12px;font-weight:600;font-size:13px}
+label.f>*:not(span){margin-top:5px;font-weight:400}
+label.f small{display:block;font-weight:400;color:var(--muted);margin-top:3px}
+
+/* layout */
+#app{display:grid;grid-template-rows:56px 1fr;height:100%}
+header{display:flex;align-items:center;gap:10px;padding:0 14px;background:var(--surface);border-bottom:1px solid var(--border)}
+.brand{font-weight:700;display:flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.logo{width:24px;height:24px;border-radius:7px;background:var(--accent);display:grid;place-items:center;color:var(--accent-text);font-size:13px}
+.search{position:relative;flex:1;max-width:460px;margin-left:8px}
+.search input{padding-left:32px}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:2}
+.spacer{flex:1}
+kbd{font:12px ui-monospace,Consolas,monospace;padding:1px 6px;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;background:var(--surface-2);color:var(--muted)}
+#bell .dot{position:absolute;top:5px;right:5px;min-width:16px;height:16px;border-radius:8px;background:var(--fail);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+#menu-btn{display:none}
+.shell{display:grid;grid-template-columns:240px minmax(340px,440px) 1fr;min-height:0}
+.shell.usage-mode{grid-template-columns:240px 1fr}
+#sidebar{background:var(--surface);border-right:1px solid var(--border);padding:12px;overflow:auto}
+#sidebar h6{margin:14px 8px 6px;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.nav{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:0;background:none;border-radius:8px;text-align:left}
+.nav:hover{background:var(--surface-2)}
+.nav[aria-current=true]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav .n{font-size:12px;background:var(--surface-2);color:var(--muted);padding:1px 8px;border-radius:10px;font-weight:600}
+.nav[aria-current=true] .n{background:var(--surface);color:var(--accent)}
+.nav .pn{display:flex;align-items:center;gap:8px;min-width:0}
+.swatch{width:9px;height:9px;border-radius:3px;flex:none}
+#sidebar-scrim{display:none}
+#listpane{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--border);background:var(--bg)}
+.lp-head{padding:12px 14px 8px;display:flex;flex-direction:column;gap:10px}
+.lp-title{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lp-title h1{font-size:16px;margin:0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:3px 10px;border:1px solid var(--border);background:var(--surface);border-radius:999px;font-size:12.5px}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+#bulkbar{display:none;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 14px;background:var(--accent-soft);border-block:1px solid var(--border)}
+#bulkbar.on{display:flex}
+#bulkbar b{margin-right:auto}
+#list{overflow:auto;flex:1;padding:0 10px 14px;margin:0;list-style:none}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;margin-top:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;cursor:pointer}
+.row:hover{border-color:var(--muted)}
+.row[aria-selected=true]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.row input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent)}
+.row .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .m{display:flex;gap:6px 10px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:12.5px;margin-top:3px}
+.row .body{min-width:0}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.s-running{color:var(--run);background:var(--run-bg)}
+.s-waiting{color:var(--wait);background:var(--wait-bg)}
+.s-failed{color:var(--fail);background:var(--fail-bg)}
+.s-done{color:var(--done);background:var(--done-bg)}
+.s-running::before{animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.empty{padding:40px 20px;text-align:center;color:var(--muted)}
+#detail{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--surface)}
+.d-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+.d-head h2{margin:0;font-size:17px}
+.d-top{display:flex;gap:10px;align-items:center}
+.d-actions{display:flex;gap:6px;flex-wrap:wrap}
+.meta{display:flex;gap:6px 14px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+#back{display:none}
+#transcript{flex:1;overflow:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:92%;padding:9px 12px;border-radius:12px;background:var(--surface-2);white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user{align-self:flex-end;background:var(--accent-soft)}
+.msg .who{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px;font-weight:700}
+.tool{align-self:stretch;font-size:12.5px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--code);overflow-wrap:anywhere}
+.tool b{color:var(--accent)}
+.approval{border:1px solid var(--wait);background:var(--wait-bg);border-radius:12px;padding:12px;align-self:stretch}
+.approval h4{margin:0 0 6px;color:var(--wait);font-size:14px}
+.approval pre{margin:8px 0;padding:8px 10px;background:var(--code);color:var(--text);border-radius:8px;overflow:auto;font-size:12.5px;white-space:pre-wrap}
+.approval .btns{display:flex;gap:8px}
+.placeholder{margin:auto;color:var(--muted);text-align:center;padding:20px}
+
+/* usage */
+#usage{overflow:auto;padding:20px;display:none}
+.usage-mode #listpane,.usage-mode #detail{display:none}
+.usage-mode #usage{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+.card .k{color:var(--muted);font-size:12.5px}
+.card .v{font-size:24px;font-weight:700;margin-top:2px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+.panel h3{margin:0 0 10px;font-size:14px}
+.panel svg{width:100%;height:auto;display:block}
+.panel svg text{fill:var(--muted);font-size:11px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--border)}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right}
+.tw{overflow-x:auto}
+
+/* popovers */
+.pop{position:fixed;z-index:50;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);display:none}
+.pop.on{display:block}
+#row-menu{min-width:170px;padding:5px}
+#row-menu button{display:block;width:100%;text-align:left;padding:8px 10px;border:0;background:none;border-radius:7px}
+#row-menu button:hover{background:var(--surface-2)}
+#row-menu button.danger{color:var(--fail)}
+#notif-menu{width:360px;max-width:calc(100vw - 20px);top:54px;right:10px;max-height:70vh;overflow:auto}
+.nh{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);font-weight:700}
+.ni{display:block;width:100%;text-align:left;padding:10px 12px;border:0;border-bottom:1px solid var(--border);background:none}
+.ni:hover{background:var(--surface-2)}
+.ni.unread::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:7px}
+.ni small{display:block;color:var(--muted);margin-top:2px}
+
+dialog{border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text);padding:0;box-shadow:var(--shadow);width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px)}
+dialog::backdrop{background:rgba(10,12,18,.5)}
+dialog form,.dlg{display:flex;flex-direction:column;max-height:calc(100vh - 28px)}
+.dh{padding:16px 18px 6px;display:flex;justify-content:space-between;align-items:center}
+.dh h3{margin:0;font-size:16px}
+.db{padding:10px 18px;overflow:auto}
+.df{padding:12px 18px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--border)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+fieldset{border:1px solid var(--border);border-radius:10px;margin:0 0 12px;padding:8px 12px}
+legend{font-weight:600;font-size:13px;padding:0 4px}
+fieldset label{display:flex;gap:8px;align-items:center;padding:4px 0}
+#palette{width:min(580px,calc(100vw - 24px));margin-top:12vh;align-self:start}
+#palette input{border:0;border-bottom:1px solid var(--border);border-radius:0;padding:14px 16px;font-size:16px}
+#palette input:focus{outline:none}
+#pal-list{list-style:none;margin:0;padding:6px;max-height:50vh;overflow:auto}
+#pal-list button{display:flex;justify-content:space-between;width:100%;padding:9px 10px;border:0;background:none;border-radius:8px;text-align:left}
+#pal-list button[aria-selected=true],#pal-list button:hover{background:var(--accent-soft)}
+#pal-list small{color:var(--muted)}
+
+/* logs */
+#logs-panel{position:fixed;top:0;right:0;bottom:0;width:min(640px,100vw);z-index:40;background:var(--surface);border-left:1px solid var(--border);box-shadow:var(--shadow);display:none;flex-direction:column}
+#logs-panel.on{display:flex}
+.lg-tools{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--border);align-items:center}
+.lg-tools input{flex:1;min-width:140px;width:auto}
+#log-lines{flex:1;overflow:auto;padding:8px 0;font-size:12.5px;background:var(--code)}
+.ll{display:grid;grid-template-columns:70px 50px 1fr;gap:8px;padding:2px 14px;overflow-wrap:anywhere}
+.ll .lv{font-weight:700}
+.lv-debug{color:var(--muted)}.lv-info{color:var(--run)}.lv-warn{color:var(--wait)}.lv-error{color:var(--fail)}
+.ll .ts{color:var(--muted)}
+mark{background:#ffe27a;color:#000;border-radius:2px}
+
+#toasts{position:fixed;right:14px;bottom:14px;z-index:90;display:flex;flex-direction:column;gap:8px;width:min(340px,calc(100vw - 28px))}
+.toast{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--run);border-radius:10px;box-shadow:var(--shadow);padding:10px 12px;display:flex;gap:10px;align-items:flex-start;animation:tin .2s ease}
+.toast.done{border-left-color:var(--done)}.toast.failed{border-left-color:var(--fail)}.toast.waiting{border-left-color:var(--wait)}
+.toast div{flex:1}.toast small{color:var(--muted);display:block}
+.toast button{border:0;background:none;color:var(--muted);font-size:18px;line-height:1;padding:0 2px}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+
+@media (max-width:1100px){
+  .shell{grid-template-columns:220px 1fr}
+  #detail{position:fixed;inset:56px 0 0 0;z-index:30;display:none}
+  body.show-detail #detail{display:flex}
+  #back{display:inline-flex}
+  .shell.usage-mode{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  header{gap:6px;padding:0 8px}
+  #menu-btn{display:grid}
+  .brand span.t,.hide-m,#palette-btn{display:none}
+  .search{margin-left:0}
+  #new-btn .lbl{display:none}
+  .shell,.shell.usage-mode{grid-template-columns:1fr}
+  #sidebar{position:fixed;top:56px;bottom:0;left:0;width:260px;z-index:60;transform:translateX(-102%);transition:transform .2s;box-shadow:var(--shadow)}
+  body.show-sidebar #sidebar{transform:none}
+  body.show-sidebar #sidebar-scrim{display:block;position:fixed;inset:56px 0 0 0;background:rgba(10,12,18,.45);z-index:55}
+  .row2{grid-template-columns:1fr}
+  .d-head{padding:12px}#transcript{padding:12px}
+  #usage{padding:12px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <button class="icon-btn" id="menu-btn" aria-label="Open projects menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <div class="brand"><div class="logo">&#9670;</div><span class="t">Agent Console</span></div>
+  <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg><input type="search" id="search" placeholder="Search sessions" aria-label="Search sessions"></div>
+  <span class="spacer"></span>
+  <button class="btn hide-m" id="palette-btn" aria-label="Open command palette">Commands <kbd>Ctrl K</kbd></button>
+  <button class="btn primary" id="new-btn" aria-label="New session"><span>+</span><span class="lbl">New session</span></button>
+  <button class="icon-btn" id="bell" aria-label="Notifications" aria-haspopup="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot" id="bell-n" hidden>0</span></button>
+  <button class="icon-btn" id="settings-btn" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
+</header>
+<div class="shell" id="shell">
+  <nav id="sidebar" aria-label="Projects"></nav>
+  <div id="sidebar-scrim"></div>
+  <section id="listpane" aria-label="Sessions">
+    <div class="lp-head">
+      <div class="lp-title"><h1 id="list-title">All sessions</h1>
+        <label style="display:flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="select-all" aria-label="Select all visible sessions"> Select all</label></div>
+      <div class="chips" id="chips" role="group" aria-label="Filter by status"></div>
+    </div>
+    <div id="bulkbar" role="toolbar" aria-label="Bulk actions"><b id="bulk-n">0 selected</b>
+      <button class="btn sm" id="bulk-stop">Stop</button><button class="btn sm" id="bulk-archive">Archive</button><button class="btn sm danger" id="bulk-delete">Delete</button><button class="btn sm" id="bulk-clear">Clear</button></div>
+    <ul id="list"></ul>
+  </section>
+  <section id="detail" aria-label="Session detail"></section>
+  <section id="usage" aria-label="Usage"></section>
+</div>
+</div>
+
+<div class="pop" id="row-menu" role="menu">
+  <button role="menuitem" data-act="restart">Restart</button>
+  <button role="menuitem" data-act="stop">Stop</button>
+  <button role="menuitem" data-act="duplicate">Duplicate</button>
+  <button role="menuitem" data-act="delete" class="danger">Delete</button>
+</div>
+<div class="pop" id="notif-menu" role="dialog" aria-label="Notifications"></div>
+
+<aside id="logs-panel" aria-label="Session logs">
+  <div class="dh"><h3 id="logs-title">Logs</h3><button class="icon-btn" id="logs-close" aria-label="Close logs">&#10005;</button></div>
+  <div class="lg-tools">
+    <div class="chips" id="lvl-chips" role="group" aria-label="Log levels"></div>
+    <input type="search" id="log-search" placeholder="Search logs" aria-label="Search logs">
+  </div>
+  <div id="log-lines" class="mono"></div>
+</aside>
+
+<dialog id="new-dialog" aria-labelledby="nd-t">
+  <form method="dialog" id="new-form">
+    <div class="dh"><h3 id="nd-t">New session</h3></div>
+    <div class="db">
+      <label class="f"><span>Project</span><select id="ns-project"></select></label>
+      <label class="f"><span>Model</span><select id="ns-model"></select></label>
+      <label class="f"><span>Task description</span><textarea id="ns-task" required placeholder="e.g. Fix the flaky checkout test and open a PR"></textarea></label>
+    </div>
+    <div class="df"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary" value="ok">Start session</button></div>
+  </form>
+</dialog>
+
+<dialog id="settings-dialog" aria-labelledby="sd-t">
+  <form method="dialog" id="settings-form">
+    <div class="dh"><h3 id="sd-t">Settings</h3></div>
+    <div class="db">
+      <div class="row2">
+        <label class="f"><span>Default model</span><select id="st-model"></select></label>
+        <label class="f"><span>Theme</span><select id="st-theme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+      </div>
+      <fieldset><legend>Notifications</legend>
+        <label><input type="checkbox" id="st-n-done"> Agent finishes</label>
+        <label><input type="checkbox" id="st-n-fail"> Agent fails</label>
+        <label><input type="checkbox" id="st-n-appr"> Approval needed</label>
+        <label><input type="checkbox" id="st-n-toast"> Show toasts</label>
+      </fieldset>
+      <fieldset><legend>API keys</legend>
+        <label class="f"><span>Anthropic</span><input type="password" id="st-k-a" autocomplete="off" placeholder="sk-ant-..."></label>
+        <label class="f" style="margin:0"><span>OpenAI</span><input type="password" id="st-k-o" autocomplete="off" placeholder="sk-..."></label>
+      </fieldset>
+    </div>
+    <div class="df"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary" value="ok">Save settings</button></div>
+  </form>
+</dialog>
+
+<dialog id="confirm-dialog" aria-labelledby="cd-t">
+  <form method="dialog">
+    <div class="dh"><h3 id="cd-t">Delete sessions?</h3></div>
+    <div class="db"><p id="cd-msg" style="margin:6px 0"></p></div>
+    <div class="df"><button type="button" class="btn" data-close>Cancel</button><button class="btn danger" id="cd-ok" value="ok">Delete</button></div>
+  </form>
+</dialog>
+
+<dialog id="palette" aria-label="Command palette">
+  <input type="text" id="pal-input" placeholder="Type a command or session..." aria-label="Command">
+  <ul id="pal-list"></ul>
+</dialog>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MODELS={"opus":{n:"Opus 4.5",rate:60},"sonnet":{n:"Sonnet 4.5",rate:14},"haiku":{n:"Haiku 4.5",rate:4},"gpt":{n:"GPT-5 Codex",rate:20}};
+const STAT={running:"Running",waiting:"Needs approval",failed:"Failed",done:"Done"};
+const PROJ=[{id:"web",name:"storefront-web",c:"#4f46e5"},{id:"api",name:"billing-api",c:"#0891b2"},{id:"mob",name:"mobile-app",c:"#d97706"},{id:"inf",name:"infra-terraform",c:"#16a34a"},{id:"doc",name:"docs-site",c:"#db2777"}];
+const T=(m)=>m*60;
+let S=[
+ ["Fix flaky checkout test","web","sonnet","running",T(14),2.41],
+ ["Migrate invoices to decimal cents","api","opus","waiting",T(38),11.8],
+ ["Add dark mode to settings screen","mob","sonnet","running",T(7),1.12],
+ ["Upgrade Terraform AWS provider to v6","inf","opus","waiting",T(52),14.3],
+ ["Rewrite quickstart guide","doc","haiku","done",T(9),0.31],
+ ["Debug 502s on /v2/charges","api","opus","failed",T(23),7.65],
+ ["Replace moment.js with date-fns","web","sonnet","done",T(31),4.02],
+ ["Push notification deep links","mob","sonnet","running",T(19),2.77],
+ ["Add rate limiting middleware","api","sonnet","done",T(44),5.9],
+ ["Cache module for CI runners","inf","haiku","failed",T(6),0.18],
+ ["Fix broken links in changelog","doc","haiku","done",T(3),0.07],
+ ["Accessibility audit of product page","web","opus","waiting",T(27),8.4],
+ ["Refactor auth token refresh","mob","opus","done",T(61),16.9],
+ ["Write webhook retry tests","api","gpt","running",T(11),1.95],
+ ["Reduce bundle size of cart island","web","sonnet","failed",T(17),2.2]
+].map((a,i)=>({id:"s"+(i+1),title:a[0],project:a[1],model:a[2],status:a[3],elapsed:a[4],cost:a[5],archived:false,tokens:Math.round(a[5]/MODELS[a[2]].rate*1e6),task:a[0],seed:i+3}));
+let nextId=16;
+const st={project:"all",status:"all",q:"",sel:new Set(),open:null,view:"sessions",unread:0,notifs:[],lvls:{debug:true,info:true,warn:true,error:true},logQ:"",logSid:null};
+const cfg=Object.assign({model:"sonnet",theme:"auto",done:true,fail:true,appr:true,toast:true,ka:"",ko:""},(()=>{try{return JSON.parse(localStorage.getItem("agent-cfg")||"{}")}catch(e){return {}}})());
+const saveCfg=()=>{try{localStorage.setItem("agent-cfg",JSON.stringify(Object.assign({},cfg,{ka:"",ko:""})))}catch(e){}};
+const applyTheme=()=>{if(cfg.theme==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",cfg.theme)};
+
+const fmtT=s=>{s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}h ${m}m`:m?`${m}m ${String(x).padStart(2,"0")}s`:`${x}s`};
+const fmtC=c=>"$"+c.toFixed(2);
+const fmtK=n=>n>=1e6?(n/1e6).toFixed(2)+"M":Math.round(n/1e3)+"k";
+const proj=id=>PROJ.find(p=>p.id===id);
+const byId=id=>S.find(s=>s.id===id);
+
+/* ---------- toasts & notifications ---------- */
+function notify(kind,title,sub,sid){
+  st.notifs.unshift({kind,title,sub,sid,read:false,at:Date.now()});st.notifs=st.notifs.slice(0,30);
+  const allowed=kind==="done"?cfg.done:kind==="failed"?cfg.fail:cfg.appr;
+  if(!allowed){st.notifs.shift();return}
+  badge();renderNotifs();
+  if(cfg.toast)toast(kind,title,sub,sid);
+}
+function toast(kind,title,sub,sid){
+  const t=document.createElement("div");t.className="toast "+kind;t.setAttribute("role","status");
+  t.innerHTML=`<div><b>${esc(title)}</b><small>${esc(sub)}</small></div>${sid?'<button class="btn sm" data-view>View</button>':""}<button aria-label="Dismiss" data-x>&times;</button>`;
+  $("#toasts").appendChild(t);
+  const kill=()=>t.remove();
+  t.querySelector("[data-x]").onclick=kill;
+  const v=t.querySelector("[data-view]");if(v)v.onclick=()=>{openSession(sid);kill()};
+  setTimeout(kill,6000);
+}
+function badge(){const n=st.notifs.filter(x=>!x.read).length;const b=$("#bell-n");b.hidden=!n;b.textContent=n}
+function renderNotifs(){
+  const el=$("#notif-menu");
+  el.innerHTML=`<div class="nh">Notifications <button class="btn sm" id="mark-read">Mark all read</button></div>`+
+   (st.notifs.length?st.notifs.map((n,i)=>`<button class="ni ${n.read?"":"unread"}" data-i="${i}"><b>${esc(n.title)}</b><small>${esc(n.sub)}</small></button>`).join(""):`<div class="empty">Nothing yet</div>`);
+}
+$("#notif-menu").addEventListener("click",e=>{
+  if(e.target.id==="mark-read"){st.notifs.forEach(n=>n.read=true);badge();renderNotifs();return}
+  const b=e.target.closest(".ni");if(!b)return;const n=st.notifs[+b.dataset.i];n.read=true;badge();renderNotifs();closePops();if(n.sid&&byId(n.sid))openSession(n.sid);
+});
+
+/* ---------- popovers ---------- */
+function closePops(){$$(".pop.on").forEach(p=>p.classList.remove("on"));$("#bell").setAttribute("aria-expanded","false")}
+document.addEventListener("click",e=>{if(!e.target.closest(".pop,#bell,.row-menu-btn"))closePops()});
+$("#bell").onclick=e=>{const o=$("#notif-menu").classList.contains("on");closePops();if(!o){renderNotifs();$("#notif-menu").classList.add("on");$("#bell").setAttribute("aria-expanded","true")}};
+let menuSid=null;
+function openRowMenu(btn,sid){
+  const m=$("#row-menu"),was=m.classList.contains("on")&&menuSid===sid;closePops();if(was)return;
+  menuSid=sid;m.classList.add("on");
+  const r=btn.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight;
+  m.style.left=Math.max(8,Math.min(r.right-w,innerWidth-w-8))+"px";
+  m.style.top=(r.bottom+h+8>innerHeight?r.top-h-4:r.bottom+4)+"px";
+}
+$("#row-menu").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;const a=b.dataset.act,id=menuSid;closePops();doAct(a,id);
+});
+function doAct(a,id){
+  const s=byId(id);if(!s)return;
+  if(a==="stop"){if(s.status==="running"||s.status==="waiting"){s.status="failed";s.stopped=true;toast("failed","Session stopped",s.title);render()}else toast("waiting","Not running",s.title)}
+  if(a==="restart"){s.status="running";s.elapsed=0;s.stopped=false;toast("running","Session restarted",s.title);render()}
+  if(a==="duplicate"){const c=Object.assign({},s,{id:"s"+(++nextId),title:s.title+" (copy)",status:"running",elapsed:0,cost:0,tokens:0});S.unshift(c);toast("running","Session duplicated",c.title);render()}
+  if(a==="delete")askDelete([id]);
+}
+
+/* ---------- dialogs ---------- */
+function openDlg(d){if(!d.open)d.showModal()}
+$$("dialog").forEach(d=>{d.addEventListener("click",e=>{if(e.target===d&&d.id!=="palette")d.close();if(e.target===d&&d.id==="palette")d.close()});$$("[data-close]",d).forEach(b=>b.onclick=()=>d.close())});
+function fillModels(sel,val){sel.innerHTML=Object.entries(MODELS).map(([k,m])=>`<option value="${k}">${m.n}</option>`).join("");sel.value=val}
+$("#new-btn").onclick=()=>openNew();
+function openNew(p){
+  $("#ns-project").innerHTML=PROJ.map(x=>`<option value="${x.id}">${x.name}</option>`).join("");
+  $("#ns-project").value=p||(st.project!=="all"?st.project:"web");fillModels($("#ns-model"),cfg.model);$("#ns-task").value="";openDlg($("#new-dialog"));$("#ns-task").focus();
+}
+$("#new-form").addEventListener("submit",e=>{
+  const task=$("#ns-task").value.trim();if(!task){e.preventDefault();return}
+  const s={id:"s"+(++nextId),title:task.length>48?task.slice(0,46)+"…":task,task,project:$("#ns-project").value,model:$("#ns-model").value,status:"running",elapsed:0,cost:0,tokens:0,archived:false,seed:nextId};
+  S.unshift(s);st.view="sessions";render();openSession(s.id);toast("running","Session started",s.title);
+});
+$("#settings-btn").onclick=()=>{
+  fillModels($("#st-model"),cfg.model);$("#st-theme").value=cfg.theme;
+  $("#st-n-done").checked=cfg.done;$("#st-n-fail").checked=cfg.fail;$("#st-n-appr").checked=cfg.appr;$("#st-n-toast").checked=cfg.toast;
+  $("#st-k-a").value=cfg.ka;$("#st-k-o").value=cfg.ko;openDlg($("#settings-dialog"));
+};
+$("#settings-form").addEventListener("submit",()=>{
+  Object.assign(cfg,{model:$("#st-model").value,theme:$("#st-theme").value,done:$("#st-n-done").checked,fail:$("#st-n-fail").checked,appr:$("#st-n-appr").checked,toast:$("#st-n-toast").checked,ka:$("#st-k-a").value,ko:$("#st-k-o").value});
+  saveCfg();applyTheme();toast("done","Settings saved","Preferences updated");
+});
+let delIds=[];
+function askDelete(ids){
+  delIds=ids;$("#cd-t").textContent=ids.length>1?`Delete ${ids.length} sessions?`:"Delete session?";
+  $("#cd-msg").textContent=ids.length>1?`${ids.length} sessions and their logs will be permanently deleted. This cannot be undone.`:`"${byId(ids[0]).title}" and its logs will be permanently deleted. This cannot be undone.`;
+  openDlg($("#confirm-dialog"));
+}
+$("#cd-ok").onclick=()=>{
+  const n=delIds.length;S=S.filter(s=>!delIds.includes(s.id));delIds.forEach(i=>st.sel.delete(i));if(st.open&&!byId(st.open)){st.open=null;document.body.classList.remove("show-detail")}
+  delIds=[];render();toast("done",n>1?`${n} sessions deleted`:"Session deleted","");
+};
+
+/* ---------- bulk ---------- */
+function bulk(a){
+  const ids=[...st.sel];if(!ids.length)return;
+  if(a==="delete"){askDelete(ids);return}
+  ids.forEach(id=>{const s=byId(id);if(!s)return;
+    if(a==="stop"&&(s.status==="running"||s.status==="waiting")){s.status="failed";s.stopped=true}
+    if(a==="archive")s.archived=true});
+  toast("done",a==="stop"?"Stopped sessions":"Archived sessions",ids.length+" sessions");st.sel.clear();render();
+}
+$("#bulk-stop").onclick=()=>bulk("stop");$("#bulk-archive").onclick=()=>bulk("archive");$("#bulk-delete").onclick=()=>bulk("delete");
+$("#bulk-clear").onclick=()=>{st.sel.clear();render()};
+$("#select-all").onchange=e=>{const v=visible();if(e.target.checked)v.forEach(s=>st.sel.add(s.id));else v.forEach(s=>st.sel.delete(s.id));render()};
+
+/* ---------- render ---------- */
+function visible(){
+  const q=st.q.toLowerCase();
+  return S.filter(s=>(st.project==="archived"?s.archived:!s.archived&&(st.project==="all"||s.project===st.project))&&(st.status==="all"||s.status===st.status)&&(!q||(s.title+" "+proj(s.project).name+" "+MODELS[s.model].n).toLowerCase().includes(q)));
+}
+function renderSidebar(){
+  const act=S.filter(s=>!s.archived);
+  let h=`<button class="nav" data-p="all" aria-current="${st.view==="sessions"&&st.project==="all"}"><span>All sessions</span><span class="n">${act.length}</span></button><h6>Projects</h6>`;
+  h+=PROJ.map(p=>`<button class="nav" data-p="${p.id}" aria-current="${st.view==="sessions"&&st.project===p.id}"><span class="pn"><i class="swatch" style="background:${p.c}"></i>${p.name}</span><span class="n">${act.filter(s=>s.project===p.id).length}</span></button>`).join("");
+  h+=`<h6>Library</h6><button class="nav" data-p="archived" aria-current="${st.view==="sessions"&&st.project==="archived"}"><span>Archived</span><span class="n">${S.filter(s=>s.archived).length}</span></button>
+  <button class="nav" id="nav-usage" aria-current="${st.view==="usage"}"><span>Usage &amp; spend</span></button>`;
+  $("#sidebar").innerHTML=h;
+}
+$("#sidebar").addEventListener("click",e=>{
+  const b=e.target.closest(".nav");if(!b)return;
+  if(b.id==="nav-usage")st.view="usage";else{st.view="sessions";st.project=b.dataset.p}
+  document.body.classList.remove("show-sidebar","show-detail");render();
+});
+function renderChips(){
+  const c=S.filter(s=>!s.archived);
+  $("#chips").innerHTML=[["all","All"],["running","Running"],["waiting","Approval"],["failed","Failed"],["done","Done"]].map(([k,l])=>`<button class="chip" data-s="${k}" aria-pressed="${st.status===k}">${l}${k!=="all"?" "+c.filter(s=>s.status===k).length:""}</button>`).join("");
+}
+$("#chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;st.status=b.dataset.s;render()});
+function renderList(){
+  const v=visible();
+  $("#list-title").textContent=st.project==="all"?"All sessions":st.project==="archived"?"Archived":proj(st.project).name;
+  $("#list").innerHTML=v.length?v.map(s=>`<li class="row" data-id="${s.id}" aria-selected="${st.open===s.id}">
+    <input type="checkbox" aria-label="Select ${esc(s.title)}" ${st.sel.has(s.id)?"checked":""}>
+    <div class="body"><div class="t">${esc(s.title)}</div>
+    <div class="m"><span class="badge s-${s.status}">${STAT[s.status]}</span><span>${proj(s.project).name}</span><span>${MODELS[s.model].n}</span><span class="mono">${fmtT(s.elapsed)}</span><span class="mono">${fmtC(s.cost)}</span></div></div>
+    <button class="icon-btn row-menu-btn" aria-label="Actions for ${esc(s.title)}" aria-haspopup="menu"><svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></li>`).join(""):`<li class="empty">No sessions match.</li>`;
+  const n=st.sel.size;$("#bulkbar").classList.toggle("on",n>0);$("#bulk-n").textContent=n+" selected";
+  $("#select-all").checked=v.length>0&&v.every(s=>st.sel.has(s.id));
+}
+$("#list").addEventListener("click",e=>{
+  const r=e.target.closest(".row");if(!r)return;const id=r.dataset.id;
+  if(e.target.closest(".row-menu-btn")){openRowMenu(e.target.closest(".row-menu-btn"),id);return}
+  if(e.target.type==="checkbox"){e.target.checked?st.sel.add(id):st.sel.delete(id);renderList();return}
+  openSession(id);
+});
+function openSession(id){st.open=id;st.view="sessions";document.body.classList.add("show-detail");if(st.logSid&&$("#logs-panel").classList.contains("on")){st.logSid=id;renderLogs()}render()}
+const SCRIPT=s=>[
+ ["user",s.task],
+ ["agent","I'll start by reading the relevant code in "+proj(s.project).name+" and reproducing the problem."],
+ ["tool","<b>Read</b> src/"+s.project+"/index.ts (212 lines)"],
+ ["tool","<b>Grep</b> \"TODO|FIXME\" across 48 files"],
+ ["agent","Found the cause: an implicit dependency on call order. I'll make it explicit and add a regression test."],
+ ["tool","<b>Edit</b> src/"+s.project+"/core.ts (+27 -9)"],
+ ["tool","<b>Bash</b> npm test -- --silent  ->  "+(s.status==="failed"?"3 failed, 41 passed":"44 passed")]
+];
+function renderDetail(){
+  const s=byId(st.open),el=$("#detail");
+  if(!s){el.innerHTML=`<div class="placeholder">Select a session to see its transcript.</div>`;return}
+  let h=`<div class="d-head"><div class="d-top"><button class="btn sm" id="back">&larr; Sessions</button><span class="spacer"></span>
+   <button class="btn sm" id="logs-btn" aria-haspopup="dialog">Logs</button></div>
+   <h2>${esc(s.title)}</h2>
+   <div class="meta"><span class="badge s-${s.status}">${STAT[s.status]}</span><span>${proj(s.project).name}</span><span>${MODELS[s.model].n}</span><span class="mono">${fmtT(s.elapsed)}</span><span class="mono">${fmtC(s.cost)}</span><span class="mono">${fmtK(s.tokens)} tokens</span></div>
+   <div class="d-actions"><button class="btn sm" data-a="restart">Restart</button><button class="btn sm" data-a="stop">Stop</button><button class="btn sm" data-a="duplicate">Duplicate</button></div></div>
+   <div id="transcript">`;
+  SCRIPT(s).forEach(([k,t])=>{h+=k==="tool"?`<div class="tool mono">${t}</div>`:`<div class="msg ${k}"><span class="who">${k==="user"?"You":"Agent"}</span>${esc(t)}</div>`});
+  if(s.status==="waiting")h+=`<div class="approval" role="group" aria-label="Pending approval"><h4>Approval required</h4><div>The agent wants to run a command that modifies files outside the workspace.</div><pre class="mono">${s.project==="inf"?"terraform apply -auto-approve plan.out":s.project==="api"?"psql $DATABASE_URL -f migrations/0042_decimal_cents.sql":"npx playwright install --with-deps"}</pre><div class="btns"><button class="btn primary" id="approve">Approve</button><button class="btn danger" id="deny">Deny</button></div></div>`;
+  if(s.status==="failed")h+=`<div class="msg" style="background:var(--fail-bg);color:var(--fail)"><span class="who" style="color:inherit">Error</span>${s.stopped?"Stopped by user.":"Tests failed after 3 retries. See logs for the stack trace."}</div>`;
+  if(s.status==="done")h+=`<div class="msg"><span class="who">Agent</span>All checks pass. Changes committed on a new branch and a pull request is ready for review.</div>`;
+  if(s.status==="running")h+=`<div class="msg"><span class="who">Agent</span>Working…</div>`;
+  el.innerHTML=h+"</div>";
+  const tr=$("#transcript");tr.scrollTop=tr.scrollHeight;
+}
+$("#detail").addEventListener("click",e=>{
+  const s=byId(st.open);if(!s)return;
+  if(e.target.id==="back"){document.body.classList.remove("show-detail");return}
+  if(e.target.id==="logs-btn"){openLogs(s.id);return}
+  if(e.target.dataset.a){doAct(e.target.dataset.a,s.id);return}
+  if(e.target.id==="approve"){s.status="running";toast("running","Approved","Agent continues: "+s.title);render();s.fin=setTimeout(()=>finish(s.id,true),7000)}
+  if(e.target.id==="deny"){s.status="failed";s.stopped=false;notify("failed","Denied: "+s.title,"The agent stopped after the request was denied.",s.id);render()}
+});
+function finish(id,ok){const s=byId(id);if(!s||s.status!=="running")return;s.status=ok?"done":"failed";notify(ok?"done":"failed",(ok?"Finished: ":"Failed: ")+s.title,proj(s.project).name+" · "+fmtC(s.cost),s.id);render()}
+
+/* ---------- usage ---------- */
+function renderUsage(){
+  const rows=PROJ.map(p=>{const l=S.filter(s=>s.project===p.id);return{p,n:l.length,tok:l.reduce((a,s)=>a+s.tokens,0),cost:l.reduce((a,s)=>a+s.cost,0)}});
+  const tc=rows.reduce((a,r)=>a+r.cost,0),tt=rows.reduce((a,r)=>a+r.tok,0),max=Math.max(...rows.map(r=>r.cost),1);
+  const days=["Fri","Sat","Sun","Mon","Tue","Wed","Thu"],dv=[9.4,3.1,2.2,14.6,18.2,15.7,tc%20+6],dm=Math.max(...dv);
+  let bars=rows.map((r,i)=>{const y=14+i*38,w=Math.max(4,r.cost/max*330);return`<text x="0" y="${y+14}">${r.p.name}</text><rect x="120" y="${y}" width="${w}" height="22" rx="5" fill="${r.p.c}"/><text x="${126+w}" y="${y+15}" style="fill:var(--text)">${fmtC(r.cost)}</text>`}).join("");
+  let cols=dv.map((v,i)=>{const h=v/dm*130,x=20+i*62;return`<rect x="${x}" y="${150-h}" width="40" height="${h}" rx="5" fill="var(--accent)"/><text x="${x+20}" y="168" text-anchor="middle">${days[i]}</text><text x="${x+20}" y="${144-h}" text-anchor="middle">$${v.toFixed(0)}</text>`}).join("");
+  $("#usage").innerHTML=`<h1 style="margin:0;font-size:20px">Usage &amp; spend</h1><div class="meta">Last 7 days across all projects</div>
+  <div class="cards"><div class="card"><div class="k">Total spend</div><div class="v">${fmtC(tc)}</div></div><div class="card"><div class="k">Tokens</div><div class="v">${fmtK(tt)}</div></div><div class="card"><div class="k">Sessions</div><div class="v">${S.length}</div></div><div class="card"><div class="k">Avg cost / session</div><div class="v">${fmtC(tc/(S.length||1))}</div></div></div>
+  <div class="panel"><h3>Spend by project</h3><svg viewBox="0 0 520 210" role="img" aria-label="Bar chart of spend by project">${bars}</svg></div>
+  <div class="panel"><h3>Daily spend</h3><svg viewBox="0 0 460 180" role="img" aria-label="Column chart of daily spend">${cols}</svg></div>
+  <div class="panel"><h3>By project</h3><div class="tw"><table><thead><tr><th>Project</th><th class="r">Sessions</th><th class="r">Tokens</th><th class="r">Spend</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.p.name}</td><td class="r">${r.n}</td><td class="r mono">${fmtK(r.tok)}</td><td class="r mono">${fmtC(r.cost)}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+
+function render(){
+  $("#shell").classList.toggle("usage-mode",st.view==="usage");
+  renderSidebar();
+  if(st.view==="usage"){renderUsage();return}
+  renderChips();renderList();renderDetail();
+}
+$("#search").addEventListener("input",e=>{st.q=e.target.value;if(st.view!=="sessions"){st.view="sessions"}render()});
+$("#menu-btn").onclick=()=>document.body.classList.toggle("show-sidebar");
+$("#sidebar-scrim").onclick=()=>document.body.classList.remove("show-sidebar");
+
+/* ---------- logs ---------- */
+const LOGMSG=[["info","Session started, sandbox ready"],["debug","Loaded 48 files into context"],["info","Tool call: Read"],["debug","Token usage: prompt=18421 completion=1204"],["warn","Rate limit headroom below 20%"],["info","Tool call: Edit"],["debug","Diff applied cleanly"],["info","Running test suite"],["error","AssertionError: expected 200 but received 502"],["warn","Retrying request (attempt 2 of 3)"],["info","Tool call: Bash"],["debug","Cache hit for dependency graph"],["error","Process exited with code 1"],["info","Checkpoint saved"]];
+function logsFor(s){let r=s.seed*9301+49297;const out=[];const n=26;for(let i=0;i<n;i++){r=(r*9301+49297)%233280;const m=LOGMSG[Math.floor(r/233280*LOGMSG.length)];let lv=m[0];if(lv==="error"&&s.status!=="failed")lv="warn";out.push({t:i*37+(r%20),lv,m:m[1]})}
+  const t=s=>{const m=Math.floor(s/60),x=s%60;return `12:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}`};out.forEach(o=>o.ts=t(o.t));return out}
+function openLogs(id){st.logSid=id;$("#logs-panel").classList.add("on");renderLogs();$("#log-search").focus()}
+function renderLogs(){
+  const s=byId(st.logSid);if(!s)return;$("#logs-title").textContent="Logs · "+s.title;
+  $("#lvl-chips").innerHTML=["debug","info","warn","error"].map(l=>`<button class="chip" data-l="${l}" aria-pressed="${st.lvls[l]}">${l}</button>`).join("");
+  const q=st.logQ.toLowerCase();
+  const ls=logsFor(s).filter(l=>st.lvls[l.lv]&&(!q||l.m.toLowerCase().includes(q)));
+  $("#log-lines").innerHTML=ls.length?ls.map(l=>{let m=esc(l.m);if(q){const i=l.m.toLowerCase().indexOf(q);m=esc(l.m.slice(0,i))+"<mark>"+esc(l.m.slice(i,i+q.length))+"</mark>"+esc(l.m.slice(i+q.length))}return`<div class="ll"><span class="ts">${l.ts}</span><span class="lv lv-${l.lv}">${l.lv.toUpperCase()}</span><span>${m}</span></div>`}).join(""):`<div class="empty">No log lines match.</div>`;
+}
+$("#lvl-chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;st.lvls[b.dataset.l]=!st.lvls[b.dataset.l];renderLogs()});
+$("#log-search").addEventListener("input",e=>{st.logQ=e.target.value;renderLogs()});
+$("#logs-close").onclick=()=>$("#logs-panel").classList.remove("on");
+
+/* ---------- palette ---------- */
+let palItems=[],palIdx=0;
+function cmds(){
+  const c=[["New session","Ctrl N",()=>openNew()],["Open settings","",()=>$("#settings-btn").click()],["View usage & spend","",()=>{st.view="usage";render()}],["Show all sessions","",()=>{st.view="sessions";st.project="all";render()}],
+   ["Toggle theme","",()=>{cfg.theme=(document.documentElement.dataset.theme==="dark"||(cfg.theme==="auto"&&matchMedia("(prefers-color-scheme:dark)").matches))?"light":"dark";applyTheme();saveCfg()}],["Open notifications","",()=>$("#bell").click()]];
+  PROJ.forEach(p=>c.push(["Go to "+p.name,"project",()=>{st.view="sessions";st.project=p.id;render()}]));
+  S.forEach(s=>c.push(["Open: "+s.title,STAT[s.status],()=>openSession(s.id)]));return c;
+}
+function renderPal(){
+  const q=$("#pal-input").value.toLowerCase();palItems=cmds().filter(c=>c[0].toLowerCase().includes(q)).slice(0,30);palIdx=Math.min(palIdx,Math.max(0,palItems.length-1));
+  $("#pal-list").innerHTML=palItems.map((c,i)=>`<li><button data-i="${i}" aria-selected="${i===palIdx}"><span>${esc(c[0])}</span><small>${esc(c[1])}</small></button></li>`).join("")||`<li class="empty">No results</li>`;
+}
+function openPal(){$("#pal-input").value="";palIdx=0;renderPal();openDlg($("#palette"));$("#pal-input").focus()}
+function runPal(i){const c=palItems[i];if(!c)return;$("#palette").close();c[2]()}
+$("#palette-btn").onclick=openPal;
+$("#pal-input").addEventListener("input",()=>{palIdx=0;renderPal()});
+$("#pal-input").addEventListener("keydown",e=>{
+  if(e.key==="ArrowDown"){palIdx=Math.min(palIdx+1,palItems.length-1);renderPal();e.preventDefault()}
+  else if(e.key==="ArrowUp"){palIdx=Math.max(palIdx-1,0);renderPal();e.preventDefault()}
+  else if(e.key==="Enter"){runPal(palIdx);e.preventDefault()}
+});
+$("#pal-list").addEventListener("click",e=>{const b=e.target.closest("button");if(b)runPal(+b.dataset.i)});
+document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();$("#palette").open?$("#palette").close():openPal();return}
+  if(e.key==="Escape"){closePops();document.body.classList.remove("show-sidebar");if($("#logs-panel").classList.contains("on")&&!$$("dialog[open]").length)$("#logs-panel").classList.remove("on")}
+});
+
+/* ---------- live simulation ---------- */
+setInterval(()=>{let ch=false;S.forEach(s=>{if(s.status==="running"){s.elapsed++;s.cost+=MODELS[s.model].rate/3600*0.9;s.tokens+=Math.round(1e6/MODELS[s.model].rate/3600*0.9);ch=true}});
+  if(ch&&st.view==="sessions"&&!$("#row-menu").classList.contains("on")){const a=document.activeElement;if(!a||a.tagName!=="INPUT"||a.type!=="checkbox")renderList()}},1000);
+setTimeout(()=>finish("s3",true),20000);
+setTimeout(()=>finish("s8",false),32000);
+setTimeout(()=>{const s=byId("s14");if(s&&s.status==="running"){s.status="waiting";notify("waiting","Approval needed: "+s.title,"Agent wants to run a command",s.id);render()}},45000);
+
+applyTheme();render();
+})();
+</script>
+</body>
+</html>

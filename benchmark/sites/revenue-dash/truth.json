@@ -117,7 +117,10 @@
       "layer": "source",
       "what": "'Remove' is an option inside the role select and applies immediately with no confirmation or undo",
       "selector": "#people",
-      "expect": []
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "share dialog",

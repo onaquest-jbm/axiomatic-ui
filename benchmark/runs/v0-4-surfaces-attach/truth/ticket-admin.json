@@ -1,0 +1,167 @@
+{
+  "builder": "Claude Sonnet (subagent)",
+  "brief": "internal support-ticket admin table",
+  "surfaces": [
+    {
+      "name": "filter popover",
+      "opener": "#addFilter"
+    },
+    {
+      "name": "row actions menu",
+      "opener": "#tbody .kebab"
+    },
+    {
+      "name": "column menu",
+      "opener": "#colBtn"
+    },
+    {
+      "name": "ticket side panel",
+      "opener": "#tbody tr[data-id]"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Default sort by updated scatters SLA-breaching tickets; 'SLA at risk' is a quiet fifth tab",
+      "selector": "#views [data-view=\"breach\"], #thead [data-sort=\"updated\"]",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Priority and status are look-alike coloured pills with overlapping hues",
+      "selector": "#tbody tr:first-child .badge",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "render",
+      "what": "Identical avatars and bold subjects everywhere: emphasis distinguishes nothing",
+      "selector": "#tbody tr:first-child .subj, #tbody tr:first-child .av",
+      "expect": [
+        "flat-emphasis"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "11px uppercase headers, 12px mono IDs and disabled pager arrows are low contrast",
+      "selector": "#thead, #tbody tr:first-child .id, #pager :disabled",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "16px checkboxes, 28px kebab and pager buttons; under 44px on phone",
+      "selector": "#tbody tr:first-child .rowchk, #tbody tr:first-child .kebab, #pager .pg",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "convention",
+      "layer": "render",
+      "what": "At 390px the table is cut off with no cue, tabs clipped, buttons collapse to unlabeled icons",
+      "selector": "#views, .toolbar, .tablewrap",
+      "expect": [
+        "horizontal-scroll",
+        "text-overflow"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "'New ticket' is the most saturated element on a triage screen where it is rarely used",
+      "selector": "#newTicket",
+      "expect": [
+        "unearned-salience"
+      ]
+    },
+    {
+      "surface": "filter popover",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Three steps per filter that duplicate the tabs; no quick filters",
+      "selector": "#filterPop",
+      "expect": []
+    },
+    {
+      "surface": "filter popover",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Odd 'Is' label; popover covers headers; no match preview",
+      "selector": "#filterPop",
+      "expect": []
+    },
+    {
+      "surface": "row actions menu",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Frequent actions (assign to me, resolve) hidden behind a 28px kebab; rare 'Open details' leads",
+      "selector": "#rowMenu",
+      "expect": []
+    },
+    {
+      "surface": "row actions menu",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Delete sits two rows under Merge with a hairline; no undo for resolve or assign",
+      "selector": "#rowMenu [data-act=\"merge\"], #rowMenu [data-act=\"delete\"]",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "column menu",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Column picker serves almost no triage task and takes prime toolbar space",
+      "selector": "#colBtn",
+      "expect": []
+    },
+    {
+      "surface": "column menu",
+      "principle": "convention",
+      "layer": "render",
+      "what": "On phone toggling hidden columns does nothing, so the menu misstates what shows",
+      "selector": "#colMenu",
+      "expect": []
+    },
+    {
+      "surface": "ticket side panel",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "No reply box; resolve is emphasised before any response is written",
+      "selector": "#pResolve",
+      "expect": []
+    },
+    {
+      "surface": "ticket side panel",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Labels far from values; SLA due drawn like created/updated",
+      "selector": "#pBody .meta",
+      "expect": []
+    },
+    {
+      "surface": "ticket side panel",
+      "principle": "response",
+      "layer": "source",
+      "what": "Scrim blocks the list; no next/previous, so close-and-reopen per ticket",
+      "selector": "#panel",
+      "expect": []
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)"
+}

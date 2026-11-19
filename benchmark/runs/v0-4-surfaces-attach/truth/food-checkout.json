@@ -1,0 +1,168 @@
+{
+  "builder": "Claude Sonnet (subagent)",
+  "brief": "mobile-first food delivery cart and checkout",
+  "surfaces": [
+    {
+      "name": "address sheet",
+      "opener": "#addr-change"
+    },
+    {
+      "name": "payment sheet",
+      "opener": "#pay-change"
+    },
+    {
+      "name": "fees popover",
+      "opener": "#fees-info"
+    },
+    {
+      "name": "schedule picker",
+      "opener": "#sched-open"
+    },
+    {
+      "name": "undo snackbar",
+      "opener": ".remove-btn"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "fees popover",
+      "principle": "encoding",
+      "layer": "render",
+      "what": "An empty 'Promo' row shows in the summary because [hidden] is overridden by display:flex",
+      "selector": "#s-disc-row",
+      "expect": []
+    },
+    {
+      "surface": "fees popover",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Breakdown popover covers the tip and total it explains; cut off at 390px",
+      "selector": "#pop-fees",
+      "expect": [
+        "surface-offscreen"
+      ],
+      "expectNote": "surface-offscreen mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "fees popover",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Fee breakdown only reachable through a 22px info button",
+      "selector": "#fees-info",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Order summary and total sit at the bottom after seven cards; never visible on phone without scrolling",
+      "expect": [
+        "primary-not-first"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "On phone 'Remove' wraps to its own line, leaving ragged loosely attached action rows",
+      "selector": "#items .item-actions",
+      "expect": [
+        "weak-grouping"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Remove is a muted link with a ~28px hit area; minus at quantity 1 silently removes the item",
+      "selector": "#items .remove-btn, #items .dec",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "At 390px the long address runs under the 'Change' link",
+      "selector": "#addr-change",
+      "expect": [
+        "text-overflow"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Brand red used for primary, links, selection and (almost) error, so red says nothing",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Section headings and sub-amounts are small and low contrast",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Place order commits with no recap beside it; confirmation's back link allows placing it again",
+      "selector": "#place",
+      "expect": []
+    },
+    {
+      "surface": "address sheet",
+      "principle": "convention",
+      "layer": "source",
+      "what": "Sheet has no close or cancel; new address commits silently on Done",
+      "selector": "#sheet-address",
+      "expect": []
+    },
+    {
+      "surface": "schedule picker",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Disabled 'Confirm time' label hard to read in both themes",
+      "selector": "#sched-confirm",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "schedule picker",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "23 slots in one undivided grid; focus ring on 'Today' looks like a selection",
+      "selector": "#days, #slots",
+      "expect": [
+        "too-many-peers"
+      ],
+      "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input.",
+      "expectNote": "too-many-peers mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "payment sheet",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "'Default wallet' label contradicts the preselected default card",
+      "selector": "#pay-list [aria-checked=\"true\"], #pay-list .choice:last-child",
+      "expect": []
+    },
+    {
+      "surface": "undo snackbar",
+      "principle": "response",
+      "layer": "render",
+      "what": "Undo toast covers cards for six seconds while the total jumps with no other signal",
+      "selector": "#snackbar",
+      "expect": []
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)",
+  "removed": []
+}

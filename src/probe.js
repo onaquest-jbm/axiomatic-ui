@@ -74,6 +74,9 @@ function probe(opts) {
   // Regions marked data-axiomatic="specimen" display other designs (swatches, previews, screenshots).
   // They are content, not this interface, so they are left out of meaning and derivation checks.
   const specimen = (el) => !!(el.closest && el.closest('[data-axiomatic="specimen"]'));
+  // Scoped mode: after a click, only what the click made visible (a menu, dialog, panel or
+  // new view) is checked; audit.js records that set in window.__axScope before probing.
+  const scope = opts.scoped ? (window.__axScope || new Set()) : null;
   const all = Array.from(document.body.querySelectorAll('*')).slice(0, 6000);
   const styles = new Map();
   const vis = [];
@@ -82,8 +85,9 @@ function probe(opts) {
     const cs = getComputedStyle(el);
     if (!visible(el, cs)) continue;
     styles.set(el, cs);
-    vis.push(el);
+    if (!scope || scope.has(el)) vis.push(el);
   }
+  const roots = scope ? vis.filter((el) => !el.parentElement || !scope.has(el.parentElement)) : [document.body];
   const vw = innerWidth, ph = Math.max(document.documentElement.scrollHeight, innerHeight);
 
   // ---------- salience
@@ -255,13 +259,104 @@ function probe(opts) {
     const indicator = cs.animationIterationCount === 'infinite' && /spin|load|progress|pulse/i.test(cs.animationName);
     if (!indicator && durs.length && Math.max(...durs) > opts.maxMotion + 20) add('slow-motion', 'floor', 'response', `${Math.round(Math.max(...durs))}ms of motion; the derived maximum is ${opts.maxMotion}ms.`, el);
   }
-  const text = document.body.innerText || '';
+  const text = roots.map((el) => el.innerText || '').join(' ');
   const emoji = text.match(/\p{Extended_Pictographic}/gu);
   if (emoji) add('decorative-symbol', 'meaning', 'encoding', `${emoji.length} emoji in interface text: symbols that don't map to a state or object.`);
 
   // ---------- floor: human limits
+  // A fixed overlay (or a menu pushed past a side edge) that doesn't fit the window can't be
+  // scrolled into view: part of it is simply unreachable.
+  if (scope) {
+    let clipped = 0;
+    for (const el of roots) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4 || clipped >= 4) continue;
+      let fixed = false;
+      for (let n = el; n && n !== document.body; n = n.parentElement) { const p = getComputedStyle(n).position; if (p === 'fixed' || p === 'sticky') { fixed = true; break; } }
+      const out = { top: Math.max(0, -r.top), bottom: Math.max(0, r.bottom - innerHeight), left: Math.max(0, -r.left), right: Math.max(0, r.right - innerWidth) };
+      const lost = (fixed ? out.top + out.bottom : 0) + out.left + out.right;
+      if (lost > 2) { clipped++; add('surface-offscreen', 'floor', 'legibility', `${Math.round(lost)}px of this ${fixed ? 'fixed ' : ''}panel lies outside the ${innerWidth}x${innerHeight} window and can't be scrolled into view.`, el); }
+    }
+  }
+  // ---------- consequence: an irreversible action among routine ones, unseparated and styled alike
+  const DESTRUCTIVE = /\b(delete|remove|discard|destroy|erase|wipe|revoke|terminate|kill|reset|drop)\b/i;
+  const BENIGN = /\b(filter|filters|tag|selection|from (cart|list|view)|search)\b/i;
+  const labelOf = (el) => (el.getAttribute('aria-label') || el.textContent || el.value || '').replace(/\s+/g, ' ').trim();
+  const isControl = (el) => el.matches('button, [role=button], [role=menuitem], a[href], input[type=button], input[type=submit]');
+  const separated = (a, b) => {
+    // Something drawn between two controls: a rule, a separator role, or a border on either side.
+    const [first, second] = a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? [a, b] : [b, a];
+    const range = document.createRange(); range.setStartAfter(first); range.setEndBefore(second);
+    const between = range.cloneContents().querySelectorAll ? range.cloneContents().querySelectorAll('hr, [role=separator]') : [];
+    if (between.length) return true;
+    for (const el of [first, second, first.parentElement, second.parentElement]) { const cs = getComputedStyle(el); if (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== 'none' && el !== first.parentElement) return true; }
+    return false;
+  };
+  let csq = 0;
+  for (const el of vis) {
+    if (csq >= 4 || !isControl(el) || specimen(el)) continue;
+    const l = labelOf(el);
+    if (!DESTRUCTIVE.test(l) || BENIGN.test(l) || l.length > 40) continue;
+    let group = el.parentElement;
+    for (let i = 0; i < 2 && group && group.querySelectorAll('button, [role=button], [role=menuitem]').length < 2; i++) group = group.parentElement;
+    if (!group) continue;
+    const peers = Array.from(group.querySelectorAll('button, [role=button], [role=menuitem], a[href]')).filter((p) => p !== el && styles.has(p) && !DESTRUCTIVE.test(labelOf(p)));
+    if (!peers.length) continue;
+    const r = el.getBoundingClientRect();
+    const dist = (p) => { const q = p.getBoundingClientRect(); return Math.max(0, q.left - r.right, r.left - q.right, q.top - r.bottom, r.top - q.bottom); };
+    const nearest = peers.slice().sort((a, b) => dist(a) - dist(b))[0];
+    const gaps = peers.map(dist).filter((g) => g < 200);
+    const typical = gaps.length ? gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)] : 0;
+    const cs = styles.get(el), ns = styles.get(nearest);
+    // Text colour alone (red text) is not separation: it is easy to miss and carries no position
+    // or shape. Only a different fill or weight counts as looking different.
+    const alike = cs.backgroundColor === ns.backgroundColor && cs.fontWeight === ns.fontWeight;
+    if (alike && dist(nearest) <= Math.max(typical * 1.5, 12) && !separated(el, nearest)) { csq++; add('destructive-unseparated', 'meaning', 'consequence', `"${l}" sits among routine actions ("${labelOf(nearest).slice(0, 24)}") with nothing separating it and the same look, so an irreversible action reads as a routine one.`, el); }
+  }
+  for (const s of vis.filter((e) => e.matches('select'))) {
+    const opts_ = Array.from(s.options || []).map((o) => o.textContent.trim());
+    const bad = opts_.filter((t) => DESTRUCTIVE.test(t) && !BENIGN.test(t));
+    if (bad.length && bad.length < opts_.length && csq < 6) { csq++; add('destructive-unseparated', 'meaning', 'consequence', `"${bad[0]}" is an option in a select beside ordinary values: choosing it is a destructive act disguised as a setting.`, s); }
+  }
+
+  // ---------- choice / memory: too many peer actions in one undivided group
+  const wallMax = (B && B.visibleActionsPerGroup ? B.visibleActionsPerGroup : 4) * 2;
+  let walls = 0;
+  const flaggedWalls = new Set();
+  for (const parent of new Set(vis.filter(isControl).map((e) => e.parentElement))) {
+    if (!parent || walls >= 3 || parent.closest('table, nav, [role=navigation], [role=grid], [role=listbox], [role=tablist], [data-axiomatic="specimen"]')) continue;
+    if ([...flaggedWalls].some((f) => f.contains(parent) || parent.contains(f))) continue;
+    // Peers: visible controls among the parent's children, split into runs by separators.
+    let run = [], best = [];
+    for (const k of parent.children) {
+      if (k.matches('hr, [role=separator]')) { if (run.length > best.length) best = run; run = []; continue; }
+      if (styles.has(k) && isControl(k)) run.push(k);
+    }
+    if (run.length > best.length) best = run;
+    if (best.length <= wallMax) continue;
+    const avgLen = best.reduce((n, k) => n + labelOf(k).length, 0) / best.length;
+    if (avgLen > 28) continue; // rows of content (messages, files), not actions
+    walls++; flaggedWalls.add(parent);
+    add('too-many-peers', 'meaning', 'choice', `${best.length} actions side by side with nothing dividing them (about ${wallMax / 2} per group can be weighed at once): rare ones slow every choice of the frequent ones.`, parent);
+  }
+
+  // ---------- a surface that covers the control that opened it
+  if (scope && opts.trigger) {
+    const t = opts.trigger, tArea = t.w * t.h;
+    for (const el of roots) {
+      const r = el.getBoundingClientRect();
+      if (r.width * r.height > 0.6 * innerWidth * innerHeight || tArea <= 0) continue; // a modal sheet covers everything on purpose
+      let floating = false; // only an overlay can cover; content that re-rendered in place does not
+      for (let n = el; n && n !== document.body; n = n.parentElement) { const p = getComputedStyle(n).position; if (p === 'fixed' || p === 'absolute') { floating = true; break; } }
+      if (!floating) continue;
+      const dlg = el.closest('dialog'); if (dlg && dlg.matches(':modal')) continue; // a modal covers everything on purpose, behind a backdrop
+      const ix = Math.max(0, Math.min(r.right, t.x + t.w) - Math.max(r.left, t.x)), iy = Math.max(0, Math.min(r.bottom, t.y + t.h) - Math.max(r.top, t.y));
+      if (ix * iy > 0.5 * tArea) { add('covers-trigger', 'meaning', 'grouping', 'What appeared covers the control that opened it, hiding the thing just acted on.', el); break; }
+    }
+  }
+
   const vp = document.querySelector('meta[name="viewport"]');
-  if (!vp || !/width\s*=\s*device-width/.test(vp.getAttribute('content') || '')) add('no-viewport-meta', 'floor', 'legibility', 'No viewport meta: phones render a shrunken desktop page.');
+  if (!scope && (!vp || !/width\s*=\s*device-width/.test(vp.getAttribute('content') || ''))) add('no-viewport-meta', 'floor', 'legibility', 'No viewport meta: phones render a shrunken desktop page.');
   if (document.documentElement.scrollWidth > innerWidth + 1) add('horizontal-scroll', 'floor', 'legibility', `Page scrolls sideways at ${innerWidth}px.`);
   let low = 0, over = 0;
   for (const el of vis) {

@@ -153,9 +153,38 @@ async function launch({ headless = true } = {}) {
   return { browser, close, exe };
 }
 
-// Opens a page target and returns a helper bound to it.
-async function openPage(browser) {
-  const { targetId } = await browser.send('Target.createTarget', { url: 'about:blank' });
+// Connects to a browser or Electron app that is already running with --remote-debugging-port.
+// `endpoint` is a port, http://host:port or a ws:// URL. Nothing is launched, and close() only
+// disconnects: the app keeps running and is closed by whoever started it.
+async function attach(endpoint) {
+  let wsUrl = String(endpoint);
+  if (/^\d+$/.test(wsUrl)) wsUrl = `http://127.0.0.1:${wsUrl}`;
+  if (/^https?:/.test(wsUrl)) {
+    const info = await new Promise((resolve, reject) => {
+      require('http').get(wsUrl.replace(/\/$/, '') + '/json/version', (res) => {
+        let body = ''; res.on('data', (d) => { body += d; }); res.on('end', () => { try { resolve(JSON.parse(body)); } catch (e) { reject(e); } });
+      }).on('error', (e) => reject(new Error(`Nothing is listening at ${wsUrl} (${e.message}). Start the app with --remote-debugging-port first.`)));
+    });
+    wsUrl = info.webSocketDebuggerUrl;
+  }
+  const ws = await WS.connect(wsUrl);
+  const browser = new Session(ws);
+  return { browser, close: async () => ws.close(), exe: `attached ${endpoint}`, attached: true };
+}
+
+// Attaches to an existing page of an attached app: the first page whose URL contains `match`
+// (default: the first non-DevTools page).
+async function existingPage(browser, match) {
+  const { targetInfos } = await browser.send('Target.getTargets');
+  const pages = targetInfos.filter((t) => t.type === 'page' && !/^devtools:/.test(t.url));
+  const t = pages.find((p) => !match || p.url.includes(match));
+  if (!t) throw new Error(`No page${match ? ` matching "${match}"` : ''} in the attached app. Pages: ${pages.map((p) => p.url).join(', ') || 'none'}`);
+  return openPage(browser, t.targetId);
+}
+
+// Opens a page target (or binds to an existing one) and returns a helper bound to it.
+async function openPage(browser, existingTargetId) {
+  const { targetId } = existingTargetId ? { targetId: existingTargetId } : await browser.send('Target.createTarget', { url: 'about:blank' });
   const { sessionId } = await browser.send('Target.attachToTarget', { targetId, flatten: true });
   const send = (method, params) => browser.send(method, params, sessionId);
   const waitFor = (event, ms = 15000) => new Promise((resolve) => {
@@ -173,4 +202,4 @@ async function openPage(browser) {
   return { send, waitFor, evaluate, targetId, sessionId };
 }
 
-module.exports = { launch, openPage, findBrowser };
+module.exports = { launch, attach, existingPage, openPage, findBrowser };

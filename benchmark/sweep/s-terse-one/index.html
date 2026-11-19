@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Supervisor</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--text:#1c2128;--mut:#667085;--line:#dfe3e8;--acc:#3b6cf6;--ok:#17a34a;--err:#dc2626;--warn:#d97706}
+:root[data-theme=dark]{--bg:#0f1318;--panel:#171c23;--text:#e6e9ee;--mut:#8b95a5;--line:#2a313b;--acc:#6b93ff;--ok:#34d27b;--err:#f26b6b;--warn:#f0a53a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,Segoe UI,sans-serif}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--acc)}button.primary{background:var(--acc);border-color:var(--acc);color:#fff}button.danger{color:var(--err)}
+button.primary.danger{background:var(--err);border-color:var(--err);color:#fff}
+input[type=text],input[type=search],input[type=password],select{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+header{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+header h1{font-size:16px;margin:0 auto 0 0}
+nav{display:flex;gap:4px;margin-right:8px}nav button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.rel{position:relative}.badge{position:absolute;top:-6px;right:-6px;background:var(--err);color:#fff;border-radius:9px;font-size:11px;padding:0 5px}
+main{padding:16px;max-width:1100px;margin:auto}
+.bar{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.row{display:grid;grid-template-columns:28px 1fr 110px 120px 90px auto;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.row .name{font-weight:600}.row .sub{color:var(--mut);font-size:12px}
+.st{display:inline-flex;align-items:center;gap:6px}.dot{width:8px;height:8px;border-radius:50%;background:var(--mut)}
+.running .dot{background:var(--acc)}.done .dot{background:var(--ok)}.failed .dot{background:var(--err)}.stopped .dot{background:var(--warn)}
+.acts{display:flex;gap:6px;position:relative}
+.menu{position:absolute;right:0;top:100%;margin-top:4px;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px #0003;padding:4px;z-index:20}
+.menu[hidden],.pop[hidden]{display:none}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none}.menu button:hover{background:var(--bg)}
+.pop{position:absolute;right:0;top:100%;margin-top:6px;width:320px;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px #0003;z-index:30}
+.pop .hd{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--line);font-weight:600}
+.pop ul{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto}.pop li{padding:8px 12px;border-bottom:1px solid var(--line)}.pop li.unread{background:color-mix(in srgb,var(--acc) 10%,transparent)}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:0;max-width:92vw}
+dialog::backdrop{background:#0006}
+dialog .in{padding:16px;min-width:min(440px,86vw)}dialog h2{margin:0 0 12px;font-size:16px}
+.f{display:grid;gap:4px;margin-bottom:12px}.f label{font-weight:600;font-size:13px}.ft{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+#palette{padding:0;top:12vh;margin-top:0}#palette input{width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:12px;font-size:15px}
+#palette ul{list-style:none;margin:0;padding:4px;max-height:50vh;overflow:auto;width:min(520px,90vw)}
+#palette li{padding:8px 10px;border-radius:6px;cursor:pointer}#palette li[aria-selected=true]{background:var(--acc);color:#fff}
+#toasts{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:100}
+.toast{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:8px;padding:10px 12px;box-shadow:0 8px 24px #0004;display:flex;gap:10px;align-items:center;min-width:240px}
+.toast.failed{border-left-color:var(--err)}.toast span{flex:1}
+#logs-panel{position:fixed;right:0;top:0;bottom:0;width:min(560px,100vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:-8px 0 24px #0003;z-index:40;display:flex;flex-direction:column}
+#logs-panel[hidden]{display:none}#logs-panel .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
+.lf{display:flex;gap:6px;padding:8px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line)}.lf button[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+#log-lines{flex:1;overflow:auto;padding:8px 14px;font:12px/1.6 ui-monospace,Consolas,monospace}
+.l-error{color:var(--err)}.l-warn{color:var(--warn)}.l-debug{color:var(--mut)}mark{background:#fde04777;color:inherit}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}.stats .card{padding:12px}.stats b{display:block;font-size:20px}
+table{width:100%;border-collapse:collapse}th,td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.bulk{background:var(--acc);color:#fff;border-radius:8px;padding:8px 12px;display:flex;gap:8px;align-items:center;margin-bottom:10px}.bulk[hidden]{display:none}.bulk button{color:var(--text)}
+.empty{padding:24px;text-align:center;color:var(--mut)}
+@media(max-width:700px){.row{grid-template-columns:24px 1fr auto}.row .c-model,.row .c-proj,.row .c-cost{display:none}}
+</style></head><body>
+<header>
+ <h1>Agent Supervisor</h1>
+ <nav role="tablist"><button role="tab" id="tab-sessions" aria-selected="true">Sessions</button><button role="tab" id="tab-usage" aria-selected="false">Usage</button></nav>
+ <button id="btn-palette" title="Command palette (Ctrl+K)">Search&hellip; <kbd>Ctrl+K</kbd></button>
+ <span class="rel"><button id="btn-bell" aria-haspopup="true" aria-expanded="false" aria-label="Notifications">Bell<span class="badge" id="bell-badge" hidden>0</span></button>
+  <div class="pop" id="bell-dropdown" hidden><div class="hd"><span>Notifications</span><button id="btn-clear-notifs">Mark all read</button></div><ul id="notif-list"></ul></div></span>
+ <button id="btn-settings">Settings</button>
+</header>
+<main>
+<section id="sessions-view">
+ <div class="bar"><button id="btn-new" class="primary">New session</button><button id="btn-simulate">Simulate agent event</button>
+  <input type="search" id="session-filter" placeholder="Filter sessions" aria-label="Filter sessions"><label><input type="checkbox" id="show-archived"> Show archived</label></div>
+ <div class="bulk" id="bulk-bar" hidden><span id="bulk-count"></span><button id="bulk-stop">Stop</button><button id="bulk-archive">Archive</button><button id="bulk-delete">Delete</button><button id="bulk-clear">Clear</button></div>
+ <div class="card"><div class="row" style="font-weight:600;color:var(--mut)"><input type="checkbox" id="select-all" aria-label="Select all"><span>Session</span><span class="c-proj">Project</span><span class="c-model">Model</span><span class="c-cost">Status</span><span></span></div><div id="session-list"></div></div>
+</section>
+<section id="usage-view" hidden>
+ <div class="bar"><select id="usage-range" aria-label="Range"><option value="1">Today</option><option value="7" selected>7 days</option><option value="30">30 days</option></select></div>
+ <div class="stats" id="usage-stats"></div>
+ <div class="card" style="padding:12px;margin-bottom:12px"><b>Spend per day</b><svg id="usage-chart" viewBox="0 0 600 200" width="100%" role="img" aria-label="Spend per day chart"></svg></div>
+ <div class="card"><table><thead><tr><th>Project</th><th class="n">Tokens</th><th class="n">Spend</th></tr></thead><tbody id="usage-table"></tbody></table></div>
+</section>
+</main>
+
+<aside id="logs-panel" hidden aria-label="Session logs">
+ <div class="hd"><b id="logs-title">Logs</b><button id="logs-close" aria-label="Close logs">Close</button></div>
+ <div class="lf"><button data-lvl="debug" aria-pressed="true">Debug</button><button data-lvl="info" aria-pressed="true">Info</button><button data-lvl="warn" aria-pressed="true">Warn</button><button data-lvl="error" aria-pressed="true">Error</button><input type="search" id="log-search" placeholder="Search logs" aria-label="Search logs" style="flex:1;min-width:120px"></div>
+ <div id="log-lines"></div>
+</aside>
+
+<dialog id="settings-dialog"><form method="dialog" class="in" id="settings-form"><h2>Settings</h2>
+ <div class="f"><label for="set-model">Default model</label><select id="set-model"><option>claude-sonnet-5-5</option><option>claude-opus-4</option><option>claude-haiku-4</option></select></div>
+ <div class="f"><label for="set-theme">Theme</label><select id="set-theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+ <fieldset class="f" style="border:1px solid var(--line);border-radius:6px"><legend>Notifications</legend>
+  <label><input type="checkbox" id="set-n-done"> Agent finished</label><label><input type="checkbox" id="set-n-fail"> Agent failed</label><label><input type="checkbox" id="set-n-toast"> Show toasts</label></fieldset>
+ <div class="f"><label for="set-key-a">Anthropic API key</label><input type="password" id="set-key-a" autocomplete="off" placeholder="sk-ant-..."></div>
+ <div class="f"><label for="set-key-o">Other API key</label><input type="password" id="set-key-o" autocomplete="off"></div>
+ <div class="ft"><button type="button" id="settings-cancel">Cancel</button><button type="submit" class="primary" id="settings-save">Save</button></div></form></dialog>
+
+<dialog id="palette" aria-label="Command palette"><input type="text" id="palette-input" placeholder="Type a command or session&hellip;" aria-label="Command"><ul id="palette-list" role="listbox"></ul></dialog>
+
+<dialog id="confirm-dialog"><div class="in"><h2 id="confirm-title">Delete sessions?</h2><p id="confirm-text"></p><div class="ft"><button id="confirm-cancel">Cancel</button><button id="confirm-ok" class="primary danger">Delete</button></div></div></dialog>
+
+<dialog id="new-dialog"><form method="dialog" class="in" id="new-form"><h2>New session</h2>
+ <div class="f"><label for="new-name">Task</label><input type="text" id="new-name" required></div>
+ <div class="f"><label for="new-proj">Project</label><select id="new-proj"></select></div>
+ <div class="ft"><button type="button" id="new-cancel">Cancel</button><button type="submit" class="primary">Start</button></div></form></dialog>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const PROJ=['web-app','api-server','mobile','infra'],MODELS=['claude-sonnet-5-5','claude-opus-4','claude-haiku-4'];
+const RATE={'claude-sonnet-5-5':6,'claude-opus-4':30,'claude-haiku-4':1.5}; // $ per M tokens
+let seq=0;const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+function mk(name,proj,model,status,tok){return{id:++seq,name,proj,model,status,tokens:tok,archived:false,logs:genLogs(name)}}
+function genLogs(n){const m={debug:['loading context','tool schema ok','cache hit'],info:['reading files','running tests','edit applied','plan created'],warn:['rate limit near','slow tool call','retrying'],error:['test failed','tool error']};const out=[];let t=Date.now()-6e5;
+ for(let i=0;i<28;i++){const l=['debug','info','info','info','warn','debug','error'][i%7];t+=15000;out.push({t,l,m:m[l][i%m[l].length]+' ('+n+')'})}return out}
+let sessions=[mk('Fix login redirect','web-app',MODELS[0],'running',182000),mk('Add pagination to /users','api-server',MODELS[1],'done',420000),mk('Migrate to Gradle 9','mobile',MODELS[0],'failed',96000),mk('Terraform drift cleanup','infra',MODELS[2],'stopped',51000),mk('Write e2e tests','web-app',MODELS[0],'running',230000)];
+let settings=Object.assign({model:MODELS[0],theme:'system',nDone:true,nFail:true,nToast:true,keyA:'',keyO:''},store('as-settings')||{});
+let notifs=[],selected=new Set(),logSession=null,openMenu=null,lastFocus=null;
+// ---- theme
+function applyTheme(){const t=settings.theme==='system'?(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'):settings.theme;document.documentElement.dataset.theme=t}
+applyTheme();
+// ---- sessions
+const stLabel={running:'Running',done:'Finished',failed:'Failed',stopped:'Stopped'};
+function render(){const f=$('#session-filter').value.toLowerCase(),arch=$('#show-archived').checked;
+ const list=sessions.filter(s=>(arch||!s.archived)&&(s.name+s.proj).toLowerCase().includes(f));
+ $('#session-list').innerHTML=list.length?list.map(s=>`<div class="row" data-id="${s.id}"><input type="checkbox" class="sel" aria-label="Select ${esc(s.name)}" ${selected.has(s.id)?'checked':''}>
+ <div><div class="name">${esc(s.name)}${s.archived?' (archived)':''}</div><div class="sub">#${s.id}</div></div><span class="c-proj">${s.proj}</span><span class="c-model">${s.model}</span>
+ <span class="st ${s.status} c-cost"><i class="dot"></i>${stLabel[s.status]}</span>
+ <div class="acts"><button class="row-logs-btn" aria-label="Logs for ${esc(s.name)}">Logs</button><button class="row-menu-btn" aria-haspopup="menu" aria-expanded="false" aria-label="Actions for ${esc(s.name)}">&#8942;</button></div></div>`).join(''):'<div class="empty">No sessions</div>';
+ const n=selected.size;$('#bulk-bar').hidden=!n;$('#bulk-count').textContent=n+' selected';
+ const vis=list.map(s=>s.id);$('#select-all').checked=vis.length>0&&vis.every(i=>selected.has(i));openMenu=null}
+function closeMenu(){$$('.row-menu').forEach(m=>{const b=m.previousElementSibling;if(b)b.setAttribute('aria-expanded','false');m.remove()});openMenu=null}
+function openRowMenu(btn,id){closeMenu();const s=sessions.find(x=>x.id===id);const m=document.createElement('div');m.className='menu row-menu';m.setAttribute('role','menu');m.dataset.id=id;
+ m.innerHTML=`<button role="menuitem" data-a="restart">Restart</button><button role="menuitem" data-a="stop" ${s.status!=='running'?'disabled':''}>Stop</button><button role="menuitem" data-a="duplicate">Duplicate</button><button role="menuitem" data-a="delete" class="danger">Delete</button>`;
+ btn.after(m);btn.setAttribute('aria-expanded','true');openMenu=m;m.querySelector('button:not([disabled])').focus()}
+function act(a,id){const s=sessions.find(x=>x.id===id);if(!s)return;
+ if(a==='restart'){s.status='running';s.logs.push({t:Date.now(),l:'info',m:'restarted'})}
+ else if(a==='stop'){s.status='stopped';s.logs.push({t:Date.now(),l:'warn',m:'stopped by user'})}
+ else if(a==='duplicate'){const c=mk(s.name+' (copy)',s.proj,s.model,'running',0);sessions.push(c)}
+ else if(a==='delete'){confirmDel([id]);return}
+ render();usage()}
+function confirmDel(ids){$('#confirm-text').textContent=`This permanently deletes ${ids.length} session${ids.length>1?'s':''} and their logs. This cannot be undone.`;
+ const d=$('#confirm-dialog');d.dataset.ids=ids.join(',');lastFocus=document.activeElement;d.showModal();$('#confirm-cancel').focus()}
+$('#confirm-cancel').onclick=()=>$('#confirm-dialog').close();
+$('#confirm-ok').onclick=()=>{const ids=$('#confirm-dialog').dataset.ids.split(',').map(Number);sessions=sessions.filter(s=>!ids.includes(s.id));ids.forEach(i=>selected.delete(i));if(logSession&&ids.includes(logSession))closeLogs();$('#confirm-dialog').close();render();usage()};
+$('#session-list').addEventListener('click',e=>{const row=e.target.closest('.row');if(!row)return;const id=+row.dataset.id;
+ if(e.target.closest('.row-menu-btn')){e.stopPropagation();const open=row.querySelector('.row-menu');if(open)closeMenu();else openRowMenu(e.target.closest('.row-menu-btn'),id)}
+ else if(e.target.closest('.row-menu [data-a]')){const a=e.target.closest('[data-a]').dataset.a;closeMenu();act(a,id)}
+ else if(e.target.closest('.row-logs-btn'))openLogs(id);
+ else if(e.target.classList.contains('sel')){e.target.checked?selected.add(id):selected.delete(id);render()}});
+$('#select-all').onchange=e=>{$$('#session-list .row').forEach(r=>e.target.checked?selected.add(+r.dataset.id):selected.delete(+r.dataset.id));render()};
+$('#session-filter').oninput=render;$('#show-archived').onchange=render;
+$('#bulk-stop').onclick=()=>{sessions.forEach(s=>{if(selected.has(s.id)&&s.status==='running')s.status='stopped'});render()};
+$('#bulk-archive').onclick=()=>{sessions.forEach(s=>{if(selected.has(s.id))s.archived=true});selected.clear();render()};
+$('#bulk-delete').onclick=()=>confirmDel([...selected]);$('#bulk-clear').onclick=()=>{selected.clear();render()};
+// ---- new session
+function fillProj(){$('#new-proj').innerHTML=PROJ.map(p=>`<option>${p}</option>`).join('')}
+$('#btn-new').onclick=()=>{fillProj();$('#new-dialog').showModal();$('#new-name').focus()};
+$('#new-cancel').onclick=()=>$('#new-dialog').close();
+$('#new-form').onsubmit=()=>{sessions.push(mk($('#new-name').value,$('#new-proj').value,settings.model,'running',0));$('#new-name').value='';render();usage()};
+// ---- toasts & notifications
+function notify(kind,text,id){notifs.unshift({kind,text,id,t:new Date(),read:false});renderNotifs();
+ if(settings.nToast)toast(kind,text)}
+function toast(kind,text){const t=document.createElement('div');t.className='toast '+(kind==='failed'?'failed':'');t.setAttribute('role','status');t.innerHTML=`<span>${esc(text)}</span><button aria-label="Dismiss">&times;</button>`;
+ t.querySelector('button').onclick=()=>t.remove();$('#toasts').append(t);setTimeout(()=>t.remove(),6000)}
+function renderNotifs(){const u=notifs.filter(n=>!n.read).length;const b=$('#bell-badge');b.hidden=!u;b.textContent=u;
+ $('#notif-list').innerHTML=notifs.length?notifs.map(n=>`<li class="${n.read?'':'unread'}"><b>${n.kind==='failed'?'Failed':'Finished'}</b> ${esc(n.text)}<div class="sub" style="color:var(--mut);font-size:12px">${n.t.toLocaleTimeString()}</div></li>`).join(''):'<li style="color:var(--mut)">No notifications</li>'}
+function toggleBell(force){const d=$('#bell-dropdown'),show=force===undefined?d.hidden:force;d.hidden=!show;$('#btn-bell').setAttribute('aria-expanded',show)}
+$('#btn-bell').onclick=e=>{e.stopPropagation();toggleBell()};
+$('#btn-clear-notifs').onclick=()=>{notifs.forEach(n=>n.read=true);renderNotifs()};
+$('#bell-dropdown').onclick=e=>e.stopPropagation();
+function finish(s,ok){s.status=ok?'done':'failed';s.logs.push({t:Date.now(),l:ok?'info':'error',m:ok?'completed':'agent failed'});
+ if(ok&&settings.nDone||!ok&&settings.nFail)notify(ok?'done':'failed',`${s.name} ${ok?'finished':'failed'}`,s.id);render();usage()}
+$('#btn-simulate').onclick=()=>{const r=sessions.filter(s=>s.status==='running');if(!r.length){toast('done','No running sessions');return}finish(r[0],Math.random()>.35)};
+setInterval(()=>{const r=sessions.filter(s=>s.status==='running');r.forEach(s=>s.tokens+=Math.floor(Math.random()*3000));if(r.length&&Math.random()<.08)finish(r[0],Math.random()>.3)},4000);
+// ---- logs
+let lvls=new Set(['debug','info','warn','error']);
+function openLogs(id){logSession=id;const s=sessions.find(x=>x.id===id);$('#logs-title').textContent='Logs: '+s.name;$('#logs-panel').hidden=false;renderLogs();$('#logs-close').focus()}
+function closeLogs(){$('#logs-panel').hidden=true;logSession=null}
+function renderLogs(){const s=sessions.find(x=>x.id===logSession);if(!s)return;const q=$('#log-search').value.toLowerCase();
+ const rows=s.logs.filter(l=>lvls.has(l.l)&&l.m.toLowerCase().includes(q));
+ $('#log-lines').innerHTML=rows.length?rows.map(l=>{let m=esc(l.m);if(q)m=m.replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/[&<>"]/g,''),'gi'),x=>`<mark>${x}</mark>`);return `<div class="l-${l.l}">${new Date(l.t).toLocaleTimeString()} [${l.l.toUpperCase()}] ${m}</div>`}).join(''):'<div class="empty">No matching log lines</div>'}
+$('#logs-close').onclick=closeLogs;$('#log-search').oninput=renderLogs;
+$$('.lf [data-lvl]').forEach(b=>b.onclick=()=>{const l=b.dataset.lvl;lvls.has(l)?lvls.delete(l):lvls.add(l);b.setAttribute('aria-pressed',lvls.has(l));renderLogs()});
+// ---- usage
+function usage(){const days=+$('#usage-range').value,k=days/7;const by={};PROJ.forEach(p=>by[p]={t:0,c:0});
+ sessions.forEach(s=>{const t=s.tokens*Math.min(1,k+.3);by[s.proj].t+=t;by[s.proj].c+=t/1e6*RATE[s.model]});
+ const T=Object.values(by).reduce((a,b)=>a+b.t,0),C=Object.values(by).reduce((a,b)=>a+b.c,0);
+ $('#usage-stats').innerHTML=`<div class="card"><span class="sub">Total tokens</span><b>${Math.round(T).toLocaleString()}</b></div><div class="card"><span class="sub">Total spend</span><b>$${C.toFixed(2)}</b></div><div class="card"><span class="sub">Sessions</span><b>${sessions.length}</b></div>`;
+ $('#usage-table').innerHTML=PROJ.map(p=>`<tr><td>${p}</td><td class="n">${Math.round(by[p].t).toLocaleString()}</td><td class="n">$${by[p].c.toFixed(2)}</td></tr>`).join('');
+ const n=Math.max(days,1)===1?6:Math.min(days,14),pts=[];for(let i=0;i<n;i++)pts.push(C/n*(.6+.8*Math.abs(Math.sin(i*1.7+days))));
+ const mx=Math.max(...pts,.01),w=600/n;let g='';pts.forEach((v,i)=>{const h=v/mx*160;g+=`<rect x="${i*w+6}" y="${180-h}" width="${w-12}" height="${h}" rx="3" fill="var(--acc)"><title>$${v.toFixed(2)}</title></rect>`});
+ $('#usage-chart').innerHTML=`<line x1="0" y1="180" x2="600" y2="180" stroke="var(--line)"/>`+g+`<text x="4" y="14" font-size="11" fill="var(--mut)">max $${mx.toFixed(2)}</text>`}
+$('#usage-range').onchange=usage;
+function view(v){const u=v==='usage';$('#usage-view').hidden=!u;$('#sessions-view').hidden=u;$('#tab-usage').setAttribute('aria-selected',u);$('#tab-sessions').setAttribute('aria-selected',!u);if(u)usage()}
+$('#tab-sessions').onclick=()=>view('sessions');$('#tab-usage').onclick=()=>view('usage');
+// ---- settings
+function openSettings(){const d=$('#settings-dialog');$('#set-model').value=settings.model;$('#set-theme').value=settings.theme;$('#set-n-done').checked=settings.nDone;$('#set-n-fail').checked=settings.nFail;$('#set-n-toast').checked=settings.nToast;$('#set-key-a').value=settings.keyA;$('#set-key-o').value=settings.keyO;d.showModal()}
+$('#btn-settings').onclick=openSettings;$('#settings-cancel').onclick=()=>$('#settings-dialog').close();
+$('#settings-form').onsubmit=()=>{settings={model:$('#set-model').value,theme:$('#set-theme').value,nDone:$('#set-n-done').checked,nFail:$('#set-n-fail').checked,nToast:$('#set-n-toast').checked,keyA:$('#set-key-a').value,keyO:$('#set-key-o').value};store('as-settings',settings);applyTheme();toast('done','Settings saved')};
+// ---- palette
+let pi=0,pitems=[];
+function cmds(){const c=[{n:'Open settings',f:openSettings},{n:'New session',f:()=>$('#btn-new').click()},{n:'Show usage',f:()=>view('usage')},{n:'Show sessions',f:()=>view('sessions')},{n:'Toggle notifications',f:()=>toggleBell()},{n:'Toggle dark theme',f:()=>{settings.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';store('as-settings',settings);applyTheme()}},{n:'Simulate agent event',f:()=>$('#btn-simulate').click()}];
+ sessions.forEach(s=>c.push({n:'Open logs: '+s.name,f:()=>{view('sessions');openLogs(s.id)}}));return c}
+function renderPal(){const q=$('#palette-input').value.toLowerCase();pitems=cmds().filter(c=>c.n.toLowerCase().includes(q));pi=Math.min(pi,Math.max(0,pitems.length-1));
+ $('#palette-list').innerHTML=pitems.map((c,i)=>`<li role="option" aria-selected="${i===pi}" data-i="${i}">${esc(c.n)}</li>`).join('')||'<li>No results</li>'}
+function openPalette(){closeMenu();toggleBell(false);const d=$('#palette');if(!d.open)d.showModal();$('#palette-input').value='';pi=0;renderPal();$('#palette-input').focus()}
+function runPal(i){const c=pitems[i];if(!c)return;$('#palette').close();c.f()}
+$('#btn-palette').onclick=openPalette;$('#palette-input').oninput=()=>{pi=0;renderPal()};
+$('#palette-input').onkeydown=e=>{if(e.key==='ArrowDown'){pi=Math.min(pi+1,pitems.length-1);renderPal();e.preventDefault()}else if(e.key==='ArrowUp'){pi=Math.max(pi-1,0);renderPal();e.preventDefault()}else if(e.key==='Enter')runPal(pi)};
+$('#palette-list').onclick=e=>{const li=e.target.closest('li[data-i]');if(li)runPal(+li.dataset.i)};
+$('#palette').addEventListener('click',e=>{if(e.target.id==='palette')e.target.close()});
+$$('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
+// ---- global
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPalette();return}
+ if(e.key==='Escape'){if(openMenu)closeMenu();else if(!$('#bell-dropdown').hidden)toggleBell(false);else if(!$('#logs-panel').hidden&&!document.querySelector('dialog[open]'))closeLogs()}
+ if(openMenu&&(e.key==='ArrowDown'||e.key==='ArrowUp')){const b=$$('button:not([disabled])',openMenu),i=b.indexOf(document.activeElement);b[(i+(e.key==='ArrowDown'?1:-1)+b.length)%b.length].focus();e.preventDefault()}});
+document.addEventListener('click',e=>{if(!e.target.closest('.row-menu'))closeMenu();if(!e.target.closest('#bell-dropdown'))toggleBell(false)});
+render();renderNotifs();usage();
+notifs.push({kind:'done',text:'Welcome: supervisor ready',t:new Date(),read:false});renderNotifs();
+})();
+</script></body></html>

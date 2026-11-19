@@ -30,6 +30,8 @@ const FAIR = new Set(['floor', 'meaning']);
 const slug = (s) => s.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
 const rulesOf = (fs_) => { const m = {}; for (const f of fs_) m[f.rule] = (m[f.rule] || 0) + 1; return m; };
 
+const OPEN_AT_LOAD = process.argv.includes('--open-at-load');
+
 async function main() {
   fs.rmSync(BUILD, { recursive: true, force: true });
   fs.mkdirSync(BUILD, { recursive: true });
@@ -42,6 +44,13 @@ async function main() {
     fs.writeFileSync(path.join(BUILD, s, 'page.html'), html);
     pages.push({ site: s, surface: 'page', file: `${s}/page.html` });
     for (const sf of truth.surfaces || []) {
+      // By default a surface is opened the way a person opens it: verify clicks its opener and
+      // probes what appears. --open-at-load restores the old way (a script opens it before the
+      // probe), and non-click openers (a right-click) still use it.
+      if (!OPEN_AT_LOAD && (sf.event || 'click') === 'click') {
+        pages.push({ site: s, surface: sf.name, file: `${s}/page.html`, opener: sf.opener, steps: [{ name: sf.name, click: sf.opener }] });
+        continue;
+      }
       const opener = `<script>addEventListener('load', () => setTimeout(() => { const el = document.querySelector(${JSON.stringify(sf.opener)}); if (el) { el.dispatchEvent(new MouseEvent(${JSON.stringify(sf.event || 'click')}, { bubbles: true, cancelable: true, clientX: 200, clientY: 200 })); } else { document.title = 'OPENER MISSING'; } }, 50));</script>`;
       const f = `${s}/${slug(sf.name)}.html`;
       fs.writeFileSync(path.join(BUILD, f), html.includes('</body>') ? html.replace(/<\/body>(?![\s\S]*<\/body>)/, opener + '</body>') : html + opener);
@@ -50,7 +59,7 @@ async function main() {
   }
 
   const scen = { model: path.relative(BUILD, MODEL).split(path.sep).join('/'), widths: [1280, 390], themes: ['light', 'dark'],
-    scenarios: pages.map((p) => ({ name: `${p.site}|${p.surface}`, url: p.file, plan: {}, settleMs: 700 })) };
+    scenarios: pages.map((p) => ({ name: `${p.site}|${p.surface}`, url: p.file, plan: {}, settleMs: 700, steps: p.steps })) };
   const sf = path.join(BUILD, 'scenarios.json');
   fs.writeFileSync(sf, JSON.stringify(scen, null, 2));
   process.stdout.write(`verify: ${pages.length} pages (${sites.length} sites)…\n`);

@@ -91,7 +91,10 @@
       "layer": "render",
       "what": "Popover covers the field it explains; no arrow, no close",
       "selector": "#help-pop-1",
-      "expect": []
+      "expect": [
+        "covers-trigger"
+      ],
+      "expectNote": "covers-trigger mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "help popover",

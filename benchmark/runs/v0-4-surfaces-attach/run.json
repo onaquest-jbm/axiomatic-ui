@@ -1,0 +1,17 @@
+{
+  "label": "v0.4 surfaces + attach",
+  "slug": "v0-4-surfaces-attach",
+  "note": "verify checks what each click reveals, --explore, --attach; new checks: too-many-peers, destructive-unseparated, covers-trigger, surface-offscreen. Sites opened by click steps.",
+  "createdAt": "2026-11-19T22:42:02.996Z",
+  "gitCommit": "9bac704",
+  "siteVersions": {
+    "agent-desk": "526e53dfc97b601845e9c0ff510a936f82be9eb3",
+    "food-checkout": "21ba364f17cc81ff22947e953a7e76fb2485e182",
+    "inbox": "2d0b7ab6276e048604ce37d4b9e2b384f3d7f579",
+    "onboarding-wizard": "6813214fd2d9ccce8795472cdba7b5032f337572",
+    "revenue-dash": "5641da40be6e46998d8c894600832484305df148",
+    "ticket-admin": "940b7eddd59aab1faf672fc8e54488d394f81432",
+    "tracewell-landing": "3dfcfd07cb820dfa9af18ef6a72a8b9f2e3da951",
+    "workspace-settings": "f4ba0b446fdf20c660030b4b6bbaab38eb3e99c9"
+  }
+}

@@ -1,0 +1,1312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Relay · Agent workspace</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font: 16px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --canvas:#f7f8fc; --surface:#fff; --subtle:#f8f9fc; --hover:#f0f2f8; --line:#e5e8f0; --strong-line:#d9deea;
+      --text:#171c2e; --secondary:#475169; --muted:#626d85; --accent:#5746d9; --accent-hover:#4736c4; --accent-soft:#efedff; --accent-line:#dcd6ff;
+      --purple:#5e4ad5; --purple-soft:#efebff; --green:#087853; --green-soft:#e6f7ee; --amber:#955509; --amber-soft:#fff4df; --amber-line:#f4dfb4;
+      --red:#be3a50; --red-soft:#fcecf0; --blue:#275fc4; --blue-soft:#eaf1ff;
+      --shadow:0 2px 5px #25254a06,0 1px 2px #25254a04; --float:0 18px 50px #24234524,0 4px 12px #24234512;
+      --mono:ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    }
+    :root[data-theme=light] {color-scheme:light}
+    :root[data-theme=dark] {color-scheme:dark}
+    :root[data-theme=dark] { --canvas:#111321; --surface:#191c2d; --subtle:#16192a; --hover:#24283d; --line:#292e45; --strong-line:#39405c; --text:#f0f1fd; --secondary:#c3c8dd; --muted:#a0a9c4; --accent:#6954df; --accent-hover:#7560e8; --accent-soft:#2b254d; --accent-line:#433879; --purple:#b6a8ff; --purple-soft:#302852; --green:#78dfb0; --green-soft:#17392f; --amber:#ffd08a; --amber-soft:#382b20; --amber-line:#594222; --red:#ff9aad; --red-soft:#422639; --blue:#99baff; --blue-soft:#233455; --shadow:0 2px 5px #0002; --float:0 18px 50px #0008,0 4px 12px #0005; }
+    * {box-sizing:border-box}
+    [hidden] {display:none!important}
+    body {margin:0;background:var(--canvas);color:var(--text);min-width:0}
+    button,input,select,textarea {font:inherit;color:inherit}
+    button {cursor:pointer}
+    button:disabled {opacity:.48;cursor:default}
+    button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible {outline:2px solid var(--accent);outline-offset:3px}
+    :is(h1,h2)[tabindex="-1"]:focus {outline:none}
+    button,input,select,textarea { -webkit-tap-highlight-color:transparent }
+    h1,h2,h3,p {margin:0}
+    .icon {width:18px;height:18px;flex:none;vertical-align:middle;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;fill:none}
+    .mini {width:15px;height:15px}
+    .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+    .icon-button,.button {border:1px solid var(--strong-line);background:var(--surface);border-radius:8px;display:inline-flex;gap:8px;align-items:center;justify-content:center;min-height:36px;padding:0 12px;color:var(--secondary);font-weight:650;font-size:.87rem;white-space:nowrap}
+    .icon-button {width:36px;padding:0;color:var(--muted)}
+    .icon-button:hover,.button:hover {background:var(--hover);color:var(--text)}
+    .icon-button.ghost {border-color:transparent;background:transparent}
+    .icon-button.ghost:hover,.icon-button[aria-expanded=true] {background:var(--hover);color:var(--text)}
+    .button.primary {background:var(--accent);border-color:var(--accent);color:white;box-shadow:0 2px 4px #4b34c82b}
+    .button.primary:hover {background:var(--accent-hover);border-color:var(--accent-hover);color:white}
+    .button.danger {background:#b72943;color:white;border-color:#b72943}
+    .button.danger:hover {background:#9c2037}
+    .topbar {height:65px;position:sticky;top:0;z-index:5;display:grid;grid-template-columns:224px 1fr auto;align-items:center;background:var(--surface);border-bottom:1px solid var(--line);padding-right:25px}
+    .brand {display:flex;align-items:center;gap:10px;padding:0 23px;letter-spacing:-.045em;font-size:1.42rem;font-weight:780}
+    .brand-mark {width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(145deg,#7868fb,#503bd2);color:#fff;box-shadow:0 3px 6px #5945e035}
+    .brand-mark .icon {width:20px;height:20px;stroke-width:1.9}
+    .header-search {display:flex;align-items:center;justify-content:center;padding:0 15px}
+    #search-button {display:flex;align-items:center;gap:9px;width:min(100%,348px);padding:0 9px 0 12px;min-height:36px;color:var(--muted);background:var(--subtle);border:1px solid var(--line);border-radius:8px;text-align:left;font-size:.87rem}
+    #search-button:hover {border-color:var(--accent);color:var(--text)}
+    #search-button span {flex:1}
+    kbd {font:600 .73rem var(--mono);color:var(--muted);padding:2px 5px;border:1px solid var(--line);border-radius:5px;background:var(--surface);white-space:nowrap}
+    .header-tools {display:flex;align-items:center;gap:7px}
+    #notifications-button {position:relative}
+    .unread-marker {position:absolute;top:6px;right:7px;width:8px;height:8px;border:2px solid var(--surface);border-radius:50%;background:#8b73f8}
+    #mobile-nav-button,#close-mobile-nav,#detail-back,#nav-scrim,#detail-scrim {display:none}
+    .layout {display:grid;grid-template-columns:224px minmax(0,1fr);min-height:calc(100dvh - 65px)}
+    .sidebar {position:sticky;top:65px;display:flex;flex-direction:column;height:calc(100dvh - 65px);background:var(--surface);border-right:1px solid var(--line);padding:24px 14px 15px;z-index:4;overflow:auto}
+    .nav-section {margin-bottom:29px}
+    .nav-heading {margin:0 9px 9px;font-size:.72rem;font-weight:750;letter-spacing:.10em;text-transform:uppercase;color:var(--muted)}
+    .nav-link {display:flex;align-items:center;gap:10px;width:100%;min-height:39px;border:0;padding:0 9px;background:transparent;text-align:left;border-radius:8px;color:var(--secondary);font-size:.88rem;font-weight:555;margin-bottom:3px}
+    .nav-link span:nth-last-child(2) {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .nav-link:hover {background:var(--hover)}
+    .nav-link[aria-current=true] {color:var(--purple);background:var(--accent-soft);font-weight:730}
+    .nav-link small {margin-left:auto;flex:none;color:var(--muted);font-size:.75rem;font-variant-numeric:tabular-nums}
+    .nav-link[aria-current=true] small {color:var(--purple)}
+    .project-icon {width:24px;height:24px;border-radius:6px;display:grid;place-items:center;flex:none;color:var(--project-ink);background:var(--project-bg)}
+    .project-icon .icon {width:14px;height:14px;stroke-width:1.8}
+    .sidebar-footer {margin-top:auto;border-top:1px solid var(--line);padding:14px 7px 2px;display:flex;gap:9px;align-items:center}
+    .workspace-icon {width:34px;height:34px;border-radius:8px;background:var(--subtle);border:1px solid var(--line);color:var(--muted);display:grid;place-items:center;flex:none}
+    .sidebar-footer strong,.sidebar-footer small {display:block}
+    .sidebar-footer strong {font-size:.83rem}
+    .sidebar-footer small {color:var(--muted);font-size:.75rem}
+    main {width:100%;max-width:1750px;padding:29px 29px 36px;margin-inline:auto;min-width:0}
+    .page-head {display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:23px}
+    .page-head h1 {font-size:clamp(1.68rem,2.25vw,2.15rem);line-height:1.12;letter-spacing:-.047em;font-weight:780}
+    .page-head p {margin-top:7px;color:var(--muted);font-size:.91rem}
+    #new-session-button {min-height:40px;padding:0 14px}
+    .metrics {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+    .metric {min-width:0;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:14px 15px;text-align:left;color:var(--text)}
+    button.metric:hover {border-color:var(--accent-line);background:var(--subtle)}
+    .metric[aria-pressed=true] {border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+    .metric-label {display:block;font-size:.86rem;font-weight:625;color:var(--secondary);padding-right:34px}
+    .metric-value {display:block;margin-top:5px;font-size:1.68rem;line-height:1.12;font-weight:770;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+    .metric-foot {display:block;margin-top:5px;color:var(--muted);font-size:.74rem}
+    .metric-icon,.state-icon,.activity-icon {display:grid;place-items:center;flex:none;border-radius:8px;color:var(--tone);background:var(--tone-bg)}
+    .metric-icon {position:absolute;top:13px;right:13px;width:33px;height:33px}
+    .tone-running {--tone:var(--blue);--tone-bg:var(--blue-soft)}
+    .tone-waiting {--tone:var(--amber);--tone-bg:var(--amber-soft)}
+    .tone-done {--tone:var(--green);--tone-bg:var(--green-soft)}
+    .tone-failed {--tone:var(--red);--tone-bg:var(--red-soft)}
+    .tone-stopped,.tone-neutral {--tone:var(--muted);--tone-bg:var(--hover)}
+    .tone-purple {--tone:var(--purple);--tone-bg:var(--purple-soft)}
+    .workspace {display:grid;grid-template-columns:minmax(0,1.48fr) minmax(330px,1fr);gap:16px;align-items:start}
+    .panel {min-width:0;border:1px solid var(--line);border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+    .list-head {display:flex;justify-content:space-between;gap:8px;align-items:center;padding:14px 14px 13px 16px}
+    .panel-title {font-size:1.06rem;font-weight:750;letter-spacing:-.021em}
+    .list-title {display:flex;align-items:center;gap:8px;white-space:nowrap}
+    .count {font-size:.73rem;font-weight:675;color:var(--muted);border-radius:6px;background:var(--subtle);border:1px solid var(--line);padding:1px 6px;font-variant-numeric:tabular-nums}
+    .segmented {display:flex;gap:2px;min-width:0;padding:2px;background:var(--subtle);border:1px solid var(--line);border-radius:8px}
+    .segmented button {background:transparent;color:var(--muted);border:1px solid transparent;border-radius:6px;padding:4px 8px;white-space:nowrap;font-size:.74rem;font-weight:660}
+    .segmented button:hover {color:var(--text)}
+    .segmented button[aria-pressed=true] {background:var(--surface);border-color:var(--line);box-shadow:var(--shadow);color:var(--text)}
+    .session-list {--columns:minmax(0,2.2fr) minmax(70px,.94fr) minmax(59px,.88fr) 47px 43px}
+    .table-head,.session-row {display:grid;grid-template-columns:35px minmax(0,1fr) 38px;align-items:center}
+    .table-head {min-height:33px;background:var(--subtle);border-block:1px solid var(--line);font-size:.7rem;text-transform:uppercase;letter-spacing:.065em;color:var(--muted);font-weight:740}
+    .column-labels,.session-open {display:grid;grid-template-columns:var(--columns);align-items:center;gap:8px;text-align:left}
+    .column-labels span:last-child,.row-cost {text-align:right}
+    .select-cell {display:grid;justify-content:center;align-items:center;height:100%}
+    input[type=checkbox] {margin:0;width:15px;height:15px;accent-color:var(--accent);cursor:pointer}
+    .session-row {min-height:62px;border-bottom:1px solid var(--line);position:relative}
+    .session-row:last-child {border-bottom:0;border-radius:0 0 12px 12px}
+    .session-row:hover {background:var(--subtle)}
+    .session-row.is-current {background:var(--accent-soft);box-shadow:inset 3px 0 var(--accent)}
+    .session-open {width:100%;min-height:61px;padding:8px 0;background:none;border:0;color:inherit}
+    .session-open:focus-visible {outline-offset:-2px;border-radius:6px}
+    .row-identity {display:flex;align-items:center;gap:8px;min-width:0}
+    .state-icon {width:31px;height:31px}
+    .row-labels {min-width:0}
+    .row-title,.row-meta {display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .row-title {font-weight:700;font-size:.85rem;letter-spacing:-.009em}
+    .row-meta {font-size:.73rem;color:var(--muted);margin-top:2px}
+    .row-model,.row-time,.row-cost {color:var(--secondary);font-size:.76rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .row-menu-button {width:30px;height:34px;min-height:34px;margin-left:3px}
+    .state-badge {width:max-content;max-width:100%;border-radius:6px;padding:3px 5px;display:inline-flex;align-items:center;gap:4px;color:var(--tone);background:var(--tone-bg);font-size:.72rem;font-weight:720;white-space:nowrap}
+    .state-badge i {width:5px;height:5px;border-radius:50%;background:currentColor;flex:none}
+    .bulk-bar {display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 11px;background:var(--accent-soft);border-top:1px solid var(--accent-line);font-size:.81rem;color:var(--purple)}
+    .bulk-bar strong {margin-right:auto}
+    .bulk-bar .button {min-height:30px;padding-inline:8px;font-size:.74rem}
+    .empty {padding:32px 16px;text-align:center;color:var(--muted);font-size:.91rem}
+    .detail {position:sticky;top:81px;overflow:hidden}
+    .detail-head {padding:16px 16px 13px;border-bottom:1px solid var(--line)}
+    .detail-top {display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:9px}
+    .detail-top .button {min-height:31px;padding:0 8px;font-size:.75rem}
+    .breadcrumb {min-width:0;display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.75rem;font-weight:600}
+    .breadcrumb span {overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .breadcrumb .icon {color:var(--purple)}
+    .detail-head h2 {font-size:1.22rem;line-height:1.23;letter-spacing:-.032em;font-weight:770;overflow-wrap:anywhere}
+    .detail-meta {display:flex;align-items:center;gap:7px 11px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:.75rem}
+    .detail-meta>span:not(.state-badge) {display:inline-flex;align-items:center;gap:4px}
+    .detail-scroll {max-height:calc(100dvh - 229px);overflow:auto;overscroll-behavior:contain}
+    .approval {margin:14px 15px 0;padding:11px;background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:9px}
+    .approval-head {display:flex;align-items:center;gap:7px;color:var(--amber);font-size:.87rem;font-weight:760}
+    .approval p {margin:5px 0 8px;color:var(--secondary);font-size:.8rem}
+    .approval code {display:block;border-radius:6px;border:1px solid var(--amber-line);background:var(--surface);padding:6px 8px;font:.74rem/1.5 var(--mono);overflow-wrap:anywhere}
+    .approval-actions {display:flex;gap:7px;margin-top:9px}
+    .approval-actions .button {min-height:30px;padding:0 9px;font-size:.77rem}
+    .transcript {padding:15px 16px 6px}
+    .transcript-head {display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:11px;border-bottom:1px solid var(--line)}
+    .transcript-head span {font-size:.73rem;color:var(--muted)}
+    .timeline {list-style:none;margin:0;padding:0}
+    .timeline-entry {position:relative;display:grid;grid-template-columns:27px minmax(0,1fr);gap:8px;padding-top:12px;padding-bottom:10px}
+    .timeline-entry:not(:last-child)::before {content:'';position:absolute;left:13px;top:37px;bottom:-12px;width:1px;background:var(--line)}
+    .activity-icon {width:27px;height:27px;border-radius:7px;z-index:1}
+    .activity-icon .icon {width:15px;height:15px}
+    .entry-head {display:flex;justify-content:space-between;align-items:baseline;gap:7px;font-size:.82rem;font-weight:730}
+    .entry-head time {color:var(--muted);font:400 .68rem var(--mono);white-space:nowrap}
+    .entry-text {color:var(--secondary);font-size:.875rem;overflow-wrap:anywhere;white-space:pre-wrap;margin-top:3px}
+    .entry-code {display:block;margin:7px 0 0;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--subtle);font:.74rem/1.5 var(--mono);color:var(--secondary);white-space:pre-wrap;overflow-wrap:anywhere}
+    .detail-empty {padding:30px 14px;text-align:center;color:var(--muted)}
+    .usage-panels {display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+    .usage-panel {padding:17px;min-width:0}
+    .usage-panel>p {color:var(--muted);font-size:.85rem;margin-top:3px}
+    .chart {margin:19px 0 0;display:grid;grid-template-columns:auto 1fr;gap:8px}
+    .chart-axis {display:flex;flex-direction:column;justify-content:space-between;height:172px;color:var(--muted);text-align:right;font: .7rem var(--mono)}
+    .chart-body {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:190px;gap:6px;position:relative;isolation:isolate}
+    .chart-grid {z-index:-1;position:absolute;inset:4px 0 19px;display:flex;flex-direction:column;justify-content:space-between}
+    .chart-grid i {width:100%;height:1px;background:var(--line)}
+    .chart-day {display:grid;grid-template-rows:minmax(0,1fr) 19px;align-items:end;justify-items:center;min-width:0;color:var(--muted);font-size:.67rem;text-align:center;white-space:nowrap}
+    .chart-bar {display:flex;flex-direction:column-reverse;width:min(68%,28px);height:100%;justify-content:flex-start;border-radius:5px 5px 0 0;overflow:hidden;margin-bottom:1px}
+    .chart-bar i {display:block;background:var(--series)}
+    .legend {display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:12px;color:var(--secondary);font-size:.76rem}
+    .legend span {display:inline-flex;align-items:center;gap:5px}
+    .legend i {width:8px;height:8px;border-radius:2px;background:var(--series)}
+    .usage-table {width:100%;border-collapse:collapse;text-align:left;font-variant-numeric:tabular-nums;font-size:.85rem;margin-top:13px}
+    .usage-table th,.usage-table td {padding:10px 4px;border-bottom:1px solid var(--line)}
+    .usage-table tr:last-child td {border-bottom:0}
+    .usage-table th {font-size:.73rem;color:var(--muted)}
+    .usage-table :is(th,td):not(:first-child) {text-align:right;white-space:nowrap}
+    .usage-project {display:flex;align-items:center;gap:6px;font-weight:650;overflow-wrap:anywhere}
+    .popover {position:fixed;z-index:12;background:var(--surface);border:1px solid var(--line);border-radius:11px;box-shadow:var(--float)}
+    #notifications-popover {top:58px;right:24px;width:min(355px,calc(100vw - 24px));max-height:calc(100dvh - 73px);overflow:auto}
+    .popover-head {display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 13px;border-bottom:1px solid var(--line)}
+    .text-button {background:none;border:0;color:var(--purple);font-weight:680;font-size:.78rem;padding:4px}
+    .text-button:hover {text-decoration:underline}
+    .notification {display:grid;grid-template-columns:29px minmax(0,1fr) 7px;align-items:start;gap:8px;width:100%;text-align:left;padding:11px 12px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--text)}
+    .notification:last-child {border-bottom:0}
+    .notification:hover:not(:disabled) {background:var(--hover)}
+    .notification:disabled {opacity:.78}
+    .notification strong,.notification small {display:block;overflow-wrap:anywhere}
+    .notification strong {font-size:.86rem}
+    .notification small {margin-top:2px;color:var(--muted);font-size:.75rem}
+    .notification-dot {align-self:center;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+    #row-menu {width:168px;padding:4px}
+    .menu-item {display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 8px;border:0;border-radius:6px;background:none;color:var(--secondary);font-weight:580;font-size:.84rem}
+    .menu-item:hover:not(:disabled) {background:var(--hover);color:var(--text)}
+    .menu-item[data-action=delete] {color:var(--red)}
+    dialog {max-height:calc(100dvh - 28px);width:min(480px,calc(100% - 28px));padding:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--text);box-shadow:var(--float);overscroll-behavior:contain}
+    dialog::backdrop {background:#11132977;backdrop-filter:blur(2px)}
+    .dialog-head {display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:17px 18px 13px;border-bottom:1px solid var(--line)}
+    .dialog-head h2 {font-size:1.23rem;letter-spacing:-.028em}
+    .dialog-head p {margin-top:3px;font-size:.83rem;color:var(--muted);overflow-wrap:anywhere}
+    .dialog-head .icon-button {margin:-3px -5px 0 0}
+    .dialog-body {padding:16px 18px;display:grid;gap:13px}
+    .form-field {display:grid;gap:5px;min-width:0;color:var(--secondary);font-size:.86rem;font-weight:650}
+    .form-field small,.settings-hint {font-size:.77rem;color:var(--muted);font-weight:400}
+    .field {width:100%;min-height:39px;border:1px solid var(--strong-line);border-radius:7px;background:var(--subtle);padding:8px 9px;color:var(--text);font-size:.9rem}
+    select.field {appearance:none;padding-right:32px}
+    .select-wrap {position:relative;display:block}
+    .select-wrap .icon {position:absolute;right:10px;top:11px;pointer-events:none;color:var(--muted)}
+    textarea.field {resize:vertical;min-height:99px}
+    .dialog-foot {display:flex;justify-content:flex-end;gap:8px;padding:11px 18px;border-top:1px solid var(--line)}
+    .settings-section {border-top:1px solid var(--line);padding-top:12px;display:grid;gap:8px}
+    .settings-section h3 {font-size:.91rem}
+    .check-line {display:flex;align-items:center;gap:8px;color:var(--secondary);font-size:.85rem}
+    .field-pair {display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    #command-dialog {width:min(550px,calc(100% - 22px));margin-top:min(17vh,125px)}
+    .command-search {display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted)}
+    .command-search input {flex:1;min-width:0;border:0;padding:6px;background:none;color:var(--text)}
+    .command-search .button {min-height:27px;font-size:.72rem;padding-inline:6px}
+    .command-results {padding:6px;max-height:min(55dvh,380px);overflow:auto}
+    .command-heading {font-size:.72rem;color:var(--muted);padding:5px 8px;font-weight:750}
+    .command-option {display:flex;align-items:center;gap:9px;padding:8px;border:0;border-radius:7px;background:none;color:var(--secondary);width:100%;text-align:left;font-size:.88rem}
+    .command-option:hover,.command-option.is-active {background:var(--accent-soft);color:var(--purple)}
+    .command-option span {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .command-option small {margin-left:auto;color:var(--muted);white-space:nowrap;font-size:.73rem}
+    .command-footer {padding:7px 12px;border-top:1px solid var(--line);font-size:.74rem;color:var(--muted);display:flex;gap:12px}
+    #logs-dialog {position:fixed;inset:0 0 0 auto;margin:0;height:100dvh;max-height:100dvh;width:min(560px,100%);max-width:100%;border-radius:14px 0 0 14px}
+    .log-tools {display:grid;gap:9px;padding:13px 15px;border-bottom:1px solid var(--line)}
+    .log-filters {display:flex;gap:5px;flex-wrap:wrap}
+    .log-filters .button {min-height:31px;padding-inline:8px;font-size:.76rem}
+    .log-filters [aria-pressed=true] {background:var(--accent-soft);color:var(--purple);border-color:var(--accent-line)}
+    .log-entries {padding:0 14px 15px;list-style:none;margin:0}
+    .log-entry {display:grid;grid-template-columns:60px 48px minmax(0,1fr);align-items:baseline;gap:7px;padding:9px 1px;border-bottom:1px solid var(--line);font:.77rem/1.5 var(--mono);color:var(--secondary);overflow-wrap:anywhere}
+    .log-entry time {color:var(--muted)}
+    .log-level {font-weight:750;color:var(--tone)}
+    #toast-region {position:fixed;z-index:19;right:16px;bottom:16px;width:min(335px,calc(100vw - 32px));display:grid;gap:7px;pointer-events:none}
+    .toast {pointer-events:auto;display:flex;align-items:flex-start;gap:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);box-shadow:var(--float);padding:9px;color:var(--text);animation:toast-in .18s ease-out}
+    .toast strong {display:block;font-size:.86rem}
+    .toast p {color:var(--muted);font-size:.78rem;margin-top:1px;overflow-wrap:anywhere}
+    .toast .icon-button {margin-left:auto;width:29px;min-height:29px;height:29px}
+    @keyframes toast-in {from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    @media (prefers-reduced-motion:reduce) {*,*::before,*::after {animation-duration:.001ms!important;scroll-behavior:auto!important}}
+    @media (max-width:1290px) and (min-width:1101px) { main {padding-inline:20px}.layout,.topbar {grid-template-columns:195px minmax(0,1fr)}.topbar {grid-template-columns:195px minmax(0,1fr) auto}.workspace {gap:12px;grid-template-columns:minmax(0,1.52fr) minmax(300px,1fr)}.session-list {--columns:minmax(0,1.75fr) 67px 58px 39px 38px}.table-head,.session-row {grid-template-columns:30px minmax(0,1fr) 32px}.column-labels,.session-open {gap:5px}.row-menu-button {margin-left:0}.row-identity {gap:6px}.state-icon {width:28px;height:28px} }
+    @media (max-width:1100px) { .layout {grid-template-columns:175px minmax(0,1fr)}.topbar {grid-template-columns:175px minmax(0,1fr) auto}.sidebar {padding-inline:9px}main {padding-inline:19px}.workspace {grid-template-columns:minmax(0,1fr)}.detail {display:none;position:fixed;z-index:9;inset:65px 0 0 auto;width:min(480px,100%);border-radius:0;box-shadow:var(--float);overflow:auto}.detail.is-open {display:block}.detail-scroll {max-height:none;overflow:visible}body.detail-open::after {content:'';position:fixed;inset:65px 0 0;background:#11132958;z-index:8;pointer-events:none}#detail-back {display:inline-flex;margin-left:-5px}.detail-top .breadcrumb {margin-right:auto}.detail-head {position:sticky;top:0;background:var(--surface);z-index:2}.usage-panels {grid-template-columns:1fr} }
+    @media (max-width:700px) { .topbar {height:54px;display:flex;gap:7px;padding:0 10px}.brand {padding:0;margin-right:auto;font-size:1.28rem;gap:7px}.brand-mark {width:27px;height:27px;border-radius:7px}.brand-mark .icon {width:17px;height:17px}.header-search {padding:0}#search-button {width:36px;padding:0;justify-content:center;background:transparent;border-color:transparent}#search-button:hover {background:var(--hover)}#search-button span,#search-button kbd {display:none}.header-tools {gap:3px}#mobile-nav-button,#close-mobile-nav {display:inline-flex}.layout {display:block;min-height:calc(100dvh - 54px)}.sidebar {display:none;position:fixed;top:54px;left:0;bottom:0;width:min(272px,86vw);height:auto;z-index:11;padding:14px 11px;box-shadow:var(--float)}.sidebar.is-open {display:flex}#close-mobile-nav {align-self:flex-end;margin-bottom:9px}#nav-scrim {display:block;position:fixed;border:0;inset:54px 0 0;background:#11132972;z-index:10}.detail {top:54px}body.detail-open::after {inset:54px 0 0}main {padding:18px 12px 28px}.page-head {margin-bottom:15px;align-items:flex-start}.page-head p {margin-top:5px;font-size:.8rem;max-width:230px}#new-session-button {min-height:36px;padding-inline:8px;gap:4px;font-size:.76rem}#new-session-button .icon {width:14px;height:14px}.metrics {gap:7px;grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:14px}.metric {padding:9px 10px;border-radius:9px}.metric-label {font-size:.8rem}.metric-value {font-size:1.34rem;margin-top:3px}.metric-foot {margin-top:3px}.metric-icon {top:8px;right:8px;width:27px;height:27px}.metric-icon .icon {width:16px;height:16px}.list-head {padding:9px}.table-head,.session-row {grid-template-columns:29px minmax(0,1fr) 34px}.table-head {display:none}.session-open {grid-template-columns:minmax(0,1fr) auto auto;gap:2px 6px;min-height:67px;padding:6px 0}.session-row {min-height:68px}.row-identity {grid-area:1 / 1 / 3 / 2;gap:6px}.row-title {white-space:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-height:1.2;font-size:.8rem}.row-meta {font-size:.69rem}.state-icon {width:25px;height:25px;border-radius:6px}.state-icon .icon {width:15px;height:15px}.row-status {grid-area:1 / 2 / 2 / 4;justify-self:end;align-self:end}.row-model {grid-area:2 / 2;align-self:start}.row-time {grid-area:3 / 2;align-self:start}.row-cost {grid-area:2 / 3 / 4 / 4;align-self:start}.row-model,.row-time,.row-cost {font-size:.69rem}.row-menu-button {margin-left:2px}.bulk-bar {padding:6px}.bulk-bar .button {min-height:30px}.usage-panel {padding:12px}#notifications-popover {top:51px;right:8px}.detail-head {padding:12px 13px}.detail-top {justify-content:flex-start}.detail-top .button {margin-left:auto} }
+    @media (max-width:375px) { .list-head {gap:4px}.segmented button {padding-inline:5px}.row-identity .state-icon {display:none}.field-pair {grid-template-columns:1fr} }
+    @media (max-width:1100px) { #detail-scrim {display:block;position:fixed;inset:65px 0 0;border:0;background:#11132958;z-index:8} }
+    @media (max-width:700px) { #detail-scrim {top:54px} }
+  </style>
+</head>
+<body>
+  <svg hidden xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-logo" viewBox="0 0 24 24"><path d="m14 2-9 12h6l-1 8 9-12h-6z"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.3"/><rect x="14" y="3" width="7" height="7" rx="1.3"/><rect x="3" y="14" width="7" height="7" rx="1.3"/><rect x="14" y="14" width="7" height="7" rx="1.3"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 3v17h17M9 15v-4m5 4V6m5 9V9"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.4"/><path d="m16 16 4 4"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m9 3-.8 2.2-2 .9-2.2-.5-1.6 2.8 1.5 1.7v2.5l-1.5 1.7L4 17.1l2.2-.5 2 .9.8 2.5h3.3l.8-2.5 2-.9 2.2.5 1.6-2.8-1.5-1.7v-2.5l1.5-1.7-1.6-2.8-2.2.5-2-.9-.8-2.2z" transform="translate(1.4 .5)"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s7-3.5 7-10V6l-7-3-7 3v6c0 6.5 7 10 7 10Z"/><path d="M12 8v4m0 4h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-error" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5m0 3h.01"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24"><path d="M12 2v20m5-15a4 4 0 0 0-4-2H10a3.5 3.5 0 0 0 0 7h4a3.5 3.5 0 0 1 0 7h-3c-2 0-3.5-.7-4.5-2"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m7 7-5 5 5 5m10-10 5 5-5 5m-3-14-4 18"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zm-9 9 9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 4 16 4 16 0V6M4 12c0 4 16 4 16 0"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6c-2-2-5-3-9-2v15c4-1 7 0 9 2 2-2 5-3 9-2V4c-4-1-7 0-9 2Zm0 0v15"/></symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Zm0 18v-9m-8-4.5 8 4.5 8-4.5"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></symbol>
+    <symbol id="i-lines" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2 7M3 5v6h6"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13m-8 4v5m4-5v5"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v11h14V9m-9 4h4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-nav" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6"/></symbol>
+    <symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="6" r="2"/><path d="M6 7v10m12-9c0 4-5 4-7 4-3 0-5 2-5 5"/></symbol>
+  </svg>
+  <header class="topbar">
+    <button id="mobile-nav-button" class="icon-button ghost" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="project-sidebar"><svg class="icon" aria-hidden="true"><use href="#i-nav"/></svg></button>
+    <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-logo"/></svg></span>Relay</div>
+    <div class="header-search"><button id="search-button" type="button" aria-label="Search sessions and commands" aria-haspopup="dialog"><svg class="icon mini" aria-hidden="true"><use href="#i-search"/></svg><span>Search sessions or run a command</span><kbd>Ctrl K</kbd></button></div>
+    <div class="header-tools">
+      <button id="notifications-button" class="icon-button ghost" type="button" aria-label="Notifications" aria-expanded="false" aria-controls="notifications-popover"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg><span class="unread-marker" id="unread-marker" hidden></span></button>
+      <button id="settings-button" class="icon-button ghost" type="button" aria-label="Settings" aria-haspopup="dialog"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg></button>
+    </div>
+  </header>
+  <div class="layout">
+    <aside id="project-sidebar" class="sidebar" aria-label="Workspace navigation">
+      <button id="close-mobile-nav" class="icon-button ghost" type="button" aria-label="Close navigation"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+      <nav aria-label="Workspace">
+        <section class="nav-section" aria-labelledby="workspace-label">
+          <h2 class="nav-heading" id="workspace-label">Workspace</h2>
+          <button class="nav-link" type="button" data-view="sessions" aria-current="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg><span>Sessions</span><small id="nav-session-count">15</small></button>
+          <button class="nav-link" type="button" data-view="usage"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><span>Usage</span><small></small></button>
+        </section>
+        <section class="nav-section" aria-labelledby="projects-label">
+          <h2 class="nav-heading" id="projects-label">Projects</h2>
+          <div id="projects"></div>
+        </section>
+      </nav>
+      <div class="sidebar-footer"><span class="workspace-icon"><svg class="icon" aria-hidden="true"><use href="#i-terminal"/></svg></span><span><strong>Local workspace</strong><small>Offline simulation</small></span></div>
+    </aside>
+    <button id="nav-scrim" type="button" aria-label="Close navigation" hidden></button>
+    <main id="main">
+      <section id="sessions-view" aria-labelledby="sessions-title">
+        <div class="page-head"><div><h1 id="sessions-title" tabindex="-1">Agent sessions</h1><p id="sessions-subtitle">Monitor and manage coding agents across your projects.</p></div><button id="new-session-button" class="button primary" type="button" aria-haspopup="dialog"><svg class="icon mini" aria-hidden="true"><use href="#i-plus"/></svg>New session</button></div>
+        <div class="metrics" id="session-metrics" aria-label="Session summary"></div>
+        <div class="workspace">
+          <section class="panel session-list" aria-labelledby="list-title">
+            <div class="list-head"><div class="list-title"><h2 class="panel-title" id="list-title">Sessions</h2><span id="visible-count" class="count"></span></div><div class="segmented" role="group" aria-label="Filter sessions"><button type="button" data-filter="all" aria-pressed="true">All</button><button type="button" data-filter="waiting" aria-pressed="false">Needs approval</button><button type="button" data-filter="archived" aria-pressed="false">Archived</button></div></div>
+            <div class="bulk-bar" id="bulk-bar" hidden><strong id="selected-count" aria-live="polite"></strong><button class="button" type="button" id="bulk-stop">Stop</button><button class="button" type="button" id="bulk-archive">Archive</button><button class="button" type="button" id="bulk-delete">Delete</button><button class="icon-button ghost" type="button" id="clear-selection" aria-label="Clear selection"><svg class="icon mini" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+            <div class="table-head"><span class="select-cell"><input id="select-all" type="checkbox" aria-label="Select all visible sessions"></span><div class="column-labels"><span>Session</span><span>Status</span><span>Model</span><span>Time</span><span>Cost</span></div></div>
+            <div id="session-rows" aria-label="Session list"></div>
+          </section>
+          <button id="detail-scrim" tabindex="-1" type="button" aria-label="Close session details" hidden></button>
+          <aside class="panel detail" id="session-detail" aria-label="Session details"></aside>
+        </div>
+      </section>
+      <section id="usage-view" aria-labelledby="usage-title" hidden>
+        <div class="page-head"><div><h1 id="usage-title" tabindex="-1">Usage</h1><p>Track token consumption and spend across your projects.</p></div></div>
+        <div class="metrics" id="usage-metrics" aria-label="Usage totals"></div>
+        <div class="usage-panels">
+          <section class="panel usage-panel" aria-labelledby="chart-title"><h2 class="panel-title" id="chart-title">Daily spend</h2><p>Last 7 days by project</p><div id="usage-chart"></div></section>
+          <section class="panel usage-panel" aria-labelledby="project-usage-title"><h2 class="panel-title" id="project-usage-title">Usage by project</h2><p>All recorded runs</p><table class="usage-table"><thead><tr><th scope="col">Project</th><th scope="col">Tokens</th><th scope="col">Spend</th></tr></thead><tbody id="usage-projects"></tbody></table></section>
+        </div>
+      </section>
+    </main>
+  </div>
+  <section id="notifications-popover" class="popover" aria-labelledby="notifications-title" hidden><div class="popover-head"><h2 class="panel-title" id="notifications-title">Notifications</h2><button type="button" id="mark-all-read" class="text-button">Mark all as read</button></div><div id="notification-list"></div></section>
+  <div id="row-menu" class="popover" role="group" aria-label="Session actions" hidden>
+    <button class="menu-item" type="button" data-action="restart"><svg class="icon mini" aria-hidden="true"><use href="#i-restart"/></svg>Restart</button>
+    <button class="menu-item" type="button" data-action="stop"><svg class="icon mini" aria-hidden="true"><use href="#i-stop"/></svg>Stop</button>
+    <button class="menu-item" type="button" data-action="duplicate"><svg class="icon mini" aria-hidden="true"><use href="#i-copy"/></svg>Duplicate</button>
+    <button class="menu-item" type="button" data-action="logs"><svg class="icon mini" aria-hidden="true"><use href="#i-lines"/></svg>View logs</button>
+    <button class="menu-item" type="button" data-action="delete"><svg class="icon mini" aria-hidden="true"><use href="#i-trash"/></svg>Delete</button>
+  </div>
+  <dialog id="new-dialog" aria-labelledby="new-title">
+    <form id="new-form"><div class="dialog-head"><div><h2 id="new-title">New session</h2><p>Start a coding task in the local simulator.</p></div><button class="icon-button ghost" type="button" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><label class="form-field">Project<span class="select-wrap"><select id="new-project" class="field" name="project" required></select><svg class="icon mini" aria-hidden="true"><use href="#i-chevron"/></svg></span></label><label class="form-field">Model<span class="select-wrap"><select id="new-model" class="field" name="model" required></select><svg class="icon mini" aria-hidden="true"><use href="#i-chevron"/></svg></span></label><label class="form-field">Task description<textarea class="field" id="task-description" name="task" required maxlength="1600" placeholder="Describe the change you want the agent to make…"></textarea></label></div>
+      <div class="dialog-foot"><button class="button" type="button" data-close>Cancel</button><button type="submit" class="button primary"><svg class="icon mini" aria-hidden="true"><use href="#i-plus"/></svg>Start session</button></div>
+    </form>
+  </dialog>
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form id="settings-form"><div class="dialog-head"><div><h2 id="settings-title">Settings</h2><p>Configure your local workspace.</p></div><button class="icon-button ghost" type="button" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="field-pair"><label class="form-field">Default model<span class="select-wrap"><select class="field" id="default-model" name="model"></select><svg class="icon mini" aria-hidden="true"><use href="#i-chevron"/></svg></span></label><label class="form-field">Theme<span class="select-wrap"><select class="field" name="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select><svg class="icon mini" aria-hidden="true"><use href="#i-chevron"/></svg></span></label></div>
+      <section class="settings-section" aria-labelledby="notify-settings"><h3 id="notify-settings">Notifications</h3><label class="check-line"><input type="checkbox" name="finish"> Session completed</label><label class="check-line"><input type="checkbox" name="fail"> Session failed</label><label class="check-line"><input type="checkbox" name="approval"> Approval requested</label></section>
+      <section class="settings-section" aria-labelledby="key-settings"><h3 id="key-settings">API keys</h3><p class="settings-hint">Keys stay in this tab and are unused in offline mode.</p><label class="form-field">OpenAI<input class="field" name="openai" type="password" autocomplete="off" placeholder="Enter API key" spellcheck="false"></label><label class="form-field">Anthropic<input class="field" name="anthropic" type="password" autocomplete="off" placeholder="Enter API key" spellcheck="false"></label><label class="form-field">Google<input class="field" name="google" type="password" autocomplete="off" placeholder="Enter API key" spellcheck="false"></label></section></div>
+      <div class="dialog-foot"><button class="button" type="button" data-close>Cancel</button><button type="submit" class="button primary">Save settings</button></div>
+    </form>
+  </dialog>
+  <dialog id="command-dialog" aria-labelledby="command-title">
+    <h2 class="sr-only" id="command-title">Command palette</h2><div class="command-search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input id="command-query" aria-label="Search sessions, projects and commands" placeholder="Search sessions, projects and commands…" autocomplete="off"><button class="button" type="button" data-close aria-label="Close command palette">Esc</button></div><div class="command-results" id="command-results"></div><div class="command-footer"><span><kbd>↑</kbd> <kbd>↓</kbd> Navigate</span><span><kbd>Enter</kbd> Open</span></div>
+  </dialog>
+  <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+    <form id="delete-form"><div class="dialog-head"><div><h2 id="delete-title">Delete session?</h2><p id="delete-description"></p></div><button class="icon-button ghost" type="button" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></div><div class="dialog-foot"><button class="button" type="button" data-close autofocus>Cancel</button><button class="button danger" type="submit">Delete</button></div></form>
+  </dialog>
+  <dialog id="logs-dialog" aria-labelledby="logs-title"><div class="dialog-head"><div><h2 id="logs-title">Session logs</h2><p id="logs-subtitle"></p></div><button class="icon-button ghost" type="button" data-close aria-label="Close logs"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></div><div class="log-tools"><input class="field" type="search" id="logs-query" placeholder="Search logs…" aria-label="Search logs"><div class="log-filters" role="group" aria-label="Log level"><button class="button" type="button" data-log-level="all" aria-pressed="true">All levels</button><button class="button" type="button" data-log-level="debug" aria-pressed="false">Debug</button><button class="button" type="button" data-log-level="info" aria-pressed="false">Info</button><button class="button" type="button" data-log-level="warn" aria-pressed="false">Warn</button><button class="button" type="button" data-log-level="error" aria-pressed="false">Error</button></div></div><ul class="log-entries" id="logs-entries"></ul></dialog>
+  <div id="toast-region" role="status" aria-live="polite" aria-atomic="false"></div>
+  <script>
+    'use strict';
+
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const byId = id => document.getElementById(id);
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[char]);
+    const icon = (name, mini = false) => `<svg class="icon${mini ? ' mini' : ''}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+    const usd = new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'});
+    const whole = new Intl.NumberFormat('en-US');
+    const compact = new Intl.NumberFormat('en-US', {notation:'compact', maximumFractionDigits:1});
+    const timeLabel = new Intl.DateTimeFormat('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'});
+    const dayLabel = new Intl.DateTimeFormat('en-US', {weekday:'short'});
+    const dateLabel = new Intl.DateTimeFormat('en-US', {month:'short', day:'numeric'});
+    const models = {
+      sonnet: 'Sonnet 4.5', gpt: 'GPT-5.1', opus: 'Opus 4.5', gemini: 'Gemini 2.5', haiku: 'Haiku 4.5'
+    };
+    const projects = {
+      atlas: {name:'Atlas API', icon:'layers', tone:'purple', series:'#7865ef'},
+      storefront: {name:'Storefront', icon:'cube', tone:'running', series:'#5488ef'},
+      infra: {name:'Platform Infra', icon:'terminal', tone:'done', series:'#29a77b'},
+      design: {name:'Design System', icon:'grid', tone:'waiting', series:'#db9742'},
+      docs: {name:'Developer Docs', icon:'book', tone:'failed', series:'#d56181'}
+    };
+    const stateLabels = {
+      running:{label:'Running', short:'Running', icon:'activity'},
+      waiting:{label:'Waiting for approval', short:'Approval', icon:'shield'},
+      failed:{label:'Failed', short:'Failed', icon:'error'},
+      done:{label:'Done', short:'Done', icon:'check'},
+      stopped:{label:'Stopped', short:'Stopped', icon:'stop'}
+    };
+    const eventTypes = {
+      prompt:{title:'You', icon:'user', tone:'neutral', level:'info'},
+      agent:{title:'Agent', icon:'logo', tone:'purple', level:'info'},
+      tool:{title:'Tool output', icon:'terminal', tone:'running', level:'debug'},
+      approval:{title:'Approval requested', icon:'shield', tone:'waiting', level:'warn'},
+      approved:{title:'Approved', icon:'check', tone:'done', level:'info'},
+      denied:{title:'Denied', icon:'x', tone:'failed', level:'warn'},
+      done:{title:'Session completed', icon:'circle-check', tone:'done', level:'info'},
+      failure:{title:'Session failed', icon:'error', tone:'failed', level:'error'},
+      stopped:{title:'Session stopped', icon:'stop', tone:'neutral', level:'warn'},
+      restart:{title:'Session restarted', icon:'restart', tone:'running', level:'info'}
+    };
+    const pendingRequests = {
+      migration: {description:'Run the prepared migration against the local development database.', command:'pnpm db:migrate --env development'},
+      dependency: {description:'Install the requested dependencies in the project workspace.', command:'pnpm install'},
+      general: {description:'Authorize the proposed workspace change. This action is simulated locally.', command:'Apply prepared workspace changes'}
+    };
+    const defaultSettings = {model:'sonnet', theme:'system', finish:true, fail:true, approval:true};
+    const storageKey = 'relay-workspace-v1';
+    const keyValues = {openai:'', anthropic:'', google:''};
+    const day = 86400000;
+    const minute = 60000;
+    let sequence = 0;
+    const uniqueId = () => `${Date.now().toString(36)}-${(++sequence).toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+    const atDay = (offset, now = Date.now()) => {
+      const date = new Date(now);
+      date.setDate(date.getDate() + offset);
+      return date;
+    };
+    const dayKey = timestamp => {
+      const date = new Date(timestamp);
+      return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+    };
+
+    function seedWorkspace() {
+      const now = Date.now();
+      const seed = [
+        ['atlas','Add billing schema migration','feat/billing-v2','waiting','sonnet',382,.42,48210,0,'Add a billing_events table for invoice reconciliation. Include a reversible migration and verify it on the local database.','I checked the existing billing schema and prepared an up/down migration with an index on invoice_id.','db/migrations/024_billing_events.sql\nSchema checks passed · migration ready','migration'],
+        ['storefront','Fix cart state race condition','fix/cart-sync','running','gpt',754,.68,85300,0,'Fix duplicate cart updates when a customer changes quantity in two tabs. Add coverage for out-of-order responses.','I reproduced the race in the cart store and am checking the mutation queue against delayed responses.','src/cart/store.ts · 3 scenarios reproduced'],
+        ['infra','Audit staging Terraform drift','chore/staging-drift','running','opus',242,.31,26030,0,'Compare the staging Terraform plan with the checked-in configuration and summarize the drift by module.','I am comparing the plan output against the tracked staging modules.','terraform plan · 3 modules inspected'],
+        ['design','Update button focus states','fix/focus-ring','done','sonnet',503,.28,35720,0,'Apply the standard focus ring to every button variant and verify keyboard navigation in Storybook.','Updated the shared focus styles and checked keyboard focus against each button variant.','Button.spec.tsx · 24 tests passed'],
+        ['atlas','Trace order webhook timeouts','fix/webhook-timeout','failed','gpt',1071,1.14,137840,0,'Trace why order webhooks exceed their delivery deadline during batch processing.','I isolated the retry window, but the recorded integration test could not access the webhook fixture.','integration/webhooks.spec.ts · fixture unavailable'],
+        ['docs','Refresh onboarding examples','docs/quickstart','done','haiku',325,.09,22740,1,'Update the quickstart for the latest SDK and verify that each example runs with the documented inputs.','Replaced the obsolete SDK setup and checked the JavaScript and Python examples.','docs/quickstart.md · snippets validated'],
+        ['storefront','Add checkout telemetry','feat/checkout-events','waiting','sonnet',543,.37,45380,1,'Add checkout conversion events with a shared analytics package and cover opt-out behavior.','The event mapping and opt-out tests are ready. The new analytics client needs workspace approval.','src/checkout/events.ts · event schema validated','dependency'],
+        ['infra','Rotate CI runner images','chore/runner-images','done','gemini',626,.44,78400,2,'Update the build runner to the current base image and check toolchain compatibility.','Updated the image reference and verified the Node and Python toolchains in the runner configuration.','ci/runner.Dockerfile · build validation passed'],
+        ['design','Normalize spacing tokens','chore/spacing-tokens','running','sonnet',195,.16,19130,2,'Consolidate duplicate spacing tokens and update components that reference deprecated aliases.','I identified four equivalent token pairs and am updating their component references.','tokens/spacing.json · 14 references found'],
+        ['atlas','Paginate audit log endpoint','feat/audit-pagination','done','opus',1493,1.72,119720,3,'Add cursor pagination to the audit log endpoint with stable ordering across duplicate timestamps.','Implemented a compound cursor and tested forward pagination during concurrent inserts.','audit-pagination.spec.ts · 18 tests passed'],
+        ['docs','Repair broken reference links','fix/docs-links','done','haiku',163,.06,16320,3,'Run the reference link checker and repair broken internal links in the developer guide.','Updated seven references after the guide restructure and reran the link checker.','docs:check-links · 0 broken links'],
+        ['storefront','Optimize product thumbnails','perf/product-images','failed','gemini',1066,.52,101030,4,'Reduce product thumbnail payloads while preserving image quality on retina displays.','I prepared an image size comparison, but the local optimization fixture is missing.','image benchmark · sample fixture unavailable'],
+        ['infra','Add queue depth alert','feat/queue-alerts','done','gpt',737,.67,83730,4,'Add a queue depth alert with a ten-minute threshold and link the incident runbook.','Added the alert, validated the query, and linked the queue saturation runbook.','alerts/queue.yml · rule validation passed'],
+        ['design','Document modal keyboard traps','docs/modal-a11y','done','sonnet',490,.25,31780,5,'Document dialog focus behavior and add an accessible example with a nested confirmation.','Documented initial focus, return focus, and how to test nested dialogs with a keyboard.','stories/Modal.mdx · examples verified'],
+        ['atlas','Extend rate limit test coverage','test/rate-limit','done','gpt',929,.81,101740,6,'Add tests for tenant-level rate limits, reset behavior, and concurrent requests.','Added coverage for the reset boundary and concurrent requests across distinct tenants.','rate-limit.spec.ts · 32 tests passed']
+      ];
+      const ledger = [];
+      const sessions = seed.map((entry, index) => {
+        const [project,title,branch,status,model,seconds,cost,tokens,daysAgo,task,update,code,request] = entry;
+        const started = now - (daysAgo * day + index * 12 * minute + seconds * 1000);
+        const end = started + seconds * 1000;
+        const id = `relay-${index + 1}`;
+        const usageId = `usage-${index + 1}`;
+        ledger.push({id:usageId, project, at:atDay(-daysAgo, now).getTime(), cost, tokens});
+        const events = [
+          {type:'prompt', at:started, text:task},
+          {type:'agent', at:started + Math.min(34000, seconds * 200), text:update},
+          {type:'tool', at:end - 1000, text:'Workspace check', code}
+        ];
+        if (status === 'waiting') events.push({type:'approval', at:end, text:pendingRequests[request].description});
+        if (status === 'done') events.push({type:'done', at:end, text:'The requested changes passed verification.'});
+        if (status === 'failed') events.push({type:'failure', at:end, text:'Verification stopped because a required local fixture was unavailable.'});
+        return {
+          id, project, title, branch, status, model, task, usageId, started, elapsed:seconds * 1000,
+          runningSince:status === 'running' ? now : null, events, request:request || null, archived:false,
+          step:status === 'running' ? 'finish' : null,
+          nextAt:status === 'running' ? now + (index === 1 ? 85000 : index === 2 ? 115000 : 155000) : null,
+          outcome:index === 2 ? 'failed' : 'done'
+        };
+      });
+      const notifications = [
+        {id:'notice-1', sessionId:'relay-1', text:'Add billing schema migration', title:'Approval requested', tone:'waiting', icon:'shield', at:sessions[0].events.at(-1).at, read:false},
+        {id:'notice-2', sessionId:'relay-4', text:'Update button focus states', title:'Session completed', tone:'done', icon:'circle-check', at:sessions[3].events.at(-1).at, read:false},
+        {id:'notice-3', sessionId:'relay-5', text:'Trace order webhook timeouts', title:'Session failed', tone:'failed', icon:'error', at:sessions[4].events.at(-1).at, read:true}
+      ];
+      return {sessions, ledger, notifications, settings:{...defaultSettings}};
+    }
+
+    function loadWorkspace() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(storageKey));
+        if (Array.isArray(stored?.sessions) && Array.isArray(stored.ledger) && Array.isArray(stored.notifications)) {
+          stored.settings = {...defaultSettings, ...stored.settings};
+          return stored;
+        }
+      } catch { /* The workspace remains usable when browser storage is unavailable. */ }
+      return seedWorkspace();
+    }
+
+    const workspace = loadWorkspace();
+    const ui = {
+      view:'sessions', project:'all', filter:'all',
+      sessionId:workspace.sessions.find(session => !session.archived)?.id ?? null,
+      selected:new Set(), mobileDetail:false, navOpen:false, popover:null, popoverButton:null, menuSession:null,
+      logsId:null, logLevel:'all', deleteIds:[], commandIndex:0
+    };
+    const mobileNav = matchMedia('(max-width:700px)');
+    const compactDetail = matchMedia('(max-width:1100px)');
+    const systemTheme = matchMedia('(prefers-color-scheme:dark)');
+    const findSession = id => workspace.sessions.find(session => session.id === id);
+    const projectName = key => projects[key]?.name ?? 'Unknown project';
+    const usage = session => workspace.ledger.find(item => item.id === session.usageId) ?? {cost:0,tokens:0};
+    const save = () => {
+      try { localStorage.setItem(storageKey, JSON.stringify(workspace)); } catch { /* Storage can be disabled. */ }
+    };
+
+    function applyTheme() {
+      const theme = workspace.settings.theme;
+      document.documentElement.dataset.theme = theme === 'system' ? (systemTheme.matches ? 'dark' : 'light') : theme;
+    }
+
+    function elapsed(session) {
+      const value = session.elapsed + (session.runningSince == null ? 0 : Math.max(0, Date.now() - session.runningSince));
+      const seconds = Math.floor(value / 1000);
+      if (seconds >= 3600) return `${Math.floor(seconds / 3600)}h ${Math.floor(seconds / 60) % 60}m`;
+      return seconds >= 60 ? `${Math.floor(seconds / 60)}m ${seconds % 60}s` : `${seconds}s`;
+    }
+
+    function relativeTime(timestamp) {
+      const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / minute));
+      if (!minutes) return 'Just now';
+      if (minutes < 60) return `${minutes}m ago`;
+      if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+      return dateLabel.format(timestamp);
+    }
+
+    function projectIcon(key) {
+      const project = projects[key];
+      return `<span class="project-icon tone-${project.tone}" style="--project-ink:var(--tone);--project-bg:var(--tone-bg)">${icon(project.icon)}</span>`;
+    }
+
+    function badge(status, abbreviated = false) {
+      const state = stateLabels[status];
+      return `<span class="state-badge tone-${status}"${abbreviated ? ` title="${state.label}"` : ''}><i aria-hidden="true"></i>${abbreviated ? state.short : state.label}</span>`;
+    }
+
+    function visibleSessions() {
+      return workspace.sessions.filter(session => {
+        if (ui.project !== 'all' && session.project !== ui.project) return false;
+        if (ui.filter === 'archived') return session.archived;
+        return !session.archived && (ui.filter === 'all' || session.status === ui.filter);
+      });
+    }
+
+    function renderNav() {
+      const active = workspace.sessions.filter(session => !session.archived);
+      byId('nav-session-count').textContent = active.length;
+      $$('nav [data-view]').forEach(button => {
+        button.setAttribute('aria-current', button.dataset.view === ui.view && (ui.view === 'usage' || ui.project === 'all'));
+      });
+      byId('projects').innerHTML = Object.entries(projects).map(([key, project]) => {
+        const count = active.filter(session => session.project === key).length;
+        const current = ui.view === 'sessions' && ui.project === key;
+        return `<button class="nav-link" type="button" data-project="${key}" aria-current="${current}">${projectIcon(key)}<span>${project.name}</span><small>${count}</small></button>`;
+      }).join('');
+    }
+
+    function renderMetric({title, value, caption, symbol, tone, attrs = ''}) {
+      const tag = attrs ? 'button' : 'div';
+      return `<${tag} class="metric"${attrs ? ` type="button" ${attrs}` : ''}><span class="metric-icon tone-${tone}">${icon(symbol)}</span><span class="metric-label">${title}</span><strong class="metric-value">${value}</strong><small class="metric-foot">${caption}</small></${tag}>`;
+    }
+
+    function renderMetrics() {
+      const inProject = item => ui.project === 'all' || ui.project === item.project;
+      const sessions = workspace.sessions.filter(session => !session.archived && inProject(session));
+      const count = status => sessions.filter(session => session.status === status).length;
+      const spend = workspace.ledger.filter(inProject).reduce((total, item) => total + item.cost, 0);
+      const entries = [
+        {title:'Running', value:count('running'), caption:'Agents in progress', symbol:'activity', tone:'running', filter:'running'},
+        {title:'Needs approval', value:count('waiting'), caption:'Awaiting your review', symbol:'shield', tone:'waiting', filter:'waiting'},
+        {title:'Completed', value:count('done'), caption:'Successful sessions', symbol:'circle-check', tone:'done', filter:'done'},
+        {title:'Total spend', value:usd.format(spend), caption:'Across recorded runs', symbol:'dollar', tone:'purple', attrs:'data-view="usage"'}
+      ];
+      byId('session-metrics').innerHTML = entries.map(entry => renderMetric({
+        ...entry, attrs:entry.filter ? `data-metric-filter="${entry.filter}" aria-pressed="${ui.filter === entry.filter}"` : entry.attrs
+      })).join('');
+      $$('.segmented [data-filter]').forEach(button => button.setAttribute('aria-pressed', button.dataset.filter === ui.filter));
+    }
+
+    function renderSelection() {
+      const selected = [...ui.selected].map(findSession).filter(Boolean);
+      const visible = visibleSessions();
+      const checked = visible.filter(session => ui.selected.has(session.id)).length;
+      const selectAll = byId('select-all');
+      selectAll.checked = Boolean(visible.length && checked === visible.length);
+      selectAll.indeterminate = checked > 0 && checked < visible.length;
+      selectAll.disabled = visible.length === 0;
+      $$('.select-session').forEach(input => { input.checked = ui.selected.has(input.value); });
+      byId('bulk-bar').hidden = selected.length === 0;
+      byId('selected-count').textContent = `${selected.length} selected`;
+      byId('bulk-stop').disabled = !selected.some(session => ['running','waiting'].includes(session.status));
+      byId('bulk-archive').disabled = !selected.some(session => !session.archived);
+    }
+
+    function renderRows() {
+      const sessions = visibleSessions();
+      byId('visible-count').textContent = sessions.length;
+      byId('session-rows').innerHTML = sessions.length ? sessions.map(session => {
+        const {id, status, title, branch, project, model} = session;
+        const current = id === ui.sessionId;
+        return `<div class="session-row${current ? ' is-current' : ''}"><label class="select-cell"><input class="select-session" type="checkbox" value="${escapeHtml(id)}" aria-label="Select ${escapeHtml(title)}"></label>
+          <button class="session-open" type="button" data-session="${escapeHtml(id)}" aria-controls="session-detail" aria-current="${current}">
+            <span class="row-identity"><span class="state-icon tone-${status}">${icon(stateLabels[status].icon, true)}</span><span class="row-labels"><strong class="row-title" title="${escapeHtml(title)}">${escapeHtml(title)}</strong><span class="row-meta" title="${escapeHtml(branch)}">${projectName(project)} <span aria-hidden="true">·</span> ${escapeHtml(branch)}</span></span></span>
+            <span class="row-status">${badge(status, true)}</span><span class="row-model">${models[model]}</span><span class="row-time" data-elapsed="${escapeHtml(id)}">${elapsed(session)}</span><span class="row-cost">${usd.format(usage(session).cost)}</span>
+          </button>
+          <button class="icon-button ghost row-menu-button" type="button" data-menu-session="${escapeHtml(id)}" aria-label="Actions for ${escapeHtml(title)}" aria-expanded="false" aria-controls="row-menu">${icon('more')}</button></div>`;
+      }).join('') : `<p class="empty">${ui.filter === 'archived' ? 'No archived sessions.' : 'No sessions match this view.'}</p>`;
+      renderSelection();
+    }
+
+    function renderDetail() {
+      const session = findSession(ui.sessionId);
+      const detail = byId('session-detail');
+      const lastScroll = $('.detail-scroll', detail)?.scrollTop ?? 0;
+      const waiting = session?.status === 'waiting' && pendingRequests[session.request];
+      if (!session) {
+        detail.innerHTML = '<p class="detail-empty">Select a session to see its activity.</p>';
+        return;
+      }
+      const timestamp = at => `<time datetime="${new Date(at).toISOString()}">${timeLabel.format(at)}</time>`;
+      detail.innerHTML = `<div class="detail-head"><div class="detail-top">
+        <button class="icon-button ghost" id="detail-back" type="button" aria-label="Back to sessions">${icon('back')}</button>
+        <p class="breadcrumb">${icon(projects[session.project].icon, true)}<span>${projectName(session.project)}</span>${icon('branch', true)}<span>${escapeHtml(session.branch)}</span></p>
+        <button class="button" id="detail-logs" type="button" aria-haspopup="dialog">${icon('lines', true)} Logs</button>
+        </div><h2 id="detail-title" tabindex="-1">${escapeHtml(session.title)}</h2>
+        <div class="detail-meta">${badge(session.status)}${session.archived ? '<span>Archived</span>' : ''}<span>${icon('cpu', true)} ${models[session.model]}</span><span>${icon('clock', true)} <span data-elapsed="${escapeHtml(session.id)}">${elapsed(session)}</span></span><span>${escapeHtml(usd.format(usage(session).cost))}</span></div></div>
+        <div class="detail-scroll">${waiting ? `<section class="approval" aria-labelledby="approval-title"><h3 class="approval-head" id="approval-title">${icon('shield', true)} Approval required</h3><p>${escapeHtml(waiting.description)}</p><code>${escapeHtml(waiting.command)}</code><div class="approval-actions"><button class="button primary" id="approve-button" type="button">${icon('check', true)} Approve</button><button class="button" id="deny-button" type="button">Deny</button></div></section>` : ''}
+        <section class="transcript" aria-labelledby="transcript-title"><div class="transcript-head"><h3 class="panel-title" id="transcript-title">Transcript</h3><span>${session.events.length} ${session.events.length === 1 ? 'event' : 'events'}</span></div>
+        <ol class="timeline">${session.events.map(event => {
+          const {title, icon: symbol, tone} = eventTypes[event.type];
+          return `<li class="timeline-entry"><span class="activity-icon tone-${tone}">${icon(symbol)}</span><div><div class="entry-head"><span>${title}</span>${timestamp(event.at)}</div><p class="entry-text">${escapeHtml(event.text)}</p>${event.code ? `<code class="entry-code">${escapeHtml(event.code)}</code>` : ''}</div></li>`;
+        }).join('')}</ol></section></div>`;
+      $('.detail-scroll', detail).scrollTop = lastScroll;
+    }
+
+    function renderNotifications() {
+      const unread = workspace.notifications.filter(item => !item.read).length;
+      byId('unread-marker').hidden = unread === 0;
+      byId('notifications-button').setAttribute('aria-label', unread ? `Notifications, ${unread} unread` : 'Notifications');
+      byId('mark-all-read').disabled = unread === 0;
+      byId('notification-list').innerHTML = workspace.notifications.length ? workspace.notifications.map(item => {
+        return `<button class="notification" type="button" data-notification="${escapeHtml(item.id)}" ${findSession(item.sessionId) ? '' : 'disabled'}><span class="activity-icon tone-${item.tone}">${icon(item.icon)}</span><span><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.text)} · ${relativeTime(item.at)}</small></span><span class="notification-dot" ${item.read ? 'hidden' : ''} aria-label="Unread"></span></button>`;
+      }).join('') : '<p class="empty">No notifications yet.</p>';
+    }
+
+    function renderUsage() {
+      const totals = Object.keys(projects).map(project => {
+        return workspace.ledger.filter(item => item.project === project).reduce((sum, item) => {
+          sum.tokens += item.tokens;
+          sum.cost += item.cost;
+          sum.runs += 1;
+          return sum;
+        }, {project, tokens:0, cost:0, runs:0});
+      });
+      const sum = key => totals.reduce((value, item) => value + item[key], 0);
+      byId('usage-metrics').innerHTML = [
+        {title:'Total spend', value:usd.format(sum('cost')), caption:'All recorded runs', tone:'purple', symbol:'dollar'},
+        {title:'Total tokens', value:compact.format(sum('tokens')), caption:`${whole.format(sum('tokens'))} tokens`, tone:'running', symbol:'cpu'},
+        {title:'Projects', value:totals.filter(item => item.runs).length, caption:'With recorded usage', tone:'done', symbol:'folder'},
+        {title:'Run attempts', value:whole.format(sum('runs')), caption:'Including restarts', tone:'waiting', symbol:'activity'}
+      ].map(renderMetric).join('');
+      byId('usage-projects').innerHTML = totals.map(item => `<tr><td><span class="usage-project">${projectIcon(item.project)}${projectName(item.project)}</span></td><td>${whole.format(item.tokens)}</td><td>${usd.format(item.cost)}</td></tr>`).join('');
+      const days = Array.from({length:7}, (_, index) => atDay(index - 6));
+      const daily = days.map(date => {
+        const costs = Object.fromEntries(Object.keys(projects).map(project => [project,0]));
+        workspace.ledger.filter(item => dayKey(item.at) === dayKey(date)).forEach(item => { costs[item.project] += item.cost; });
+        return {date, costs, total:Object.values(costs).reduce((total, value) => total + value, 0)};
+      });
+      const top = Math.max(.2, Math.ceil(Math.max(...daily.map(item => item.total)) * 2) / 2);
+      byId('usage-chart').innerHTML = `<div class="chart" aria-label="Daily spend chart"><div class="chart-axis" aria-hidden="true">${[1,.75,.5,.25,0].map(ratio => `<span>${usd.format(top * ratio)}</span>`).join('')}</div>
+        <div class="chart-body"><span class="chart-grid" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>${daily.map(({date, costs, total}) => {
+          const description = `${dateLabel.format(date)}: ${usd.format(total)}. ${Object.entries(costs).filter(([,cost]) => cost > 0).map(([project,cost]) => `${projectName(project)} ${usd.format(cost)}`).join(', ')}`;
+          return `<div class="chart-day"><div class="chart-bar" role="img" aria-label="${escapeHtml(description)}" title="${escapeHtml(description)}">${Object.entries(costs).map(([project,cost]) => cost ? `<i style="height:${cost / top * 100}%;--series:${projects[project].series}"></i>` : '').join('')}</div><span>${dayLabel.format(date)}</span></div>`;
+        }).join('')}</div></div><div class="legend">${Object.values(projects).map(project => `<span><i style="--series:${project.series}"></i>${project.name}</span>`).join('')}</div>`;
+    }
+
+    function renderLogs() {
+      const session = findSession(ui.logsId);
+      if (!session) return;
+      const query = byId('logs-query').value.trim().toLowerCase();
+      const tones = {debug:'neutral',info:'running',warn:'waiting',error:'failed'};
+      const entries = session.events.map(event => {
+        const type = eventTypes[event.type];
+        return {at:event.at, level:type.level, text:[type.title, event.text, event.code].filter(Boolean).join(' · ')};
+      }).filter(entry => (ui.logLevel === 'all' || ui.logLevel === entry.level) && `${entry.level} ${entry.text}`.toLowerCase().includes(query));
+      byId('logs-entries').innerHTML = entries.length ? entries.map(({at, level, text}) => `<li class="log-entry"><time datetime="${new Date(at).toISOString()}">${timeLabel.format(at)}</time><span class="log-level tone-${tones[level]}">${level.toUpperCase()}</span><span>${escapeHtml(text)}</span></li>`).join('') : '<li class="empty">No logs match your filters.</li>';
+      $$('[data-log-level]').forEach(button => button.setAttribute('aria-pressed', button.dataset.logLevel === ui.logLevel));
+    }
+
+    function render() {
+      const focused = document.activeElement;
+      const focusKey = focused?.id ? `#${CSS.escape(focused.id)}` : focused?.classList.contains('select-session') ? `.select-session[value="${CSS.escape(focused.value)}"]` : ['session','menuSession','project','metricFilter','notification'].map(key => {
+        if (!focused?.dataset[key]) return '';
+        const attribute = key.replace(/[A-Z]/g, char => `-${char.toLowerCase()}`);
+        return `[data-${attribute}="${CSS.escape(focused.dataset[key])}"]`;
+      }).find(Boolean);
+      renderNav();
+      byId('sessions-view').hidden = ui.view !== 'sessions';
+      byId('usage-view').hidden = ui.view !== 'usage';
+      byId('sessions-title').textContent = ui.project === 'all' ? 'Agent sessions' : projectName(ui.project);
+      byId('sessions-subtitle').textContent = ui.project === 'all' ? 'Monitor and manage coding agents across your projects.' : `Manage coding agents working on ${projectName(ui.project)}.`;
+      renderMetrics();
+      renderRows();
+      renderDetail();
+      renderNotifications();
+      if (ui.view === 'usage') renderUsage();
+      if (byId('logs-dialog').open) renderLogs();
+      if (ui.popover?.id === 'row-menu') {
+        const button = rowActionButton(ui.menuSession);
+        if (button) {
+          ui.popoverButton = button;
+          button.setAttribute('aria-expanded', 'true');
+          syncRowMenu();
+        } else closePopover();
+      }
+      if (focusKey && !focused.isConnected) $(focusKey)?.focus({preventScroll:true});
+    }
+
+    function toast(title, copy, tone = 'purple', symbol = 'circle-check') {
+      const entry = document.createElement('div');
+      entry.className = 'toast';
+      entry.innerHTML = `<span class="activity-icon tone-${tone}">${icon(symbol)}</span><div><strong>${escapeHtml(title)}</strong>${copy ? `<p>${escapeHtml(copy)}</p>` : ''}</div><button class="icon-button ghost toast-dismiss" type="button" aria-label="Dismiss notification">${icon('x', true)}</button>`;
+      const region = byId('toast-region');
+      while (region.children.length >= 4) region.firstElementChild.remove();
+      region.append(entry);
+      setTimeout(() => entry.remove(), 6500);
+    }
+
+    function notify(session, type, at) {
+      if (!workspace.settings[type]) return;
+      const meta = {finish:eventTypes.done, fail:eventTypes.failure, approval:eventTypes.approval}[type];
+      workspace.notifications.unshift({id:uniqueId(), sessionId:session.id, text:session.title, title:meta.title, tone:meta.tone, icon:meta.icon, at, read:false});
+      workspace.notifications = workspace.notifications.slice(0,30);
+      toast(meta.title, session.title, meta.tone, meta.icon);
+    }
+
+    function stopClock(session, at) {
+      if (session.runningSince != null) session.elapsed += Math.max(0, at - session.runningSince);
+      session.runningSince = null;
+      session.nextAt = null;
+      session.step = null;
+    }
+
+    function appendEvent(session, type, text, at = Date.now(), code) {
+      session.events.push({type, text, at, code});
+    }
+
+    function addUsage(session, tokens) {
+      const current = usage(session);
+      const perMillion = {sonnet:8, gpt:9, opus:19, gemini:5, haiku:3};
+      current.tokens += tokens;
+      current.cost += tokens * perMillion[session.model] / 1000000;
+    }
+
+    function determineRequest(task) {
+      if (/\b(migrat\w*|schema)\b/i.test(task)) return 'migration';
+      if (/\b(install\w*|dependenc\w*)\b/i.test(task)) return 'dependency';
+      if (/\b(deploy\w*|delet\w*|release)\b/i.test(task)) return 'general';
+      return null;
+    }
+
+    function beginRun(session, restarting = false) {
+      const now = Date.now();
+      const usageId = uniqueId();
+      workspace.ledger.push({id:usageId, project:session.project, at:now, cost:0, tokens:0});
+      Object.assign(session, {
+        status:'running', archived:false, started:now, runningSince:now, elapsed:0, usageId,
+        request:null, step:'inspect', nextAt:now + 2200,
+        outcome:/\b(simulate (a )?failure|force (a )?(failure|error)|fail this run)\b/i.test(session.task) ? 'failed' : 'done'
+      });
+      if (restarting) appendEvent(session, 'restart', 'A new attempt started with the original task.', now);
+      else appendEvent(session, 'prompt', session.task, now);
+    }
+
+    function updateRuns() {
+      const now = Date.now();
+      let changed = false;
+      for (const session of workspace.sessions) {
+        while (session.status === 'running' && session.nextAt != null && session.nextAt <= now) {
+          changed = true;
+          const at = session.nextAt;
+          if (session.step === 'inspect') {
+            addUsage(session, 1800);
+            appendEvent(session, 'agent', 'Reviewed the task and prepared a plan for the workspace.', at);
+            session.step = 'apply';
+            session.nextAt = at + 3200;
+            continue;
+          }
+          if (session.step === 'apply') {
+            addUsage(session, 2100);
+            appendEvent(session, 'tool', 'Validated the proposed changes in the simulator.', at, `${projectName(session.project)} · workspace check complete`);
+            const request = determineRequest(session.task);
+            if (request) {
+              session.request = request;
+              stopClock(session, at);
+              session.status = 'waiting';
+              appendEvent(session, 'approval', pendingRequests[request].description, at);
+              notify(session, 'approval', at);
+            } else {
+              session.step = 'finish';
+              session.nextAt = at + 4300;
+            }
+            continue;
+          }
+          stopClock(session, at);
+          addUsage(session, 2600);
+          session.status = session.outcome;
+          if (session.outcome === 'failed') {
+            appendEvent(session, 'failure', 'A simulated verification check failed. Review the session logs for details.', at, 'CHECK_FAILED · workspace validation');
+            notify(session, 'fail', at);
+          } else {
+            appendEvent(session, 'done', 'The simulated run finished and its verification checks passed.', at, 'Validation complete · all checks passed');
+            notify(session, 'finish', at);
+          }
+        }
+      }
+      if (changed) {
+        save();
+        render();
+      }
+      $$('[data-elapsed]').forEach(node => {
+        const session = findSession(node.dataset.elapsed);
+        if (session?.status === 'running') node.textContent = elapsed(session);
+      });
+    }
+
+    function setMobileDetail(open, restoreFocus = false) {
+      ui.mobileDetail = open && compactDetail.matches;
+      byId('session-detail').classList.toggle('is-open', ui.mobileDetail);
+      byId('detail-scrim').hidden = !ui.mobileDetail;
+      $('.session-list').inert = ui.mobileDetail;
+      if (restoreFocus) {
+        const row = $(`.session-open[data-session="${CSS.escape(ui.sessionId ?? '')}"]`);
+        (row || byId('sessions-title')).focus({preventScroll:true});
+      }
+    }
+
+    function setMobileNav(open, restoreFocus = false) {
+      ui.navOpen = open && mobileNav.matches;
+      byId('project-sidebar').classList.toggle('is-open', ui.navOpen);
+      byId('nav-scrim').hidden = !ui.navOpen;
+      byId('mobile-nav-button').setAttribute('aria-expanded', ui.navOpen);
+      byId('main').inert = ui.navOpen;
+      if (ui.navOpen) byId('close-mobile-nav').focus();
+      if (restoreFocus) byId('mobile-nav-button').focus();
+    }
+
+    function showView(view, project = 'all') {
+      closePopover();
+      setMobileNav(false);
+      setMobileDetail(false);
+      ui.view = view;
+      ui.project = project;
+      ui.filter = 'all';
+      ui.selected.clear();
+      if (!visibleSessions().some(session => session.id === ui.sessionId)) ui.sessionId = visibleSessions()[0]?.id ?? null;
+      render();
+      window.scrollTo(0, 0);
+      byId(view === 'usage' ? 'usage-title' : 'sessions-title').focus({preventScroll:true});
+    }
+
+    function openSession(id, openOnPhone = true) {
+      const session = findSession(id);
+      if (!session) return;
+      const switchView = ui.view !== 'sessions';
+      const inList = visibleSessions().some(item => item.id === id);
+      closePopover();
+      setMobileNav(false);
+      ui.view = 'sessions';
+      if (!inList) {
+        if (ui.project !== session.project) ui.project = 'all';
+        ui.filter = session.archived ? 'archived' : 'all';
+        ui.selected.clear();
+      }
+      ui.sessionId = id;
+      byId('session-detail').scrollTop = 0;
+      const transcript = $('.detail-scroll');
+      if (transcript) transcript.scrollTop = 0;
+      render();
+      if (switchView) window.scrollTo(0, 0);
+      if (openOnPhone) {
+        setMobileDetail(true);
+        if (ui.mobileDetail) byId('detail-title').focus({preventScroll:true});
+      }
+    }
+
+    function filterSessions(filter, toggle) {
+      ui.filter = toggle && ui.filter === filter ? 'all' : filter;
+      ui.selected.clear();
+      const visible = visibleSessions();
+      if (!visible.some(session => session.id === ui.sessionId)) ui.sessionId = visible[0]?.id ?? null;
+      render();
+    }
+
+    const rowActionButton = id => $(`.row-menu-button[data-menu-session="${CSS.escape(id ?? '')}"]`);
+    function closePopover(restoreFocus = false) {
+      if (!ui.popover) return;
+      ui.popover.hidden = true;
+      ui.popoverButton?.setAttribute('aria-expanded', 'false');
+      if (restoreFocus) ui.popoverButton?.focus({preventScroll:true});
+      ui.popover = null;
+      ui.popoverButton = null;
+      ui.menuSession = null;
+    }
+
+    function togglePopover(panel, button, sessionId) {
+      if (ui.popover === panel && ui.popoverButton === button) {
+        closePopover(true);
+        return;
+      }
+      closePopover();
+      ui.popover = panel;
+      ui.popoverButton = button;
+      ui.menuSession = sessionId ?? null;
+      panel.hidden = false;
+      button.setAttribute('aria-expanded', 'true');
+      if (sessionId) syncRowMenu();
+      $('button:not(:disabled)', panel)?.focus({preventScroll:true});
+    }
+
+    function syncRowMenu() {
+      const menu = byId('row-menu');
+      const session = findSession(ui.menuSession);
+      const button = ui.popoverButton;
+      if (!button || !session) return;
+      $('[data-action="stop"]', menu).disabled = !['running','waiting'].includes(session.status);
+      const rect = button.getBoundingClientRect();
+      const height = menu.offsetHeight;
+      const viewportHeight = document.documentElement.clientHeight;
+      const viewportWidth = document.documentElement.clientWidth;
+      menu.style.left = `${Math.max(8, Math.min(viewportWidth - menu.offsetWidth - 8, rect.right - menu.offsetWidth))}px`;
+      const preferred = rect.bottom + height + 4 <= viewportHeight ? rect.bottom + 4 : rect.top - height - 4;
+      menu.style.top = `${Math.max(8, Math.min(viewportHeight - height - 8, preferred))}px`;
+    }
+
+    const modalOpeners = new WeakMap();
+    function showDialog(id, opener = document.activeElement, field) {
+      closePopover();
+      if (ui.navOpen) setMobileNav(false);
+      const dialog = byId(id);
+      if (dialog.open) return;
+      modalOpeners.set(dialog, opener);
+      dialog.showModal();
+      if (field) byId(field).focus();
+    }
+
+    function showNew(opener) {
+      const form = byId('new-form');
+      form.reset();
+      form.elements.project.value = ui.project !== 'all' ? ui.project : Object.keys(projects)[0];
+      form.elements.model.value = workspace.settings.model;
+      byId('task-description').setCustomValidity('');
+      showDialog('new-dialog', opener, 'new-project');
+    }
+
+    function showSettings(opener) {
+      const form = byId('settings-form');
+      Object.entries(workspace.settings).forEach(([key, value]) => {
+        if (typeof value === 'boolean') form.elements[key].checked = value;
+        else form.elements[key].value = value;
+      });
+      Object.entries(keyValues).forEach(([key, value]) => { form.elements[key].value = value; });
+      showDialog('settings-dialog', opener, 'default-model');
+    }
+
+    function showLogs(id, opener) {
+      const session = findSession(id);
+      if (!session) return;
+      ui.logsId = id;
+      ui.logLevel = 'all';
+      byId('logs-subtitle').textContent = `${session.title} · ${projectName(session.project)}`;
+      byId('logs-query').value = '';
+      renderLogs();
+      showDialog('logs-dialog', opener, 'logs-query');
+      byId('logs-dialog').scrollTop = 0;
+    }
+
+    function askDelete(ids, opener) {
+      const sessions = ids.map(findSession).filter(Boolean);
+      if (!sessions.length) return;
+      ui.deleteIds = sessions.map(session => session.id);
+      byId('delete-title').textContent = sessions.length === 1 ? 'Delete session?' : `Delete ${sessions.length} sessions?`;
+      byId('delete-description').textContent = sessions.length === 1 ? `“${sessions[0].title}” and its transcript and logs will be permanently deleted.` : 'The selected sessions and their transcripts and logs will be permanently deleted.';
+      showDialog('delete-dialog', opener);
+    }
+
+    const commands = [
+      {key:'new', label:'New session', icon:'plus'},
+      {key:'settings', label:'Settings', icon:'settings'},
+      {key:'usage', label:'View usage', icon:'chart'},
+      {key:'sessions', label:'View all sessions', icon:'grid'},
+      {key:'notifications', label:'Open notifications', icon:'bell'}
+    ];
+
+    function renderCommands() {
+      const query = byId('command-query').value.trim().toLowerCase();
+      const matches = text => !query || query.split(/\s+/).every(part => text.toLowerCase().includes(part));
+      const option = (attribute, value, label, symbol, context = '') => `<button class="command-option" type="button" data-${attribute}="${escapeHtml(value)}">${icon(symbol, true)}<span>${escapeHtml(label)}</span>${context ? `<small>${escapeHtml(context)}</small>` : ''}</button>`;
+      const sections = [
+        ['Commands', commands.filter(command => matches(command.label)).map(command => option('command', command.key, command.label, command.icon))],
+        ['Projects', Object.entries(projects).filter(([, project]) => query && matches(project.name)).map(([key, project]) => option('result-project', key, project.name, project.icon))],
+        ['Sessions', workspace.sessions.filter(session => matches(`${session.title} ${projectName(session.project)} ${session.branch} ${session.task} ${stateLabels[session.status].label} ${models[session.model]} ${session.archived ? 'archived' : ''}`)).slice(0, query ? 15 : 5).map(session => option('result-session', session.id, session.title, stateLabels[session.status].icon, projectName(session.project)))]
+      ];
+      byId('command-results').innerHTML = sections.filter(([,options]) => options.length).map(([title,options]) => `<div class="command-heading">${title}</div>${options.join('')}`).join('') || '<p class="empty">No matching sessions or commands.</p>';
+      highlightCommand(0);
+      byId('command-results').scrollTop = 0;
+    }
+
+    function highlightCommand(index, scroll = false) {
+      const options = $$('.command-option');
+      if (!options.length) return;
+      ui.commandIndex = (index + options.length) % options.length;
+      options.forEach((option, position) => option.classList.toggle('is-active', position === ui.commandIndex));
+      if (scroll) options[ui.commandIndex].scrollIntoView({block:'nearest'});
+    }
+
+    function showCommand(opener) {
+      byId('command-query').value = '';
+      renderCommands();
+      showDialog('command-dialog', opener, 'command-query');
+    }
+
+    function openCommandOption(button) {
+      const {command, resultSession, resultProject} = button.dataset;
+      byId('command-dialog').close();
+      const opener = byId('search-button');
+      if (resultSession) {
+        openSession(resultSession);
+        if (!compactDetail.matches) byId('detail-title')?.focus({preventScroll:true});
+      } else if (resultProject) showView('sessions', resultProject);
+      else if (command === 'new') showNew(opener);
+      else if (command === 'settings') showSettings(opener);
+      else if (command === 'usage' || command === 'sessions') showView(command);
+      else if (command === 'notifications') togglePopover(byId('notifications-popover'), byId('notifications-button'));
+    }
+
+    function stopSession(session) {
+      if (!['running','waiting'].includes(session.status)) return false;
+      stopClock(session, Date.now());
+      session.status = 'stopped';
+      session.request = null;
+      appendEvent(session, 'stopped', 'The run was stopped from the workspace.');
+      return true;
+    }
+
+    function createSession({project, model, task, title, branch}) {
+      const id = uniqueId();
+      const description = task.split(/\r?\n/)[0].trim() || task;
+      title ||= description.length > 72 ? `${description.slice(0,69).trimEnd()}…` : description;
+      branch ||= `relay/${title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0,25) || 'task'}`;
+      const session = {id, project, model, task, title, branch, events:[]};
+      beginRun(session);
+      workspace.sessions.unshift(session);
+      save();
+      openSession(id);
+      return session;
+    }
+
+    function resolveApproval(approved) {
+      const session = findSession(ui.sessionId);
+      if (!session || session.status !== 'waiting') return;
+      const now = Date.now();
+      const request = pendingRequests[session.request];
+      session.request = null;
+      if (approved) {
+        session.status = 'running';
+        session.runningSince = now;
+        session.step = 'finish';
+        session.nextAt = now + 4300;
+        appendEvent(session, 'approved', 'You approved the requested action. The run resumed.', now, request.command);
+        toast('Approval granted', session.title, 'done');
+      } else {
+        session.status = 'stopped';
+        appendEvent(session, 'denied', 'You denied the requested action. The run was stopped.', now, request.command);
+        toast('Approval denied', session.title, 'failed', 'x');
+      }
+      save();
+      render();
+      byId('detail-title').focus({preventScroll:true});
+    }
+
+    function handleRowAction(action) {
+      const session = findSession(ui.menuSession);
+      if (!session) return;
+      const opener = ui.popoverButton;
+      closePopover();
+      switch (action) {
+        case 'logs':
+          showLogs(session.id, opener);
+          break;
+        case 'delete':
+          askDelete([session.id], opener);
+          break;
+        case 'restart':
+          beginRun(session, true);
+          save();
+          openSession(session.id, false);
+          (rowActionButton(session.id) || byId('sessions-title')).focus({preventScroll:true});
+          toast('Session restarted', session.title, 'running', 'restart');
+          break;
+        case 'stop':
+          if (stopSession(session)) {
+            save();
+            render();
+            (rowActionButton(session.id) || byId('sessions-title')).focus({preventScroll:true});
+            toast('Session stopped', session.title, 'neutral', 'stop');
+          }
+          break;
+        case 'duplicate':
+          createSession({...session, title:`${session.title} (copy)`});
+          if (!compactDetail.matches) byId('detail-title').focus({preventScroll:true});
+          toast('Session duplicated', session.title, 'purple', 'copy');
+          break;
+      }
+    }
+
+    function updateAfterRemoval() {
+      const visible = visibleSessions();
+      if (!visible.some(session => session.id === ui.sessionId)) {
+        ui.sessionId = visible[0]?.id ?? null;
+        setMobileDetail(false);
+      }
+      ui.selected.clear();
+      save();
+      render();
+    }
+
+    function performBulk(action) {
+      const sessions = [...ui.selected].map(findSession).filter(Boolean);
+      let count = 0;
+      sessions.forEach(session => {
+        if (action === 'archive' && !session.archived) {
+          stopSession(session);
+          session.archived = true;
+          count++;
+        } else if (action === 'stop' && stopSession(session)) count++;
+      });
+      updateAfterRemoval();
+      byId('list-title').setAttribute('tabindex', '-1');
+      byId('list-title').focus({preventScroll:true});
+      toast(`${count} ${count === 1 ? 'session' : 'sessions'} ${action === 'stop' ? 'stopped' : 'archived'}`, '', 'neutral', action === 'stop' ? 'stop' : 'archive');
+    }
+
+    function readNotification(id) {
+      const notification = workspace.notifications.find(item => item.id === id);
+      if (!notification) return;
+      notification.read = true;
+      save();
+      closePopover();
+      openSession(notification.sessionId);
+      if (!compactDetail.matches) byId('detail-title')?.focus({preventScroll:true});
+    }
+
+    function handleClick(event) {
+      const button = event.target.closest('button');
+      if (ui.popover && !ui.popover.contains(event.target) && ui.popoverButton !== button && !button?.matches('.row-menu-button')) closePopover();
+      if (!button || button.disabled) return;
+      const {id, dataset} = button;
+      if (button.hasAttribute('data-close')) { button.closest('dialog').close(); return; }
+      if (button.classList.contains('toast-dismiss')) { button.closest('.toast').remove(); return; }
+      if (dataset.view) { showView(dataset.view); return; }
+      if (dataset.project) { showView('sessions', dataset.project); return; }
+      if (dataset.filter) { filterSessions(dataset.filter, false); return; }
+      if (dataset.metricFilter) { filterSessions(dataset.metricFilter, true); return; }
+      if (dataset.session) { openSession(dataset.session); return; }
+      if (dataset.menuSession) { togglePopover(byId('row-menu'), button, dataset.menuSession); return; }
+      if (dataset.action) { handleRowAction(dataset.action); return; }
+      if (dataset.notification) { readNotification(dataset.notification); return; }
+      if (button.classList.contains('command-option')) { openCommandOption(button); return; }
+      if (dataset.logLevel) { ui.logLevel = dataset.logLevel; renderLogs(); return; }
+      switch (id) {
+        case 'mobile-nav-button': setMobileNav(!ui.navOpen, ui.navOpen); break;
+        case 'close-mobile-nav':
+        case 'nav-scrim': setMobileNav(false, true); break;
+        case 'detail-scrim':
+        case 'detail-back': setMobileDetail(false, true); break;
+        case 'search-button': showCommand(button); break;
+        case 'new-session-button': showNew(button); break;
+        case 'settings-button': showSettings(button); break;
+        case 'notifications-button': togglePopover(byId('notifications-popover'), button); break;
+        case 'mark-all-read':
+          workspace.notifications.forEach(item => { item.read = true; });
+          save();
+          renderNotifications();
+          $('#notification-list button:not(:disabled)')?.focus({preventScroll:true});
+          break;
+        case 'detail-logs': showLogs(ui.sessionId, button); break;
+        case 'approve-button': resolveApproval(true); break;
+        case 'deny-button': resolveApproval(false); break;
+        case 'bulk-stop': performBulk('stop'); break;
+        case 'bulk-archive': performBulk('archive'); break;
+        case 'bulk-delete': askDelete([...ui.selected], button); break;
+        case 'clear-selection':
+          ui.selected.clear();
+          renderSelection();
+          $('.session-open')?.focus({preventScroll:true});
+          break;
+      }
+    }
+
+    document.addEventListener('click', handleClick);
+    document.addEventListener('change', event => {
+      const input = event.target;
+      if (input.id === 'select-all') {
+        visibleSessions().forEach(session => { if (input.checked) ui.selected.add(session.id); else ui.selected.delete(session.id); });
+      } else if (input.classList.contains('select-session')) {
+        if (input.checked) ui.selected.add(input.value);
+        else ui.selected.delete(input.value);
+      } else return;
+      renderSelection();
+    });
+    document.addEventListener('keydown', event => {
+      const key = event.key.toLowerCase();
+      if ((event.ctrlKey || event.metaKey) && key === 'k') {
+        event.preventDefault();
+        if (byId('command-dialog').open) byId('command-dialog').close();
+        else if (!$('dialog[open]')) showCommand(byId('search-button'));
+        return;
+      }
+      if (key === 'escape' && !$('dialog[open]')) {
+        if (ui.popover) closePopover(true);
+        else if (ui.navOpen) setMobileNav(false, true);
+        else if (ui.mobileDetail) setMobileDetail(false, true);
+      }
+    });
+    byId('command-query').addEventListener('input', renderCommands);
+    byId('command-query').addEventListener('keydown', event => {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        highlightCommand(ui.commandIndex + (event.key === 'ArrowDown' ? 1 : -1), true);
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        $$('.command-option')[ui.commandIndex]?.click();
+      }
+    });
+    byId('logs-query').addEventListener('input', renderLogs);
+    byId('task-description').addEventListener('input', event => { event.target.setCustomValidity(''); });
+    byId('new-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const inputs = new FormData(event.target);
+      const task = inputs.get('task').trim();
+      if (!task) {
+        byId('task-description').setCustomValidity('Enter a task description.');
+        byId('task-description').reportValidity();
+        return;
+      }
+      byId('new-dialog').close();
+      const session = createSession({project:inputs.get('project'), model:inputs.get('model'), task});
+      if (!compactDetail.matches) byId('detail-title').focus({preventScroll:true});
+      toast('Session started', session.title, 'running', 'activity');
+    });
+    byId('settings-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const inputs = new FormData(event.target);
+      workspace.settings = {model:inputs.get('model'), theme:inputs.get('theme'), finish:inputs.has('finish'), fail:inputs.has('fail'), approval:inputs.has('approval')};
+      Object.keys(keyValues).forEach(key => { keyValues[key] = inputs.get(key).trim(); });
+      save();
+      applyTheme();
+      byId('settings-dialog').close();
+      toast('Settings saved', 'Your workspace preferences have been updated.');
+    });
+    byId('delete-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const ids = new Set(ui.deleteIds);
+      workspace.sessions = workspace.sessions.filter(session => !ids.has(session.id));
+      workspace.notifications = workspace.notifications.filter(item => !ids.has(item.sessionId));
+      byId('delete-dialog').close();
+      updateAfterRemoval();
+      byId('sessions-title').focus({preventScroll:true});
+      toast(`${ids.size} ${ids.size === 1 ? 'session' : 'sessions'} deleted`, '', 'failed', 'trash');
+    });
+    $$('dialog').forEach(dialog => {
+      dialog.addEventListener('click', event => {
+        if (event.target !== dialog) return;
+        const rect = dialog.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+      });
+      dialog.addEventListener('close', () => {
+        const opener = modalOpeners.get(dialog);
+        if (!$('dialog[open]') && document.activeElement === document.body && !ui.popover) {
+          if (opener?.isConnected && opener.getClientRects().length) opener.focus({preventScroll:true});
+          else byId(ui.view === 'usage' ? 'usage-title' : 'sessions-title').focus({preventScroll:true});
+        }
+        modalOpeners.delete(dialog);
+      });
+    });
+    window.addEventListener('scroll', () => { if (ui.popover?.id === 'row-menu') closePopover(true); }, {passive:true});
+    window.addEventListener('resize', () => { if (ui.popover?.id === 'row-menu') syncRowMenu(); });
+    mobileNav.addEventListener('change', () => setMobileNav(false));
+    compactDetail.addEventListener('change', () => setMobileDetail(false));
+    systemTheme.addEventListener('change', applyTheme);
+
+    byId('new-project').innerHTML = Object.entries(projects).map(([key, project]) => `<option value="${key}">${project.name}</option>`).join('');
+    ['new-model','default-model'].forEach(id => {
+      byId(id).innerHTML = Object.entries(models).map(([key, model]) => `<option value="${key}">${model}</option>`).join('');
+    });
+    applyTheme();
+    render();
+    updateRuns();
+    save();
+    setInterval(updateRuns, 850);
+  </script>
+</body>
+</html>

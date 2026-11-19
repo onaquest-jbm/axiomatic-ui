@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>Relay · Agent workspace</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #101012;
+    --side: #151517;
+    --card: #18181b;
+    --raised: #202024;
+    --hover: #252529;
+    --line: #2a2a2f;
+    --line-soft: #252529;
+    --ink: #f3f2f3;
+    --dim: #aaa8b1;
+    --mute: #86838e;
+    --orange: #ff784b;
+    --green: #68d8a8;
+    --yellow: #f3c575;
+    --violet: #ae9dfd;
+    --blue: #8eabff;
+    --radius: 12px;
+    --mono: 'Cascadia Code', 'SFMono-Regular', Consolas, monospace;
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; min-width: 310px; background: var(--bg); color: var(--ink); }
+  button, input, textarea { font: inherit; }
+  button { cursor: pointer; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+  button:disabled { cursor: default; opacity: .45; }
+  button[aria-current="page"] { cursor: default; }
+  h1, h2, h3, p { margin: 0; }
+  [hidden] { display: none !important; }
+  .svg { width: 18px; height: 18px; display: inline-block; flex: none; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+  .shell { display: grid; grid-template-columns: 228px minmax(0, 1fr); min-height: 100vh; }
+  .sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; background: var(--side); border-right: 1px solid var(--line); padding: 25px 15px 14px; z-index: 2; }
+  .brand { display: flex; align-items: center; gap: 11px; margin: 0 9px 40px; }
+  .brand-mark { width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid #ff936f; border-radius: 10px; background: var(--orange); color: #21120b; box-shadow: 0 3px 16px #ff784b23, inset 0 1px #ffffff38; }
+  .brand-mark .svg { width: 22px; height: 22px; stroke-width: 2.3; }
+  .brand-word { font-size: 23px; line-height: 1; font-weight: 740; letter-spacing: -.85px; }
+  .nav-group { margin-bottom: 27px; }
+  .nav-caption { display: flex; justify-content: space-between; align-items: center; height: 25px; padding: 0 8px; margin-bottom: 5px; color: var(--mute); font: 600 11px/1 var(--mono); text-transform: uppercase; letter-spacing: .11em; }
+  .nav-items { display: grid; gap: 3px; }
+  .sidebar-scroll { min-height: 0; overflow: auto; flex: 1; scrollbar-width: thin; }
+  .nav-item { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 39px; padding: 7px 9px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--dim); font-size: 14px; font-weight: 540; text-align: left; }
+  .nav-item:hover { color: var(--ink); background: var(--raised); }
+  .nav-item[aria-current="page"] { background: #30211e; border-color: #473029; color: #ff9877; }
+  .nav-item .svg { width: 16px; height: 16px; }
+  .nav-item .key { margin-left: auto; background: transparent; border: 0; color: var(--mute); }
+  .nav-item[aria-current="page"] .key { color: #e1967e; }
+  .nav-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .project-dot { width: 8px; height: 8px; border-radius: 3px; margin-inline: 4px; flex: none; background: var(--dot, var(--violet)); }
+  .sidebar-bottom { margin-top: auto; }
+  .local-state { display: flex; align-items: flex-start; gap: 9px; border: 1px solid var(--line); border-radius: 8px; margin: 1px 2px 15px; padding: 10px; background: #19191c; }
+  .local-state strong { display: block; font-size: 13px; font-weight: 620; }
+  .local-state small { display: block; color: var(--mute); font-size: 12px; }
+  .local-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 7px; background: var(--green); box-shadow: 0 0 9px #68d8a849; flex: none; }
+  .profile { width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 6px 3px; color: var(--ink); border: 0; border-top: 1px solid var(--line); background: transparent; text-align: left; }
+  .profile:hover .profile-copy strong { color: var(--orange); }
+  .profile .svg { color: var(--mute); width: 15px; height: 15px; margin-left: auto; }
+  .avatar { display: grid; place-items: center; height: 32px; width: 32px; flex: none; border: 1px solid #664333; border-radius: 8px; background: #3c2922; color: #ffc1a5; font: 650 13px/1 var(--mono); }
+  .profile-copy { min-width: 0; }
+  .profile-copy strong, .profile-copy small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .profile-copy strong { font-size: 13px; font-weight: 620; }
+  .profile-copy small { font-size: 12px; color: var(--mute); }
+  .main { min-width: 0; }
+  .topbar { height: 65px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 31px; border-bottom: 1px solid var(--line); background: #131315; }
+  .crumbs, .top-actions { display: flex; align-items: center; gap: 12px; }
+  .crumbs { color: var(--dim); font-size: 14px; white-space: nowrap; }
+  .crumbs .svg { width: 15px; height: 15px; color: var(--mute); }
+  .crumbs .separator { color: #6d6b74; }
+  .crumbs strong { color: var(--ink); font-weight: 590; }
+  .button, .icon-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 35px; background: var(--raised); border: 1px solid var(--line); border-radius: 7px; color: var(--ink); padding: 0 12px; font-size: 14px; font-weight: 570; white-space: nowrap; }
+  .button:hover, .icon-button:hover { background: var(--hover); border-color: #46444e; }
+  .button .svg, .icon-button .svg { width: 16px; height: 16px; }
+  .button.primary { min-height: 42px; padding-inline: 15px; background: var(--orange); border-color: #ff936f; box-shadow: inset 0 1px #ffffff30, 0 2px 10px #ff784b20; color: #21130d; font-weight: 740; }
+  .button.primary:hover { background: #ff936e; }
+  .button.ghost, .icon-button.ghost { border-color: transparent; background: transparent; }
+  .button.ghost:hover, .icon-button.ghost:hover { background: var(--hover); color: var(--ink); }
+  .button.subtle { background: transparent; color: var(--dim); }
+  .button.subtle:hover { color: var(--ink); }
+  .button.danger { color: #ff9b9b; }
+  .icon-button { width: 35px; padding: 0; color: var(--dim); }
+  .icon-button.small { width: 27px; min-height: 27px; }
+  .navigation-toggle { display: none; }
+  .search-trigger { min-width: 217px; justify-content: flex-start; color: var(--dim); background: #19191c; }
+  .search-trigger .key { margin-left: auto; }
+  .key { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #3a3942; border-radius: 4px; padding: 2px 5px; color: var(--dim); font: 11px/1.1 var(--mono); white-space: nowrap; }
+  .notice-trigger { position: relative; }
+  .notice-indicator { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; background: var(--orange); border: 1px solid var(--side); border-radius: 50%; }
+  .workspace { max-width: 1650px; margin-inline: auto; padding: 31px 31px 28px; }
+  .intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin: 0 0 27px; }
+  h1 { font-size: clamp(31px, 3.05vw, 48px); font-weight: 680; line-height: 1.1; letter-spacing: -.047em; }
+  .intro p { margin-top: 9px; color: var(--dim); font-size: 15px; }
+  .intro > .button { margin-bottom: 2px; }
+  .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 27px; }
+  .metric { min-width: 0; position: relative; display: block; min-height: 127px; text-align: left; padding: 15px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); }
+  .metric:hover { border-color: color-mix(in srgb, var(--tone), var(--line) 65%); background: #1c1c20; }
+  .metric:focus-visible { outline-color: var(--tone); }
+  .metric-label { display: block; margin-bottom: 8px; color: var(--dim); font-size: 14px; font-weight: 550; }
+  .metric-number { display: block; font-size: 34px; line-height: 1.1; font-weight: 670; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+  .metric-note { display: block; margin-top: 8px; color: var(--mute); font-size: 12px; }
+  .tone-icon { display: grid; place-items: center; width: 31px; height: 31px; color: var(--tone); background: color-mix(in srgb, var(--tone) 12%, #1a1a1d); border: 1px solid color-mix(in srgb, var(--tone) 21%, #1a1a1d); border-radius: 7px; flex: none; }
+  .tone-icon .svg { width: 15px; height: 15px; }
+  .metric .tone-icon { position: absolute; top: 14px; right: 14px; }
+  .metric-orange { --tone: var(--orange); }
+  .metric-yellow { --tone: var(--yellow); }
+  .metric-green { --tone: var(--green); }
+  .metric-violet { --tone: var(--violet); }
+  .metric-blue { --tone: var(--blue); }
+  .dashboard-grid { display: grid; grid-template-columns: minmax(0, 2.5fr) minmax(260px, 1fr); gap: 16px; align-items: start; }
+  .box { min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+  .box-head { min-height: 71px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 16px; }
+  .box-head h2 { font-size: 17px; font-weight: 665; letter-spacing: -.24px; }
+  .box-head p { color: var(--mute); font-size: 13px; margin-top: 1px; }
+  .box-actions { display: flex; gap: 7px; align-items: center; }
+  .filter-button { min-height: 31px; padding-inline: 9px; color: var(--dim); font-size: 13px; background: #1e1e22; }
+  .filter-button .svg { width: 14px; height: 14px; }
+  .filter-button .filter-chevron { width: 12px; height: 12px; margin-left: 1px; }
+  .filter-button[aria-pressed="true"] { color: var(--orange); border-color: #654335; }
+  .table-wrap { overflow-x: auto; scrollbar-width: thin; }
+  table { width: 100%; min-width: 566px; table-layout: fixed; border-collapse: collapse; text-align: left; }
+  th { padding: 9px 8px; border-block: 1px solid var(--line); background: #1c1c20; color: var(--mute); font-size: 12px; font-weight: 600; }
+  td { padding: 9px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  th:first-child, td:first-child { padding-left: 15px; }
+  th:last-child, td:last-child { padding-right: 11px; }
+  tbody tr { height: 65px; }
+  tbody tr:hover { background: #1d1d21; }
+  tbody tr:last-child td { border-bottom: 0; }
+  .col-task { width: 36%; }
+  .col-agent { width: 21%; }
+  .col-status { width: 22%; }
+  .col-progress { width: 15%; }
+  .col-menu { width: 6%; }
+  .task-cell { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .task-icon { display: grid; place-items: center; width: 31px; height: 31px; background: #232327; border: 1px solid #34343b; border-radius: 7px; color: var(--dim); flex: none; }
+  .task-icon .svg { width: 15px; height: 15px; }
+  .task-copy { min-width: 0; }
+  .task-name { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; padding: 0; background: none; color: var(--ink); text-align: left; font-size: 13px; font-weight: 620; }
+  .task-name:hover { color: var(--orange); }
+  .task-project { display: block; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font: 11px/1.55 var(--mono); color: var(--mute); }
+  .agent-cell { display: flex; align-items: center; gap: 5px; color: var(--dim); font-size: 12px; white-space: nowrap; }
+  .agent-cell .svg { width: 14px; height: 14px; }
+  .agent-claude { color: #e89b79; }
+  .agent-codex { color: #aeb4d1; }
+  .status { display: inline-flex; align-items: center; gap: 6px; width: max-content; max-width: 100%; padding: 3px 7px; border: 1px solid color-mix(in srgb, var(--status) 25%, #1a1a1d); border-radius: 5px; background: color-mix(in srgb, var(--status) 10%, #1a1a1d); color: var(--status); font-size: 12px; line-height: 1.35; white-space: nowrap; }
+  .status::before { content: ''; width: 5px; height: 5px; background: currentColor; border-radius: 50%; flex: none; }
+  .status-running { --status: var(--blue); }
+  .status-review { --status: var(--yellow); }
+  .status-completed { --status: var(--green); }
+  .status-queued { --status: #adaaBA; }
+  .status-paused { --status: var(--violet); }
+  .status-canceled { --status: #e9a1a1; }
+  .status-failed { --status: #e9a1a1; }
+  .progress-cell { display: flex; align-items: center; gap: 6px; color: var(--mute); font: 11px/1 var(--mono); }
+  .progress-cell span { width: 28px; flex: none; text-align: right; }
+  .track { width: 100%; height: 4px; overflow: hidden; border-radius: 5px; background: #33333a; }
+  .track i { display: block; height: 100%; background: var(--status, var(--orange)); border-radius: inherit; }
+  .row-menu-button { min-height: 26px; width: 25px; color: var(--mute); }
+  .box-foot { min-height: 50px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 15px; border-top: 1px solid var(--line); color: var(--mute); font-size: 12px; }
+  .text-button { background: none; border: 1px solid transparent; border-radius: 5px; color: var(--orange); padding: 4px 0; font-size: 13px; font-weight: 630; }
+  .text-button:hover { color: #ffb398; }
+  .activity-box .box-head { border-bottom: 1px solid var(--line); }
+  .live-label { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-size: 11px; white-space: nowrap; }
+  .live-label .local-dot { width: 5px; height: 5px; margin: 0; }
+  .activity-list { list-style: none; padding: 4px 15px 6px; margin: 0; }
+  .activity-item { position: relative; display: grid; grid-template-columns: 29px minmax(0, 1fr) auto; column-gap: 9px; min-height: 65px; padding: 11px 0 8px; align-items: start; }
+  .activity-item:not(:last-child)::before { position: absolute; content: ''; top: 41px; bottom: -11px; left: 14px; width: 1px; background: var(--line); }
+  .activity-item .tone-icon { width: 29px; height: 29px; }
+  .activity-item .tone-icon .svg { width: 14px; height: 14px; }
+  .event-title { overflow-wrap: anywhere; display: block; font-size: 13px; font-weight: 610; line-height: 1.35; margin: 0 0 3px; }
+  button.event-title { max-width: 100%; background: none; border: 0; padding: 0; text-align: left; color: var(--ink); }
+  button.event-title:hover { color: var(--orange); }
+  .event-sub { display: block; color: var(--mute); font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+  .event-time { font: 11px/1.5 var(--mono); color: var(--mute); white-space: nowrap; }
+  .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 255px), 1fr)); gap: 14px; }
+  .project-card { padding: 17px; }
+  .project-card-header { display: flex; gap: 11px; align-items: center; margin-bottom: 12px; }
+  .project-card h2 { font-size: 16px; overflow-wrap: anywhere; }
+  .project-card p { color: var(--mute); font-size: 14px; overflow-wrap: anywhere; }
+  .project-card .button { margin-top: 16px; }
+  .empty { padding: 37px 18px; color: var(--dim); text-align: center; font-size: 14px; }
+  .empty strong { display: block; color: var(--ink); margin-bottom: 4px; }
+  .menu { position: fixed; z-index: 5; width: max-content; min-width: 175px; max-width: min(345px, calc(100vw - 16px)); max-height: min(410px, calc(100dvh - 16px)); overflow-y: auto; padding: 5px; background: #202025; border: 1px solid #3a3942; border-radius: 9px; box-shadow: 0 10px 28px #0008; }
+  .menu button { display: flex; align-items: center; gap: 9px; border: 0; border-radius: 5px; padding: 8px 9px; width: 100%; background: none; color: var(--ink); font-size: 13px; text-align: left; }
+  .menu button:hover, .menu button:focus-visible { background: #303036; }
+  .menu button[aria-pressed="true"] { color: var(--orange); background: #332622; }
+  .menu button .svg { height: 15px; width: 15px; }
+  .menu-head { padding: 8px 9px; border-bottom: 1px solid #393940; margin-bottom: 4px; font-size: 14px; font-weight: 650; }
+  .notifications { width: 320px; max-height: min(410px, calc(100dvh - 80px)); }
+  .notifications ul { list-style: none; margin: 0; padding: 0; }
+  .notice-empty { padding: 8px 9px; color: var(--dim); font-size: 14px; }
+  .notifications button { align-items: flex-start; }
+  .notifications button .svg { margin-top: 2px; }
+  .notifications small { color: var(--dim); display: block; overflow-wrap: anywhere; font-size: 12px; }
+  .notice-completed .svg, .toast-item .svg { color: var(--green); }
+  .notice-review .svg, .toast-item[data-tone="review"] .svg { color: var(--yellow); }
+  .notice-failed .svg, .toast-item[data-tone="failed"] .svg { color: #e9a1a1; }
+  dialog { color: var(--ink); background: var(--card); padding: 0; width: min(526px, calc(100% - 26px)); max-height: calc(100dvh - 26px); border: 1px solid #3b3943; border-radius: 13px; box-shadow: 0 24px 80px #000a; }
+  dialog::backdrop { background: #08080ab5; backdrop-filter: blur(3px); }
+  .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 19px 21px 15px; border-bottom: 1px solid var(--line); }
+  .dialog-head h2 { font-size: 21px; font-weight: 680; letter-spacing: -.35px; overflow-wrap: anywhere; }
+  .dialog-head p { color: var(--dim); font-size: 13px; margin-top: 3px; }
+  .dialog-content { padding: 16px 21px 20px; }
+  .dialog-foot { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--line); padding: 12px 21px; }
+  .dialog-foot .button { min-height: 36px; }
+  .form-grid { display: grid; gap: 14px; }
+  .field { display: grid; gap: 6px; min-width: 0; font-size: 14px; font-weight: 590; }
+  .field input:not([type="checkbox"]), .field textarea, .command-input { width: 100%; min-width: 0; background: #121215; color: var(--ink); border: 1px solid #3b3943; border-radius: 6px; padding: 8px 10px; font-size: 14px; }
+  .field textarea { min-height: 86px; resize: vertical; }
+  .field input::placeholder, .field textarea::placeholder, .command-input::placeholder { color: var(--mute); }
+  fieldset.field { border: 0; padding: 0; margin: 0; }
+  .field legend { padding: 0; margin-bottom: 6px; }
+  .choices { display: flex; flex-wrap: wrap; gap: 6px; }
+  .choice { position: relative; cursor: pointer; min-width: 0; }
+  .choice input { width: 1px; height: 1px; position: absolute; opacity: 0; }
+  .choice span { display: block; border: 1px solid #3a3942; border-radius: 6px; padding: 5px 9px; color: var(--dim); background: var(--raised); font-size: 13px; overflow-wrap: anywhere; }
+  .choice input:checked + span { background: #372721; color: #ffab90; border-color: #80513f; }
+  .choice input:focus-visible + span { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .field-hint { color: var(--dim); font-size: 12px; }
+  .check-field { display: flex; align-items: flex-start; gap: 8px; }
+  .check-field input { margin-top: 4px; accent-color: var(--orange); }
+  #settings-dialog { width: min(580px, calc(100% - 26px)); overflow: hidden; }
+  #settings-form { display: flex; flex-direction: column; max-height: calc(100dvh - 28px); }
+  #settings-form .dialog-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  #settings-form .dialog-head, #settings-form .dialog-foot { flex-shrink: 0; }
+  .settings-section { display: grid; gap: 9px; border-top: 1px solid var(--line); padding-top: 13px; }
+  .settings-section h3, .settings-section legend { font-size: 14px; font-weight: 650; }
+  .settings-section .check-field { font-size: 14px; }
+  .settings-keys { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 10px; }
+  .drawer { margin: 0 0 0 auto; width: min(485px, 100%); height: 100dvh; max-height: 100dvh; max-width: 100%; border-radius: 13px 0 0 13px; }
+  .drawer[open] { display: flex; flex-direction: column; }
+  .drawer .dialog-content { flex: 1; overflow: auto; }
+  .drawer .dialog-foot { justify-content: flex-start; }
+  .drawer h3 { margin: 0 0 6px; font-size: 14px; }
+  .detail-block { margin-bottom: 18px; }
+  .detail-block p { color: var(--dim); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .proposal { margin: 0; padding: 11px; border: 1px solid var(--line); border-radius: 8px; background: #121215; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.65 var(--mono); }
+  .drawer-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+  .drawer-summary code { color: var(--dim); font: 13px var(--mono); }
+  .drawer .track { height: 6px; }
+  .log-list { list-style: none; border: 1px solid var(--line); border-radius: 8px; background: #121215; padding: 9px 11px; margin: 0; color: var(--dim); font: 12px/1.65 var(--mono); }
+  .log-list li + li { border-top: 1px solid var(--line); }
+  .log-list li { display: flex; gap: 8px; padding-block: 5px; overflow-wrap: anywhere; }
+  .log-list time { color: var(--mute); flex: none; }
+  .command-dialog .dialog-content { padding: 13px; }
+  .command-search { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .command-search .svg { margin-left: 5px; color: var(--dim); }
+  .command-results { display: grid; gap: 3px; max-height: 370px; overflow: auto; }
+  .command-item { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 1px solid transparent; background: none; border-radius: 6px; color: var(--ink); padding: 8px; font-size: 14px; }
+  .command-item:hover, .command-item:focus-visible { background: var(--raised); }
+  .command-item span { overflow-wrap: anywhere; }
+  .command-item small { color: var(--mute); margin-left: auto; flex: none; font-size: 11px; }
+  #toast { position: fixed; inset: auto 19px 19px auto; z-index: 6; pointer-events: none; display: grid; justify-items: end; gap: 8px; width: max-content; max-width: min(28rem, calc(100vw - 38px)); margin: 0; padding: 0; border: 0; overflow: visible; background: transparent; }
+  .toast-item { display: flex; align-items: center; gap: 9px; max-width: 100%; background: #25252a; color: var(--ink); border: 1px solid #494851; border-radius: 8px; padding: 11px 13px; box-shadow: 0 5px 26px #0008; font-size: 14px; overflow-wrap: anywhere; }
+  #toast::backdrop { display: none; }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f7f7f9;
+    --side: #f0f0f4;
+    --card: #fff;
+    --raised: #f3f3f6;
+    --hover: #e9e9ef;
+    --line: #d9d9e1;
+    --line-soft: #e7e7ed;
+    --ink: #222129;
+    --dim: #4f4d5b;
+    --mute: #62606e;
+    --orange: #aa3f20;
+    --green: #137350;
+    --yellow: #875707;
+    --violet: #5e44ad;
+    --blue: #3656a5;
+  }
+  [data-theme="light"] :is(.brand-mark, .button.primary) { background: #ff784b; }
+  [data-theme="light"] .button.primary:hover { background: #ff936e; }
+  [data-theme="light"] :is(.topbar, .menu, .toast-item) { background: var(--card); }
+  [data-theme="light"] :is(.local-state, .search-trigger, .filter-button, th, .task-icon, .field input:not([type="checkbox"]), .field textarea, .command-input, .proposal, .log-list) { background: var(--raised); }
+  [data-theme="light"] :is(.metric:hover, tbody tr:hover, .menu button:hover, .menu button:focus-visible, .track) { background: var(--hover); }
+  [data-theme="light"] :is(.menu, .menu-head, .key, dialog, .task-icon, .button:hover, .icon-button:hover, .field input:not([type="checkbox"]), .field textarea, .command-input, .choice span, .toast-item) { border-color: var(--line); }
+  [data-theme="light"] :is(.notice-failed, .toast-item[data-tone="failed"]) .svg { color: #9c3434; }
+  [data-theme="light"] :is(.nav-item[aria-current="page"], .avatar, .choice input:checked + span, .menu button[aria-pressed="true"]) { background: #faeae3; border-color: #e5b6a5; color: var(--orange); }
+  [data-theme="light"] :is(.nav-item[aria-current="page"] .key, .text-button:hover) { color: var(--orange); }
+  [data-theme="light"] .filter-button[aria-pressed="true"] { border-color: #ca8b75; }
+  [data-theme="light"] .tone-icon { background: color-mix(in srgb, var(--tone) 12%, var(--card)); border-color: color-mix(in srgb, var(--tone) 25%, var(--card)); }
+  [data-theme="light"] .status { background: color-mix(in srgb, var(--status) 9%, var(--card)); border-color: color-mix(in srgb, var(--status) 25%, var(--card)); }
+  [data-theme="light"] .status-queued { --status: var(--mute); }
+  [data-theme="light"] :is(.status-canceled, .status-failed) { --status: #9c3434; }
+  [data-theme="light"] .button.danger { color: #9c3434; }
+  [data-theme="light"] .agent-claude { color: #aa4e2b; }
+  [data-theme="light"] .agent-codex { color: #4a5485; }
+  [data-theme="light"] dialog::backdrop { background: #1b18266b; }
+  @media (max-width: 1220px) {
+    .workspace { padding-inline: 23px; }
+    .topbar { padding-inline: 23px; }
+    .dashboard-grid { grid-template-columns: minmax(0, 1fr) minmax(246px, .4fr); }
+    .activity-list { padding-inline: 12px; }
+    .activity-item { column-gap: 7px; }
+  }
+  @media (max-width: 1080px) {
+    .shell { grid-template-columns: 187px minmax(0, 1fr); }
+    .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .shell { display: block; }
+    .sidebar { position: fixed; top: 0; bottom: 0; left: 0; z-index: 4; width: min(252px, 85vw); height: 100dvh; box-shadow: 0 0 0 100vmax #0007; }
+    .sidebar[data-collapsed="true"] { display: none; }
+    .sidebar .brand { margin-bottom: 25px; }
+    .navigation-toggle { display: inline-flex; margin-left: -5px; }
+    .topbar { height: 57px; padding-inline: 15px; }
+    .workspace { padding: 23px 15px; }
+  }
+  @media (max-width: 530px) {
+    .crumb-root, .crumbs .separator { display: none; }
+    .top-actions, .crumbs { gap: 7px; }
+    .search-trigger { min-width: 35px; padding: 0; justify-content: center; }
+    .search-trigger span { display: none; }
+    .intro { align-items: flex-start; margin-bottom: 20px; }
+    .intro p { font-size: 14px; }
+    .intro .button.primary { min-height: 36px; padding-inline: 9px; }
+    .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-bottom: 18px; }
+    .metric { min-height: 112px; padding: 12px; }
+    .metric .tone-icon { top: 9px; right: 9px; width: 25px; height: 25px; }
+    .metric-label { font-size: 12px; padding-right: 23px; }
+    .metric-number { font-size: 30px; }
+    .box-head { padding-inline: 12px; }
+  }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="i-relay" viewBox="0 0 24 24"><path d="M13 3 5 13h6l-1 8 9-11h-6l1-7z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><rect x="14" y="14" width="7" height="7" rx="1.2"/></symbol>
+  <symbol id="i-runs" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.6" cy="10.6" r="5.8"/><path d="m15 15 4.5 4.5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-chevrons" viewBox="0 0 24 24"><path d="m8 9 4-4 4 4m-8 6 4 4 4-4"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10m-7 5h4"/></symbol>
+  <symbol id="i-review" viewBox="0 0 24 24"><circle cx="7" cy="5" r="2"/><circle cx="17" cy="7" r="2"/><circle cx="7" cy="19" r="2"/><path d="M7 7v10M17 9c0 5-3 7-8 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m6 12 4 4 8-8"/></symbol>
+  <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.4 2.4 4.7-4.9"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-12-2 14"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6m-6 4h6"/></symbol>
+  <symbol id="i-test" viewBox="0 0 24 24"><path d="M9 3h6m-5 0v6l-5 8a2.2 2.2 0 0 0 2 4h10a2.2 2.2 0 0 0 2-4l-5-8V3m-6 12h8"/></symbol>
+  <symbol id="i-bug" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="13" rx="5"/><path d="m9 7-2-3m8 3 2-3m-5 7v9M4 10l3 2m-3 3h3m-2 5 3-2m12-8-3 2m3 3h-3m2 5-3-2"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19m0-7 12 5M7 7l10 10"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2c1.1 6.4 3.7 9 10 10-6.3 1-8.9 3.6-10 10-1-6.4-3.6-9-10-10 6.4-1 9-3.6 10-10Z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 12 7-12 7z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 5v14m6-14v14"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><path d="m10 3-.7 2.4-2 .9-2.2-1.1-2 3.5 1.8 1.7v2.9L3 15l2 3.5 2.4-1 1.9.9.7 2.6h4l.7-2.6 1.9-.9 2.4 1 2-3.5-1.9-1.7v-2.9L21 8.7l-2-3.5-2.2 1.1-2-.9L14 3z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></symbol>
+</svg>
+
+<div class="shell">
+  <aside id="navigation-panel" class="sidebar" data-collapsed="true" aria-label="Workspace navigation">
+    <div class="brand"><span class="brand-mark"><svg class="svg" aria-hidden="true"><use href="#i-relay"/></svg></span><span class="brand-word">Relay</span></div>
+    <div class="sidebar-scroll">
+      <nav class="nav-group" aria-label="Workspace">
+        <div class="nav-caption">Workspace</div>
+        <div class="nav-items" id="main-navigation"></div>
+      </nav>
+      <nav class="nav-group" aria-label="Projects">
+        <div class="nav-caption">Projects <button type="button" class="icon-button small ghost" data-open="project-dialog" aria-controls="project-dialog" aria-label="Add project" title="Add project"><svg class="svg" aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+        <div class="nav-items" id="project-navigation"></div>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="local-state"><span class="local-dot"></span><div><strong>Local workspace</strong><small>Offline simulation</small></div></div>
+      <button type="button" class="profile" data-menu="profile-menu" aria-controls="profile-menu" aria-expanded="false">
+        <span class="avatar" id="avatar">W</span><span class="profile-copy"><strong id="profile-name">Workspace</strong><small>Personal</small></span><svg class="svg" aria-hidden="true"><use href="#i-chevrons"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs">
+        <button type="button" id="navigation-toggle" class="icon-button ghost navigation-toggle" aria-controls="navigation-panel" aria-expanded="false" aria-label="Toggle navigation"><svg class="svg" aria-hidden="true"><use href="#i-menu"/></svg></button>
+        <span class="crumb-root"><svg class="svg" aria-hidden="true"><use href="#i-grid"/></svg> &nbsp; Workspace</span><span class="separator">/</span><strong id="current-page">Overview</strong>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="button search-trigger" data-open="search-dialog" aria-controls="search-dialog" aria-label="Search workspace"><svg class="svg" aria-hidden="true"><use href="#i-search"/></svg><span>Search workspace</span><span class="key" id="search-shortcut">Ctrl K</span></button>
+        <button type="button" class="icon-button notice-trigger" data-menu="notifications-menu" aria-controls="notifications-menu" aria-expanded="false" aria-label="Notifications" title="Notifications"><svg class="svg" aria-hidden="true"><use href="#i-bell"/></svg><span class="notice-indicator" id="notice-indicator" hidden></span></button>
+      </div>
+    </header>
+    <main class="workspace" id="workspace-view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div id="status-menu" class="menu" aria-label="Filter by status" hidden></div>
+<div id="project-menu" class="menu" aria-label="Filter by project" hidden></div>
+<div id="run-menu" class="menu" aria-label="Run actions" hidden></div>
+<div id="profile-menu" class="menu" aria-label="Workspace options" hidden>
+  <button type="button" data-open="settings-dialog" aria-controls="settings-dialog"><svg class="svg" aria-hidden="true"><use href="#i-settings"/></svg> Workspace settings</button>
+</div>
+<div id="notifications-menu" class="menu notifications" role="region" aria-labelledby="notifications-title" tabindex="-1" hidden>
+  <h2 class="menu-head" id="notifications-title">Notifications</h2>
+  <ul id="notification-list"></ul>
+  <p class="notice-empty" id="notifications-empty" hidden>No notifications yet.</p>
+</div>
+
+<dialog id="new-run-dialog" aria-labelledby="new-run-title">
+  <form id="new-run-form">
+    <header class="dialog-head"><div><h2 id="new-run-title">New run</h2><p>Choose an agent profile and describe the task.</p></div><button type="button" class="icon-button ghost" data-close aria-label="Close new run dialog"><svg class="svg" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="dialog-content form-grid">
+      <label class="field">Task name<input name="title" required maxlength="100" placeholder="Add tests for the billing webhook" autofocus></label>
+      <fieldset class="field"><legend>Project</legend><div id="run-projects" class="choices"></div></fieldset>
+      <fieldset class="field"><legend>Agent profile</legend><div class="choices"><label class="choice"><input type="radio" name="agent" value="codex" checked><span>GPT-5 Codex</span></label><label class="choice"><input type="radio" name="agent" value="claude"><span>Claude Sonnet</span></label><label class="choice" id="local-agent-choice" hidden><input type="radio" name="agent" value="local"><span>On-device AI</span></label></div><p class="field-hint" id="agent-mode-hint">Codex and Claude profiles use the offline simulator.</p></fieldset>
+      <label class="field">Instructions<textarea name="instructions" required maxlength="12000" placeholder="Describe the change, how to verify it, and any relevant code."></textarea></label>
+    </div>
+    <footer class="dialog-foot"><button type="button" class="button subtle" data-close>Cancel</button><button type="submit" id="launch-run" class="button primary"><svg class="svg" aria-hidden="true"><use href="#i-play"/></svg> Launch run</button></footer>
+  </form>
+</dialog>
+
+<dialog id="project-dialog" aria-labelledby="project-dialog-title">
+  <form id="new-project-form">
+    <header class="dialog-head"><div><h2 id="project-dialog-title">Add project</h2><p>Group agent runs for a repository or codebase.</p></div><button type="button" class="icon-button ghost" data-close aria-label="Close add project dialog"><svg class="svg" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="dialog-content form-grid">
+      <label class="field">Project name<input name="name" required maxlength="50" placeholder="my-project" autofocus></label>
+      <label class="field">Description <textarea name="description" maxlength="260" placeholder="What does this project do?"></textarea></label>
+    </div>
+    <footer class="dialog-foot"><button type="button" class="button subtle" data-close>Cancel</button><button type="submit" id="save-project" class="button primary">Add project</button></footer>
+  </form>
+</dialog>
+
+<dialog id="settings-dialog" aria-labelledby="settings-dialog-title">
+  <form id="settings-form" autocomplete="off">
+    <header class="dialog-head"><div><h2 id="settings-dialog-title">Workspace settings</h2><p>Preferences are stored in this browser when available.</p></div><button type="button" class="icon-button ghost" data-close aria-label="Close settings dialog"><svg class="svg" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+    <div class="dialog-content form-grid">
+      <label class="field">Workspace name<input name="name" required maxlength="45" autofocus></label>
+      <div class="settings-section">
+        <fieldset class="field" aria-describedby="default-model-hint">
+          <legend>Default model</legend>
+          <div class="choices" id="default-model-choices"></div>
+          <p class="field-hint" id="default-model-hint">New runs use this model by default. On-device AI falls back to GPT-5 Codex when unavailable.</p>
+        </fieldset>
+        <label class="check-field"><input type="checkbox" name="autoplay"><span>Auto-advance simulated runs<br><span class="field-hint">Progress updates while Relay is open.</span></span></label>
+      </div>
+      <div class="settings-section">
+        <fieldset class="field">
+          <legend>Theme</legend>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="theme" value="dark"><span>Dark</span></label>
+            <label class="choice"><input type="radio" name="theme" value="light"><span>Light</span></label>
+            <label class="choice"><input type="radio" name="theme" value="system"><span>System</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="settings-section">
+        <fieldset class="field" aria-describedby="notification-preferences-hint">
+          <legend>Notification preferences</legend>
+          <p class="field-hint" id="notification-preferences-hint">Choose which events appear in the notification menu.</p>
+          <label class="check-field"><input type="checkbox" name="notifyReview">Runs that need review</label>
+          <label class="check-field"><input type="checkbox" name="notifyCompleted">Completed runs</label>
+          <label class="check-field"><input type="checkbox" name="notifyFailed">Failed runs</label>
+        </fieldset>
+      </div>
+      <section class="settings-section" aria-labelledby="api-keys-title">
+        <h3 id="api-keys-title">API keys</h3>
+        <p class="field-hint" id="api-keys-hint">Keys stay in this tab session. Relay’s offline runs use the simulator or on-device AI.</p>
+        <div class="settings-keys">
+          <label class="field">OpenAI API key<input type="password" name="openaiKey" aria-describedby="api-keys-hint" spellcheck="false" autocapitalize="off"></label>
+          <label class="field">Anthropic API key<input type="password" name="anthropicKey" aria-describedby="api-keys-hint" spellcheck="false" autocapitalize="off"></label>
+        </div>
+      </section>
+    </div>
+    <footer class="dialog-foot"><button type="button" class="button subtle" data-close>Cancel</button><button type="submit" id="save-settings" class="button primary">Save changes</button></footer>
+  </form>
+</dialog>
+
+<dialog id="search-dialog" class="command-dialog" aria-labelledby="search-title">
+  <header class="dialog-head"><div><h2 id="search-title">Search workspace</h2></div><button type="button" class="icon-button ghost" data-close aria-label="Close search dialog"><svg class="svg" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+  <div class="dialog-content">
+    <div class="command-search"><svg class="svg" aria-hidden="true"><use href="#i-search"/></svg><input id="command-input" class="command-input" type="search" autocomplete="off" placeholder="Find a run, project, or page" aria-label="Find a run, project, or page" autofocus></div>
+    <div class="command-results" id="command-results"></div>
+  </div>
+</dialog>
+
+<dialog id="run-drawer" class="drawer" aria-labelledby="drawer-title">
+  <header class="dialog-head"><div><h2 id="drawer-title"></h2><p id="drawer-subtitle"></p></div><button type="button" class="icon-button ghost" data-close aria-label="Close run details" autofocus><svg class="svg" aria-hidden="true"><use href="#i-close"/></svg></button></header>
+  <div class="dialog-content" id="drawer-content"></div>
+  <footer class="dialog-foot" id="drawer-actions"></footer>
+</dialog>
+
+<div id="toast" popover="manual" role="status" aria-atomic="false" aria-relevant="additions" hidden></div>
+
+<script>
+  'use strict';
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const byId = id => document.getElementById(id);
+  const icon = name => `<svg class="svg" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, mark => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[mark]);
+  const storageKey = 'relay.workspace.v1';
+  const keyStorage = 'relay.api-keys.v1';
+  const defaultPreferences = {name: 'Workspace', autoplay: true, defaultModel: 'codex', theme: 'dark', notifyReview: true, notifyCompleted: true, notifyFailed: true};
+  const palette = ['#ac9bff', '#77b9ff', '#f5b876', '#69d5a4', '#ef94b4'];
+  const pages = {overview: ['Overview', 'grid'], runs: ['Runs', 'runs'], projects: ['Projects', 'folder'], activity: ['Activity', 'activity']};
+  const agents = {codex: ['GPT-5 Codex', 'spark'], claude: ['Claude Sonnet', 'sun'], local: ['On-device AI', 'spark']};
+  const statuses = {running: 'Running', review: 'Needs review', completed: 'Completed', queued: 'Queued', paused: 'Paused', canceled: 'Canceled', failed: 'Failed'};
+  const activities = {
+    running: ['Run started', 'play', 'blue'], review: ['Run needs review', 'review', 'yellow'], completed: ['Run completed', 'done', 'green'],
+    queued: ['Run queued', 'clock', 'violet'], paused: ['Run paused', 'pause', 'violet'], resumed: ['Run resumed', 'play', 'blue'],
+    canceled: ['Run canceled', 'close', 'yellow'], failed: ['Run failed', 'close', 'yellow'], retry: ['Run requeued', 'clock', 'violet'], project: ['Project added', 'folder', 'orange']
+  };
+  const notificationPreferences = {review: 'notifyReview', completed: 'notifyCompleted', failed: 'notifyFailed'};
+  const runMessages = {
+    running: 'Simulator started the task.', review: 'Simulation finished. Waiting for review.', completed: 'Run marked complete.',
+    queued: 'Task added to the simulation queue.', paused: 'Simulation paused.', resumed: 'Simulation resumed.',
+    canceled: 'Run canceled.', retry: 'Run returned to the queue.', failed: 'On-device AI could not finish the task.'
+  };
+  const localMessages = {...runMessages, running: 'On-device model started generating a proposal.', queued: 'Task added to the on-device queue.', review: 'Proposal ready for review.'};
+  const stages = [
+    [15, 'Prepared a simulated workspace.'], [38, 'Simulated reviewing the task requirements.'],
+    [63, 'Simulated preparing changes.'], [85, 'Simulated checking the proposed changes.']
+  ];
+
+  function initialState() {
+    const now = Date.now();
+    const projects = [
+      {id: 'web', name: 'web-platform', description: 'Frontend application and web infrastructure.', color: palette[0]},
+      {id: 'api', name: 'api-service', description: 'Backend services, endpoints, and integrations.', color: palette[1]},
+      {id: 'ds', name: 'design-system', description: 'Shared components, tokens, and documentation.', color: palette[2]}
+    ];
+    const samples = [
+      ['r-104', 'Refactor auth middleware', 'web', 'claude', 'running', 72, 4, 'code', 'Simplify the middleware chain and keep existing session behavior. Review coverage for expired sessions.'],
+      ['r-103', 'Add billing webhook tests', 'api', 'codex', 'review', 100, 12, 'test', 'Cover duplicate webhook delivery and invalid signatures. Verify the existing billing test suite.'],
+      ['r-102', 'Migrate settings to design tokens', 'ds', 'claude', 'running', 38, 18, 'code', 'Replace hard-coded colors and spacing in settings with shared tokens. Check the responsive layout.'],
+      ['r-101', 'Fix pagination edge cases', 'api', 'codex', 'completed', 100, 27, 'bug', 'Handle empty pages and a deleted last item without changing the API contract.'],
+      ['r-100', 'Update component documentation', 'ds', 'claude', 'queued', 0, 36, 'doc', 'Update the examples for buttons, dialogs, and form inputs.'],
+      ['r-099', 'Tidy build configuration', 'web', 'codex', 'completed', 100, 53, 'code', 'Remove unused build settings and verify the regular build command.'],
+      ['r-098', 'Document error responses', 'api', 'claude', 'completed', 100, 96, 'doc', 'Document error payloads and use examples that match the existing API.']
+    ];
+    const runs = samples.map(([id, title, project, agent, status, progress, ago, glyph, instructions]) => {
+      const updated = now - ago * 60000;
+      const logs = [{at: updated - 60000, message: 'Sample run created in the offline simulator.'}, {at: updated, message: runMessages[status]}];
+      return {id, title, project, agent, status, progress, glyph, instructions, updated, logs, nextTick: now + (id === 'r-100' ? 180000 : 24000)};
+    });
+    return {projects, runs, events: runs.map(run => ({at: run.updated, type: run.status, run: run.id, subject: run.title})), prefs: {...defaultPreferences}, lastRead: 0};
+  }
+
+  function load() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey));
+      if (saved && Array.isArray(saved.projects) && Array.isArray(saved.runs) && Array.isArray(saved.events) && saved.prefs) {
+        return {...saved, prefs: {...defaultPreferences, ...saved.prefs}};
+      }
+    } catch (_) { /* A file URL can have browser-dependent storage access. */ }
+    return initialState();
+  }
+
+  function loadApiKeys() {
+    try { return JSON.parse(sessionStorage.getItem(keyStorage)) || {}; }
+    catch (_) { return {}; }
+  }
+
+  const state = load();
+  let apiKeys = loadApiKeys();
+  let view = 'overview';
+  let statusFilter = '';
+  let projectFilter = '';
+  let activeMenu = null;
+  let workspaceDirty = false;
+  let drawerId = null;
+  let localModelReady = false;
+  const localJobs = new Map();
+  const mobile = matchMedia('(max-width: 760px)');
+  const systemTheme = matchMedia('(prefers-color-scheme: dark)');
+
+  function save() {
+    try { localStorage.setItem(storageKey, JSON.stringify(state)); }
+    catch (_) { /* Continue with the in-memory workspace. */ }
+  }
+
+  function saveApiKeys(fields) {
+    apiKeys = {openai: fields.openaiKey.value.trim(), anthropic: fields.anthropicKey.value.trim()};
+    try {
+      if (apiKeys.openai || apiKeys.anthropic) sessionStorage.setItem(keyStorage, JSON.stringify(apiKeys));
+      else sessionStorage.removeItem(keyStorage);
+    } catch (_) { /* Keep keys available while this page is open. */ }
+  }
+
+  function applyTheme() {
+    document.documentElement.dataset.theme = state.prefs.theme === 'system' ? (systemTheme.matches ? 'dark' : 'light') : state.prefs.theme;
+  }
+
+  const getProject = id => state.projects.find(project => project.id === id);
+  const getRun = id => state.runs.find(run => run.id === id);
+  const makeId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const absoluteTime = at => new Date(at).toLocaleString();
+
+  function timeAgo(at) {
+    const minutes = Math.max(0, Math.floor((Date.now() - at) / 60000));
+    if (minutes < 1) return 'now';
+    if (minutes < 60) return `${minutes}m`;
+    if (minutes < 1440) return `${Math.floor(minutes / 60)}h`;
+    return `${Math.floor(minutes / 1440)}d`;
+  }
+
+  function renderNavigation() {
+    byId('main-navigation').innerHTML = Object.entries(pages).map(([key, [name, glyph]], index) =>
+      `<button type="button" class="nav-item" data-view="${key}" aria-controls="workspace-view" ${view === key && !projectFilter ? 'aria-current="page"' : ''}>${icon(glyph)}<span class="nav-name">${name}</span><span class="key" aria-hidden="true">${index + 1}</span></button>`
+    ).join('');
+    byId('project-navigation').innerHTML = state.projects.map(project =>
+      `<button type="button" class="nav-item" data-view="runs" data-project="${project.id}" aria-controls="workspace-view" ${view === 'runs' && projectFilter === project.id ? 'aria-current="page"' : ''}><span class="project-dot" style="--dot:${project.color}"></span><span class="nav-name">${esc(project.name)}</span></button>`
+    ).join('');
+    byId('profile-name').textContent = state.prefs.name;
+    byId('avatar').textContent = state.prefs.name.split(/\s+/).slice(0, 2).map(word => [...word][0]).join('').toUpperCase();
+  }
+
+  function statusBadge(status) {
+    return `<span class="status status-${status}">${statuses[status]}</span>`;
+  }
+
+  function progressBar(run) {
+    return `<div class="track status-${run.status}" role="progressbar" aria-label="Run progress" aria-valuenow="${run.progress}" aria-valuemin="0" aria-valuemax="100"><i style="width:${run.progress}%"></i></div>`;
+  }
+
+  function runRow(run) {
+    const [agentName, agentGlyph] = agents[run.agent];
+    return `<tr>
+      <td><div class="task-cell"><span class="task-icon">${icon(run.glyph)}</span><div class="task-copy"><button type="button" class="task-name" data-run="${run.id}" aria-controls="run-drawer" title="${esc(run.title)}">${esc(run.title)}</button><span class="task-project">${esc(getProject(run.project)?.name)}</span></div></div></td>
+      <td><div class="agent-cell"><span class="agent-${run.agent}">${icon(agentGlyph)}</span>${agentName}</div></td>
+      <td>${statusBadge(run.status)}</td>
+      <td><div class="progress-cell">${progressBar(run)}<span>${run.progress}%</span></div></td>
+      <td><button type="button" class="icon-button ghost row-menu-button" data-menu="run-menu" data-run-id="${run.id}" aria-controls="run-menu" aria-expanded="false" aria-label="Actions for ${esc(run.title)}" title="Run actions">${icon('more')}</button></td>
+    </tr>`;
+  }
+
+  function runsBox(overview) {
+    const filtered = state.runs.filter(run => (!projectFilter || run.project === projectFilter) && (!statusFilter || run.status === statusFilter));
+    const shown = overview ? filtered.slice(0, 5) : filtered;
+    return `<section class="box runs-box" aria-labelledby="runs-heading">
+      <header class="box-head"><div><h2 id="runs-heading">${overview ? 'Recent runs' : 'Run queue'}</h2><p>${overview ? 'Track tasks across your projects' : 'Monitor progress and review results'}</p></div>
+        <div class="box-actions">
+          <button type="button" class="button filter-button" data-menu="project-menu" aria-controls="project-menu" aria-expanded="false" aria-pressed="${Boolean(projectFilter)}">${icon('folder')} Project <svg class="svg filter-chevron" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+          <button type="button" class="button filter-button" data-menu="status-menu" aria-controls="status-menu" aria-expanded="false" aria-pressed="${Boolean(statusFilter)}">${icon('filter')} Status <svg class="svg filter-chevron" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+        </div>
+      </header>
+      ${shown.length ? `<div class="table-wrap"><table><colgroup><col class="col-task"><col class="col-agent"><col class="col-status"><col class="col-progress"><col class="col-menu"></colgroup><thead><tr><th scope="col">Task</th><th scope="col">Agent</th><th scope="col">Status</th><th scope="col">Progress</th><th scope="col" aria-label="Actions"></th></tr></thead><tbody>${shown.map(runRow).join('')}</tbody></table></div>` : `<div class="empty"><strong>No matching runs</strong>${state.runs.length ? 'Choose another project or status.' : 'Launch a run to get started.'}</div>`}
+      <footer class="box-foot"><span>${shown.length === filtered.length ? `${shown.length} ${shown.length === 1 ? 'run' : 'runs'}` : `Showing ${shown.length} of ${filtered.length} runs`}</span>${overview ? '<button type="button" class="text-button" data-view="runs" aria-controls="workspace-view">View all runs</button>' : ''}</footer>
+    </section>`;
+  }
+
+  function activityItem(event) {
+    const [title, glyph, tone] = activities[event.type];
+    return `<li class="activity-item"><span class="tone-icon metric-${tone}">${icon(glyph)}</span><div>
+      ${event.run ? `<button type="button" class="event-title" data-run="${event.run}" aria-controls="run-drawer" aria-label="${title}: ${esc(event.subject)}">${title}</button>` : `<strong class="event-title">${title}</strong>`}
+      <span class="event-sub">${esc(event.subject)}</span></div><time class="event-time" datetime="${new Date(event.at).toISOString()}" title="${esc(absoluteTime(event.at))}">${timeAgo(event.at)}</time></li>`;
+  }
+
+  function activityBox(overview) {
+    const events = overview ? state.events.slice(0, 5) : state.events;
+    return `<section class="box activity-box" aria-labelledby="activity-heading"><header class="box-head"><div><h2 id="activity-heading">${overview ? 'Activity' : 'Workspace events'}</h2><p>${overview ? 'Latest workspace events' : 'Run and project history'}</p></div><span class="live-label"><span class="local-dot"></span>Live updates</span></header>
+      ${events.length ? `<ol class="activity-list">${events.map(activityItem).join('')}</ol>` : '<div class="empty">No workspace events yet.</div>'}
+      ${overview ? '<footer class="box-foot"><button type="button" class="text-button" data-view="activity" aria-controls="workspace-view">View activity</button></footer>' : ''}</section>`;
+  }
+
+  function metrics() {
+    const count = status => state.runs.filter(run => run.status === status).length;
+    const queued = count('queued');
+    const items = [
+      ['Active runs', count('running'), `${queued} in queue`, 'activity', 'orange', 'runs', 'running'],
+      ['Awaiting review', count('review'), 'Ready for your approval', 'review', 'yellow', 'runs', 'review'],
+      ['Completed', count('completed'), 'Across all projects', 'done', 'green', 'runs', 'completed'],
+      ['Projects', state.projects.length, 'In this workspace', 'folder', 'violet', 'projects', '']
+    ];
+    return `<div class="metrics">${items.map(([label, value, note, glyph, tone, page, status]) =>
+      `<button type="button" class="metric metric-${tone}" data-view="${page}" data-status="${status}" aria-controls="workspace-view"><span class="metric-label">${label}</span><span class="tone-icon">${icon(glyph)}</span><strong class="metric-number">${value}</strong><span class="metric-note">${note}</span></button>`).join('')}</div>`;
+  }
+
+  function projectsBox() {
+    return `<section class="project-grid" aria-label="Workspace projects">${state.projects.map(project => {
+      const count = state.runs.filter(run => run.project === project.id).length;
+      return `<article class="box project-card"><div class="project-card-header"><span class="tone-icon" style="--tone:${project.color}">${icon('folder')}</span><h2>${esc(project.name)}</h2></div><p>${esc(project.description || `${count} ${count === 1 ? 'run' : 'runs'}`)}</p><button type="button" class="button subtle" data-view="runs" data-project="${project.id}" aria-controls="workspace-view">View runs${project.description ? ` (${count})` : ''}</button></article>`;
+    }).join('')}</section>`;
+  }
+
+  function renderWorkspace(restoreFocus = false) {
+    workspaceDirty = false;
+    const workspace = byId('workspace-view');
+    const tableOffset = restoreFocus ? $('.table-wrap', workspace)?.scrollLeft : 0;
+    const focus = document.activeElement;
+    const focusAttrs = ['data-view', 'data-run', 'data-run-id', 'data-menu', 'data-open', 'data-status', 'data-project'];
+    const focusSignature = element => focusAttrs.map(attr => element.getAttribute(attr)).join('|');
+    const focused = restoreFocus && workspace.contains(focus) && focus !== workspace ? focusSignature(focus) : null;
+    const project = getProject(projectFilter);
+    const title = view === 'runs' && project ? project.name : pages[view][0];
+    const subtitles = {overview: 'Launch, monitor, and review coding agents across your projects.', runs: 'Manage your agent queue and inspect individual runs.', projects: 'Organize agent tasks by repository or codebase.', activity: 'Follow run transitions and new projects in your workspace.'};
+    byId('current-page').textContent = pages[view][0];
+    const opener = view === 'projects' ? 'project-dialog' : 'new-run-dialog';
+    workspace.innerHTML = `<header class="intro"><div><h1>${esc(title)}</h1><p>${esc((view === 'runs' && project?.description) || subtitles[view])}</p></div><button type="button" class="button primary" data-open="${opener}" aria-controls="${opener}">${icon('plus')} ${view === 'projects' ? 'Add project' : 'New run'}</button></header>`;
+    if (view === 'overview') workspace.insertAdjacentHTML('beforeend', `${metrics()}<div class="dashboard-grid">${runsBox(true)}${activityBox(true)}</div>`);
+    if (view === 'runs') workspace.insertAdjacentHTML('beforeend', runsBox(false));
+    if (view === 'projects') workspace.insertAdjacentHTML('beforeend', projectsBox());
+    if (view === 'activity') workspace.insertAdjacentHTML('beforeend', activityBox(false));
+    if (tableOffset && $('.table-wrap', workspace)) $('.table-wrap', workspace).scrollLeft = tableOffset;
+    if (focused) [...workspace.querySelectorAll('button')].find(button => focusSignature(button) === focused)?.focus({preventScroll: true});
+    renderNoticeIndicator();
+  }
+
+  function isNotification(event) {
+    return event.run && Object.hasOwn(notificationPreferences, event.type) && state.prefs[notificationPreferences[event.type]];
+  }
+
+  function renderNoticeIndicator() {
+    byId('notice-indicator').hidden = !state.events.some(event => event.at > (state.lastRead ?? 0) && isNotification(event));
+  }
+
+  function renderNotifications() {
+    const menu = byId('notifications-menu');
+    const list = byId('notification-list');
+    const focused = list.contains(document.activeElement) ? document.activeElement.dataset.noticeEvent : null;
+    const scrollTop = menu.scrollTop;
+    const events = state.events.filter(isNotification);
+    list.innerHTML = events.map(event => {
+      const [label, glyph] = activities[event.type];
+      const eventKey = esc(`${event.run}:${event.type}:${event.at}`);
+      return `<li><button type="button" class="notice-${event.type}" data-notice-event="${eventKey}" data-run="${esc(event.run)}" aria-controls="run-drawer">${icon(glyph)}<span>${label}<small>${esc(event.subject)} · <time datetime="${new Date(event.at).toISOString()}" title="${esc(absoluteTime(event.at))}">${timeAgo(event.at)}</time></small></span></button></li>`;
+    }).join('');
+    byId('notifications-empty').hidden = events.length > 0;
+    menu.scrollTop = scrollTop;
+    if (focused) {
+      const button = [...list.querySelectorAll('button')].find(item => item.dataset.noticeEvent === focused);
+      (button || $('button', list) || menu).focus({preventScroll: true});
+    }
+    state.lastRead = Date.now();
+    renderNoticeIndicator();
+  }
+
+  function setView(page, options = {}) {
+    if (!Object.hasOwn(pages, page)) return;
+    closeMenu();
+    view = page;
+    statusFilter = options.status || '';
+    projectFilter = options.project || '';
+    closeNavigation();
+    renderNavigation();
+    renderWorkspace();
+    byId('workspace-view').focus({preventScroll: true});
+    window.scrollTo(0, 0);
+  }
+
+  function closeNavigation(returnFocus = false) {
+    const nav = byId('navigation-panel');
+    if (nav.dataset.collapsed === 'true') return;
+    nav.dataset.collapsed = 'true';
+    const toggle = byId('navigation-toggle');
+    toggle.setAttribute('aria-expanded', 'false');
+    if (returnFocus && mobile.matches) toggle.focus();
+  }
+
+  function toggleNavigation() {
+    const nav = byId('navigation-panel');
+    if (nav.dataset.collapsed === 'false') { closeNavigation(true); return; }
+    nav.dataset.collapsed = 'false';
+    byId('navigation-toggle').setAttribute('aria-expanded', 'true');
+    $('button', nav)?.focus();
+  }
+
+  function renderRunActions(run, context) {
+    const isMenu = context === 'menu';
+    const actions = [];
+    if (isMenu) actions.push(`<button type="button" data-run="${run.id}" aria-controls="run-drawer">${icon('doc')} View details</button>`);
+    const action = (name, label, glyph, classes = 'subtle') => `<button type="button" class="${isMenu ? '' : `button ${classes}`}" data-run-action="${name}" data-target-run="${run.id}" data-notify>${icon(glyph)} ${label}</button>`;
+    if (run.status === 'running' && run.agent !== 'local') actions.push(action('pause', 'Pause', 'pause'));
+    if (run.status === 'paused') actions.push(action('resume', 'Resume', 'play', 'primary'));
+    if (run.status === 'review') actions.push(action('approve', 'Approve', 'check', 'primary'));
+    if (['queued', 'running', 'paused'].includes(run.status)) actions.push(action('cancel', 'Cancel run', 'close', 'danger'));
+    if (['canceled', 'completed', 'review', 'failed'].includes(run.status)) actions.push(action('retry', 'Rerun', 'play'));
+    if (!isMenu) actions.push(action('export', 'Export task', 'download'));
+    return actions.join('');
+  }
+
+  function closeMenu(focus = false) {
+    if (!activeMenu) return;
+    const {element, trigger} = activeMenu;
+    element.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    activeMenu = null;
+    if ((focus || workspaceDirty) && trigger.isConnected) trigger.focus({preventScroll: true});
+    if (workspaceDirty) queueMicrotask(() => { if (workspaceDirty && !activeMenu) renderWorkspace(true); });
+  }
+
+  function openMenu(trigger) {
+    const menuId = trigger.dataset.menu;
+    const element = byId(menuId);
+    if (activeMenu?.trigger === trigger) { closeMenu(true); return; }
+    closeMenu();
+    if (menuId === 'status-menu') {
+      element.innerHTML = Object.entries({'': 'All statuses', ...statuses}).map(([key, label]) =>
+        `<button type="button" data-filter="status" data-value="${key}" aria-pressed="${key === statusFilter}">${label}</button>`).join('');
+    }
+    if (menuId === 'project-menu') {
+      element.innerHTML = [{id: '', name: 'All projects'}, ...state.projects].map(project =>
+        `<button type="button" data-filter="project" data-value="${project.id}" aria-pressed="${project.id === projectFilter}">${esc(project.name)}</button>`).join('');
+    }
+    if (menuId === 'run-menu') {
+      const run = getRun(trigger.dataset.runId);
+      if (!run) return;
+      element.innerHTML = renderRunActions(run, 'menu');
+    }
+    if (menuId === 'notifications-menu') {
+      renderNotifications();
+      save();
+    }
+    element.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+    activeMenu = {element, trigger};
+    const rect = trigger.getBoundingClientRect();
+    const gutter = 8;
+    const left = menuId === 'profile-menu' ? rect.left : rect.right - element.offsetWidth;
+    const top = rect.bottom + 6 + element.offsetHeight <= innerHeight - gutter || rect.top < element.offsetHeight + gutter
+      ? rect.bottom + 6 : rect.top - element.offsetHeight - 6;
+    element.style.left = `${Math.max(gutter, Math.min(left, innerWidth - element.offsetWidth - gutter))}px`;
+    element.style.top = `${Math.max(gutter, Math.min(top, innerHeight - element.offsetHeight - gutter))}px`;
+    ($('[aria-pressed="true"]', element) || $('button', element) || element).focus({preventScroll: true});
+  }
+
+  function renderSearch() {
+    const query = byId('command-input').value.trim().toLowerCase();
+    const options = [
+      {label: 'New run', kind: 'Action', glyph: 'plus', attr: 'data-open="new-run-dialog" aria-controls="new-run-dialog"'},
+      ...Object.entries(pages).map(([key, [label, glyph]]) => ({label, kind: 'Page', glyph, attr: `data-view="${key}" aria-controls="workspace-view"`})),
+      ...state.projects.map(project => ({label: project.name, kind: 'Project', glyph: 'folder', attr: `data-view="runs" data-project="${project.id}" aria-controls="workspace-view"`})),
+      ...state.runs.map(run => ({label: run.title, kind: 'Run', glyph: run.glyph, attr: `data-run="${run.id}" aria-controls="run-drawer"`}))
+    ];
+    const matches = options.filter(option => `${option.label} ${option.kind}`.toLowerCase().includes(query));
+    byId('command-results').innerHTML = matches.length ? matches.map(option =>
+      `<button type="button" class="command-item" ${option.attr}>${icon(option.glyph)}<span>${esc(option.label)}</span><small>${option.kind}</small></button>`
+    ).join('') : '<div class="empty">No matching results.</div>';
+  }
+
+  function openDialog(id) {
+    const dialog = byId(id);
+    if (!dialog || dialog.open) return;
+    const previous = $('dialog[open]');
+    if (previous) previous.close();
+    if (id === 'new-run-dialog') {
+      byId('run-projects').innerHTML = state.projects.map((project, index) =>
+        `<label class="choice"><input type="radio" name="project" value="${project.id}" required ${(projectFilter ? projectFilter === project.id : index === 0) ? 'checked' : ''}><span>${esc(project.name)}</span></label>`).join('');
+      const model = state.prefs.defaultModel;
+      byId('new-run-form').elements.agent.value = model === 'local' && !localModelReady ? 'codex' : model;
+    }
+    if (id === 'settings-dialog') {
+      const fields = byId('settings-form').elements;
+      const {name, autoplay, defaultModel, theme, notifyReview, notifyCompleted, notifyFailed} = state.prefs;
+      fields.name.value = name;
+      fields.autoplay.checked = autoplay;
+      fields.defaultModel.value = defaultModel;
+      fields.theme.value = theme;
+      fields.notifyReview.checked = notifyReview;
+      fields.notifyCompleted.checked = notifyCompleted;
+      fields.notifyFailed.checked = notifyFailed;
+      fields.openaiKey.value = apiKeys.openai || '';
+      fields.anthropicKey.value = apiKeys.anthropic || '';
+    }
+    if (id === 'search-dialog') {
+      byId('command-input').value = '';
+      renderSearch();
+    }
+    dialog.showModal();
+    const toast = byId('toast');
+    if (typeof toast.showPopover === 'function' && toast.matches(':popover-open')) {
+      toast.hidePopover();
+      toast.showPopover();
+    }
+  }
+
+  function renderDrawer(run, updateOnly = false) {
+    byId('drawer-title').textContent = run.title;
+    byId('drawer-subtitle').textContent = `${getProject(run.project)?.name || 'Project'} · ${agents[run.agent][0]}${run.agent === 'local' ? '' : ' · Offline simulation'}`;
+    byId('drawer-content').innerHTML = `<div class="detail-block"><div class="drawer-summary">${statusBadge(run.status)}<code>${run.progress}%</code></div>${progressBar(run)}</div>
+      <section class="detail-block"><h3>Task instructions</h3><p>${esc(run.instructions)}</p></section>
+      ${run.result ? `<section class="detail-block"><h3>Agent proposal</h3><pre class="proposal">${esc(run.result)}</pre></section>` : ''}
+      <section class="detail-block"><h3>Run log</h3><ol class="log-list">${run.logs.map(log => `<li><time title="${esc(absoluteTime(log.at))}">${esc(new Date(log.at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}))}</time><span>${esc(log.message)}</span></li>`).join('')}</ol></section>`;
+    if (!updateOnly || byId('drawer-actions').dataset.status !== run.status) {
+      const actions = byId('drawer-actions');
+      const restoreAction = actions.contains(document.activeElement) ? document.activeElement.dataset.runAction : '';
+      actions.innerHTML = renderRunActions(run, 'drawer');
+      actions.dataset.status = run.status;
+      if (restoreAction) ($(`[data-run-action="${restoreAction}"]`, actions) || $('button', actions))?.focus();
+    }
+  }
+
+  function openRun(id) {
+    const run = getRun(id);
+    if (!run) return;
+    drawerId = id;
+    renderDrawer(run);
+    openDialog('run-drawer');
+  }
+
+  function notify(message, glyph = 'done', tone = '') {
+    const toast = byId('toast');
+    const item = document.createElement('div');
+    item.className = 'toast-item';
+    item.dataset.tone = tone;
+    item.innerHTML = `${icon(glyph)}<span>${esc(message)}</span>`;
+    toast.hidden = false;
+    if (typeof toast.showPopover === 'function' && !toast.matches(':popover-open')) toast.showPopover();
+    toast.append(item);
+    setTimeout(() => {
+      item.remove();
+      if (toast.firstElementChild) return;
+      if (typeof toast.hidePopover === 'function' && toast.matches(':popover-open')) toast.hidePopover();
+      toast.hidden = true;
+    }, tone ? 5500 : 3400);
+  }
+
+  function record(type, subject, run, at = Date.now()) {
+    const event = {type, subject, run, at};
+    state.events.unshift(event);
+    state.events.splice(100);
+    if (isNotification(event)) {
+      if (activeMenu?.element.id === 'notifications-menu') renderNotifications();
+      else renderNoticeIndicator();
+    }
+  }
+
+  function transition(run, status, type = status, at = Date.now()) {
+    run.status = status;
+    run.updated = at;
+    run.nextTick = at + (status === 'queued' ? 3500 : 1800);
+    const messages = run.agent === 'local' ? localMessages : runMessages;
+    run.logs.push({at, message: messages[type]});
+    record(type, run.title, run.id, at);
+    if (Object.hasOwn(notificationPreferences, type)) {
+      const [label, glyph] = activities[type];
+      notify(`${label}: ${run.title}`, glyph, type);
+    }
+  }
+
+  function refresh(restoreFocus = false) {
+    save();
+    if (activeMenu) workspaceDirty = true;
+    else renderWorkspace(restoreFocus);
+    if (byId('run-drawer').open && drawerId) renderDrawer(getRun(drawerId), true);
+  }
+
+  function exportRun(run) {
+    const task = [`# ${run.title}`, '', `Project: ${getProject(run.project)?.name || 'Project'}`, `Agent profile: ${agents[run.agent][0]}`, '', '## Instructions', run.instructions, ''];
+    if (run.result) task.push('## Agent proposal', run.result, '');
+    const url = URL.createObjectURL(new Blob([task.join('\n')], {type: 'text/markdown;charset=utf-8'}));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${run.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'relay-task'}.md`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    notify('Task exported');
+  }
+
+  function handleRunAction(action, id) {
+    const run = getRun(id);
+    if (!run) return;
+    if (action === 'export') { exportRun(run); return; }
+    const operations = {
+      pause: ['running', 'paused', 'paused', 'Run paused'], resume: ['paused', 'running', 'resumed', 'Run resumed'],
+      approve: ['review', 'completed', 'completed'], cancel: [['running', 'queued', 'paused'], 'canceled', 'canceled', 'Run canceled'],
+      retry: [['review', 'completed', 'canceled', 'failed'], 'queued', 'retry', 'Run requeued']
+    };
+    if (!operations[action]) return;
+    const [allowed, status, type, message] = operations[action];
+    if (![allowed].flat().includes(run.status)) return;
+    if (action === 'retry') { run.progress = 0; delete run.result; }
+    if (action === 'cancel' && localJobs.has(id)) localJobs.get(id).abort();
+    transition(run, status, type);
+    refresh(true);
+    if (message) notify(message);
+  }
+
+  async function prepareLocalModel() {
+    try { localModelReady = await globalThis.LanguageModel?.availability() === 'available'; }
+    catch (_) { localModelReady = false; }
+    byId('local-agent-choice').hidden = !localModelReady;
+    if (localModelReady) byId('agent-mode-hint').textContent = 'On-device AI proposes changes from your instructions and pasted code. Codex and Claude profiles simulate a run.';
+  }
+
+  async function runLocalTask(run) {
+    const controller = new AbortController();
+    localJobs.set(run.id, controller);
+    let session;
+    const timeoutId = setTimeout(() => controller.abort('timeout'), 120000);
+    try {
+      if (await globalThis.LanguageModel?.availability() !== 'available') throw new Error('The browser model is unavailable.');
+      if (controller.signal.aborted) throw new Error('The run was interrupted.');
+      transition(run, 'running');
+      run.progress = 10;
+      refresh(true);
+      session = await globalThis.LanguageModel.create({signal: controller.signal});
+      const result = await session.prompt(`Act as a coding assistant. Propose a concise implementation and a verification plan based on the provided context. If required context is missing, state what is missing. Discuss only changes you can infer from the instructions and code.\n\nProject: ${getProject(run.project)?.name}\nTask: ${run.title}\nInstructions and code:\n${run.instructions}`, {signal: controller.signal});
+      if (controller.signal.aborted) throw new Error('The run was interrupted.');
+      if (!result.trim()) throw new Error('The browser model returned an empty proposal.');
+      run.result = result;
+      run.progress = 100;
+      transition(run, 'review');
+    } catch (error) {
+      if (controller.signal.aborted && controller.signal.reason !== 'timeout') return;
+      transition(run, 'failed');
+      run.logs.push({at: Date.now(), message: controller.signal.reason === 'timeout' ? 'Generation took longer than two minutes.' : `Model error: ${error.message || 'Unknown error'}`});
+    } finally {
+      clearTimeout(timeoutId);
+      localJobs.delete(run.id);
+      if (!controller.signal.aborted) session?.destroy();
+      refresh(true);
+    }
+  }
+
+  function requireText(input, message) {
+    input.setCustomValidity(input.value.trim() ? '' : message);
+    return input.reportValidity();
+  }
+
+  byId('new-run-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!requireText(form.elements.title, 'Enter a task name.') || !requireText(form.elements.instructions, 'Enter task instructions.')) return;
+    const fields = new FormData(form);
+    const run = {id: makeId(), title: fields.get('title').trim(), project: fields.get('project'), agent: fields.get('agent'), progress: 0, glyph: 'code', instructions: fields.get('instructions').trim(), logs: []};
+    if (!getProject(run.project) || !Object.hasOwn(agents, run.agent) || (run.agent === 'local' && !localModelReady)) return;
+    state.runs.unshift(run);
+    transition(run, 'queued');
+    form.reset();
+    refresh(true);
+    openRun(run.id);
+    notify('Run queued');
+  });
+
+  byId('new-project-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const input = form.elements.name;
+    if (!requireText(input, 'Enter a project name.')) return;
+    const name = input.value.trim();
+    if (state.projects.some(project => project.name.toLowerCase() === name.toLowerCase())) {
+      input.setCustomValidity('A project with this name already exists.');
+      input.reportValidity();
+      return;
+    }
+    const project = {id: makeId(), name, description: form.elements.description.value.trim(), color: palette[state.projects.length % palette.length]};
+    state.projects.push(project);
+    record('project', project.name);
+    form.reset();
+    byId('project-dialog').close();
+    save();
+    setView('projects');
+    notify('Project added');
+  });
+
+  byId('settings-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const fields = event.currentTarget.elements;
+    if (!requireText(fields.name, 'Enter a workspace name.')) return;
+    Object.assign(state.prefs, {
+      name: fields.name.value.trim(),
+      autoplay: fields.autoplay.checked,
+      defaultModel: fields.defaultModel.value,
+      theme: fields.theme.value,
+      notifyReview: fields.notifyReview.checked,
+      notifyCompleted: fields.notifyCompleted.checked,
+      notifyFailed: fields.notifyFailed.checked
+    });
+    saveApiKeys(fields);
+    save();
+    applyTheme();
+    renderNavigation();
+    renderNoticeIndicator();
+    byId('settings-dialog').close();
+    notify('Settings saved');
+  });
+
+  byId('settings-dialog').addEventListener('close', () => {
+    if (byId('settings-dialog').open) return;
+    const fields = byId('settings-form').elements;
+    fields.name.setCustomValidity('');
+    fields.openaiKey.value = '';
+    fields.anthropicKey.value = '';
+    if (!$('dialog[open]')) $(mobile.matches ? '#navigation-toggle' : '[data-menu="profile-menu"]').focus({preventScroll: true});
+  });
+
+  byId('command-input').addEventListener('input', renderSearch);
+  byId('command-input').addEventListener('keydown', event => {
+    if (event.key === 'Enter') { event.preventDefault(); $('#command-results button')?.click(); }
+    if (event.key === 'ArrowDown') { event.preventDefault(); $('#command-results button')?.focus(); }
+  });
+
+  document.addEventListener('input', event => {
+    if (event.target.matches('input, textarea')) event.target.setCustomValidity('');
+  });
+
+  document.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (mobile.matches && byId('navigation-panel').dataset.collapsed === 'false' && !activeMenu?.element.contains(event.target) && !byId('navigation-panel').contains(event.target) && button?.id !== 'navigation-toggle' && !$('dialog[open]')) {
+      closeMenu();
+      closeNavigation(true);
+      return;
+    }
+    if (!button) {
+      if (activeMenu && !activeMenu.element.contains(event.target)) closeMenu();
+      if (mobile.matches && !byId('navigation-panel').contains(event.target)) closeNavigation();
+      if (event.target instanceof HTMLDialogElement) {
+        const bounds = event.target.getBoundingClientRect();
+        if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) event.target.close();
+      }
+      return;
+    }
+    const {open, menu, run, view: nextView, project, status, filter, value, runAction, targetRun} = button.dataset;
+    if (menu) { openMenu(button); return; }
+    const menuTrigger = activeMenu?.trigger;
+    closeMenu(Boolean(menuTrigger && !open && !run));
+    if (button.id === 'navigation-toggle') { toggleNavigation(); return; }
+    if (mobile.matches && !byId('navigation-panel').contains(button)) closeNavigation();
+    if (button.hasAttribute('data-close')) { button.closest('dialog')?.close(); return; }
+    if (open) { openDialog(open); return; }
+    if (run) { openRun(run); return; }
+    if (nextView) {
+      if (byId('search-dialog').open) byId('search-dialog').close();
+      setView(nextView, {project, status});
+      return;
+    }
+    if (filter) {
+      if (filter === 'status') statusFilter = value;
+      if (filter === 'project') projectFilter = value;
+      renderNavigation();
+      renderWorkspace(true);
+      $(`[data-menu="${filter}-menu"]`)?.focus({preventScroll: true});
+      return;
+    }
+    if (runAction) handleRunAction(runAction, targetRun);
+  });
+
+  document.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      closeMenu();
+      openDialog('search-dialog');
+      return;
+    }
+    if (activeMenu) {
+      if (event.key === 'Escape') { event.preventDefault(); closeMenu(true); return; }
+      if (event.key === 'Tab') { closeMenu(true); return; }
+      if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+        const buttons = [...activeMenu.element.querySelectorAll('button')];
+        if (!buttons.length) return;
+        event.preventDefault();
+        const index = buttons.indexOf(document.activeElement);
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+        buttons[next].focus();
+        return;
+      }
+    }
+    if (event.key === 'Escape' && !$('dialog[open]')) closeNavigation(true);
+    if (!event.ctrlKey && !event.altKey && !event.metaKey && !$('dialog[open]') && !event.target.matches('input, textarea') && /^[1-4]$/.test(event.key)) {
+      setView(Object.keys(pages)[Number(event.key) - 1]);
+    }
+  });
+
+  window.addEventListener('resize', () => closeMenu());
+  mobile.addEventListener('change', () => closeNavigation());
+  systemTheme.addEventListener('change', applyTheme);
+  window.addEventListener('scroll', () => closeMenu(), {passive: true});
+
+  setInterval(() => {
+    const now = Date.now();
+    const local = state.runs.find(run => run.agent === 'local' && run.status === 'queued' && run.nextTick <= now);
+    if (local && !localJobs.size) void runLocalTask(local);
+    if (!state.prefs.autoplay) return;
+    const progressing = state.runs.filter(run => run.agent !== 'local' && ['queued', 'running'].includes(run.status) && run.nextTick <= now);
+    if (!progressing.length) return;
+    for (const run of progressing) {
+      if (run.status === 'queued') {
+        transition(run, 'running', 'running', now);
+        continue;
+      }
+      const previous = run.progress;
+      run.progress = Math.min(100, previous + 5);
+      run.nextTick = now + 1800;
+      for (const [threshold, message] of stages) {
+        if (previous < threshold && run.progress >= threshold) run.logs.push({at: now, message});
+      }
+      if (run.progress === 100) transition(run, 'review', 'review', now);
+    }
+    refresh(true);
+  }, 950);
+
+  if (/Mac|iPhone|iPad/.test(navigator.platform)) byId('search-shortcut').textContent = '⌘ K';
+  for (const run of state.runs.filter(item => item.agent === 'local' && item.status === 'running')) {
+    transition(run, 'failed');
+    run.logs.push({at: Date.now(), message: 'The page was closed during generation. Rerun to restart.'});
+  }
+  save();
+  applyTheme();
+  byId('default-model-choices').innerHTML = Object.entries(agents).map(([id, [label]]) =>
+    `<label class="choice"><input type="radio" name="defaultModel" value="${id}"><span>${label}</span></label>`
+  ).join('');
+  renderNavigation();
+  renderWorkspace();
+  void prepareLocalModel();
+</script>
+</body>
+</html>

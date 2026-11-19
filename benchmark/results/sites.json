@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T11:00:04.326Z",
+  "generatedAt": "2026-11-19T21:57:40.310Z",
   "sites": [
     {
       "site": "agent-desk",
@@ -31,7 +31,7 @@
       },
       "verifyPage": {
         "floor": 42,
-        "meaning": 4,
+        "meaning": 12,
         "derivation": 12
       },
       "lintFairRules": [
@@ -187,14 +187,16 @@
       "principle": "choice",
       "layer": "source",
       "what": "About nine header icon buttons, mostly rare and duplicated in More; seven sidebar nav items ahead of the chat list",
-      "expect": [],
+      "expect": [
+        "too-many-peers"
+      ],
       "verifyFired": [
         "low-contrast",
         "small-target",
         "text-on-gradient"
       ],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "agent-desk",
@@ -302,7 +304,6 @@
       "what": "'Full auto' is one click away in a plain list with no warning or confirmation",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure",
         "low-contrast"
       ],
       "caught": [],
@@ -316,7 +317,6 @@
       "what": "Permission mode is a tiny muted pill with an unexplained coloured dot; menu offset hard-coded on phone",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure",
         "low-contrast"
       ],
       "caught": [],
@@ -330,7 +330,6 @@
       "what": "Model, effort and permission are three near-identical peer pills; effort loses its label on phone",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure",
         "low-contrast"
       ],
       "caught": [],
@@ -342,10 +341,14 @@
       "principle": "consequence",
       "layer": "source",
       "what": "'Stop agent' sits under 'Export transcript' with only red text, no separator or confirmation",
-      "expect": [],
-      "verifyFired": [],
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "agent-desk",
@@ -402,10 +405,7 @@
       "layer": "render",
       "what": "An empty 'Promo' row shows in the summary because [hidden] is overridden by display:flex",
       "expect": [],
-      "verifyFired": [
-        "redundant-enclosure",
-        "text-overflow"
-      ],
+      "verifyFired": [],
       "caught": [],
       "status": "no-rule"
     },
@@ -415,13 +415,12 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Breakdown popover covers the tip and total it explains; cut off at 390px",
-      "expect": [],
-      "verifyFired": [
-        "redundant-enclosure",
-        "text-overflow"
+      "expect": [
+        "surface-offscreen"
       ],
+      "verifyFired": [],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "food-checkout",
@@ -432,10 +431,7 @@
       "expect": [
         "small-target"
       ],
-      "verifyFired": [
-        "redundant-enclosure",
-        "text-overflow"
-      ],
+      "verifyFired": [],
       "caught": [],
       "status": "silent"
     },
@@ -450,6 +446,7 @@
       ],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -467,6 +464,7 @@
       ],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -484,6 +482,7 @@
       ],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -503,6 +502,7 @@
       ],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -518,6 +518,7 @@
       "expect": [],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -535,6 +536,7 @@
       ],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -552,6 +554,7 @@
       "expect": [],
       "verifyFired": [
         "flat-emphasis",
+        "destructive-unseparated",
         "low-contrast",
         "small-target"
       ],
@@ -566,8 +569,8 @@
       "what": "Sheet has no close or cancel; new address commits silently on Done",
       "expect": [],
       "verifyFired": [
-        "slow-motion",
-        "low-contrast"
+        "low-contrast",
+        "slow-motion"
       ],
       "caught": [],
       "status": "no-rule"
@@ -582,8 +585,12 @@
         "low-contrast"
       ],
       "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
         "slow-motion",
-        "low-contrast"
+        "too-many-peers",
+        "covers-trigger",
+        "small-target"
       ],
       "caught": [
         "low-contrast"
@@ -596,13 +603,21 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "23 slots in one undivided grid; focus ring on 'Today' looks like a selection",
-      "expect": [],
-      "verifyFired": [
-        "slow-motion",
-        "low-contrast"
+      "expect": [
+        "too-many-peers"
       ],
-      "caught": [],
-      "status": "no-rule"
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "slow-motion",
+        "too-many-peers",
+        "covers-trigger",
+        "small-target"
+      ],
+      "caught": [
+        "too-many-peers"
+      ],
+      "status": "caught"
     },
     {
       "site": "food-checkout",
@@ -612,8 +627,8 @@
       "what": "'Default wallet' label contradicts the preselected default card",
       "expect": [],
       "verifyFired": [
-        "slow-motion",
-        "low-contrast"
+        "low-contrast",
+        "slow-motion"
       ],
       "caught": [],
       "status": "no-rule"
@@ -626,6 +641,7 @@
       "what": "Undo toast covers cards for six seconds while the total jumps with no other signal",
       "expect": [],
       "verifyFired": [
+        "flat-emphasis",
         "slow-motion"
       ],
       "caught": [],
@@ -754,10 +770,14 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Discard draft is a bare trash icon next to a close X that saves; no visible difference",
-      "expect": [],
-      "verifyFired": [],
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "slow-response"
+      ],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "inbox",
@@ -766,7 +786,9 @@
       "layer": "judgment",
       "what": "Compose is modal, blocking the message being replied to; no Cc, Bcc or attach",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "slow-response"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -777,7 +799,10 @@
       "layer": "judgment",
       "what": "Order reverses frequency; duplicates the toolbar",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -787,10 +812,17 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Delete directly under Archive with no gap; unclear if permanent",
-      "expect": [],
-      "verifyFired": [],
-      "caught": [],
-      "status": "no-rule"
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
+      "caught": [
+        "destructive-unseparated"
+      ],
+      "status": "caught"
     },
     {
       "site": "inbox",
@@ -799,9 +831,7 @@
       "layer": "judgment",
       "what": "Icons switch meaning; focus lands on the close X",
       "expect": [],
-      "verifyFired": [
-        "invisible-focus"
-      ],
+      "verifyFired": [],
       "caught": [],
       "status": "no-rule"
     },
@@ -814,7 +844,10 @@
       "expect": [
         "small-target"
       ],
-      "verifyFired": [],
+      "verifyFired": [
+        "low-contrast",
+        "flat-emphasis"
+      ],
       "caught": [],
       "status": "silent"
     },
@@ -825,7 +858,9 @@
       "layer": "judgment",
       "what": "Omits frequent triage shortcuts; help shown on touch phones",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -838,7 +873,9 @@
       "expect": [
         "unlabelled-field"
       ],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "silent"
     },
@@ -976,12 +1013,12 @@
       "principle": "grouping",
       "layer": "render",
       "what": "Popover covers the field it explains; no arrow, no close",
-      "expect": [],
-      "verifyFired": [
-        "redundant-enclosure"
+      "expect": [
+        "covers-trigger"
       ],
+      "verifyFired": [],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "onboarding-wizard",
@@ -990,9 +1027,7 @@
       "layer": "render",
       "what": "Popover drawn like the card, so in dark mode it blends in",
       "expect": [],
-      "verifyFired": [
-        "redundant-enclosure"
-      ],
+      "verifyFired": [],
       "caught": [],
       "status": "no-rule"
     },
@@ -1141,7 +1176,9 @@
       "layer": "render",
       "what": "Quick ranges wrap unevenly and are out of order; popover covers the KPIs it changes",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1152,7 +1189,9 @@
       "layer": "source",
       "what": "Quick ranges apply instantly but custom range needs Apply; reversed range swapped silently",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1176,9 +1215,13 @@
       "expect": [
         "small-target"
       ],
-      "verifyFired": [],
-      "caught": [],
-      "status": "silent"
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
     },
     {
       "site": "revenue-dash",
@@ -1187,7 +1230,9 @@
       "layer": "judgment",
       "what": "Drawer padded with made-up rows and a status that never varies; no action",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1197,10 +1242,17 @@
       "principle": "consequence",
       "layer": "source",
       "what": "'Remove' is an option inside the role select and applies immediately with no confirmation or undo",
-      "expect": [],
-      "verifyFired": [],
-      "caught": [],
-      "status": "no-rule"
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
+      "caught": [
+        "destructive-unseparated"
+      ],
+      "status": "caught"
     },
     {
       "site": "revenue-dash",
@@ -1212,7 +1264,10 @@
         "low-contrast",
         "unlabelled-field"
       ],
-      "verifyFired": [],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
       "caught": [],
       "status": "silent"
     },
@@ -1224,7 +1279,7 @@
       "what": "Tooltip repeats legend figures; hover earns little",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure"
+        "covers-trigger"
       ],
       "caught": [],
       "status": "no-rule"
@@ -1373,7 +1428,9 @@
       "layer": "judgment",
       "what": "Three steps per filter that duplicate the tabs; no quick filters",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1384,7 +1441,9 @@
       "layer": "render",
       "what": "Odd 'Is' label; popover covers headers; no match preview",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1395,7 +1454,9 @@
       "layer": "judgment",
       "what": "Frequent actions (assign to me, resolve) hidden behind a 28px kebab; rare 'Open details' leads",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1405,10 +1466,14 @@
       "principle": "consequence",
       "layer": "source",
       "what": "Delete sits two rows under Merge with a hairline; no undo for resolve or assign",
-      "expect": [],
-      "verifyFired": [],
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "ticket-admin",
@@ -1417,7 +1482,9 @@
       "layer": "judgment",
       "what": "Column picker serves almost no triage task and takes prime toolbar space",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1428,7 +1495,9 @@
       "layer": "render",
       "what": "On phone toggling hidden columns does nothing, so the menu misstates what shows",
       "expect": [],
-      "verifyFired": [],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
       "status": "no-rule"
     },
@@ -1440,8 +1509,8 @@
       "what": "No reply box; resolve is emphasised before any response is written",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure",
-        "low-contrast"
+        "low-contrast",
+        "covers-trigger"
       ],
       "caught": [],
       "status": "no-rule"
@@ -1454,8 +1523,8 @@
       "what": "Labels far from values; SLA due drawn like created/updated",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure",
-        "low-contrast"
+        "low-contrast",
+        "covers-trigger"
       ],
       "caught": [],
       "status": "no-rule"
@@ -1468,8 +1537,8 @@
       "what": "Scrim blocks the list; no next/previous, so close-and-reopen per ticket",
       "expect": [],
       "verifyFired": [
-        "redundant-enclosure",
-        "low-contrast"
+        "low-contrast",
+        "covers-trigger"
       ],
       "caught": [],
       "status": "no-rule"
@@ -1798,10 +1867,14 @@
       "principle": "convention",
       "layer": "render",
       "what": "Picker opens above its trigger and covers the field label and other inputs",
-      "expect": [],
-      "verifyFired": [],
+      "expect": [
+        "covers-trigger"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "workspace-settings",
@@ -1809,10 +1882,14 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "About 400 ungrouped zone names with no offsets; five rows visible",
-      "expect": [],
-      "verifyFired": [],
+      "expect": [
+        "too-many-peers"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
       "caught": [],
-      "status": "no-rule"
+      "status": "silent"
     },
     {
       "site": "workspace-settings",
@@ -1853,10 +1930,17 @@
       "principle": "salience",
       "layer": "render",
       "what": "Toast covers the Save button just clicked, at both widths",
-      "expect": [],
-      "verifyFired": [],
-      "caught": [],
-      "status": "no-rule"
+      "expect": [
+        "covers-trigger"
+      ],
+      "verifyFired": [
+        "small-target",
+        "covers-trigger"
+      ],
+      "caught": [
+        "covers-trigger"
+      ],
+      "status": "caught"
     },
     {
       "site": "workspace-settings",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T10:44:13.203Z",
+  "generatedAt": "2026-11-19T22:20:14.738Z",
   "verified": true,
   "model": "demo/model.json",
   "controls": [
@@ -11,8 +11,22 @@
       "verifyNoplan": []
     },
     {
+      "id": "ctl-menu-open--step",
+      "title": "Clean menu open at load",
+      "lint": [],
+      "verifyPlan": [],
+      "verifyNoplan": []
+    },
+    {
       "id": "ctl-menu-open--open",
       "title": "Clean menu open at load",
+      "lint": [],
+      "verifyPlan": [],
+      "verifyNoplan": []
+    },
+    {
+      "id": "ctl-dialog-open--step",
+      "title": "Clean dialog open at load",
       "lint": [],
       "verifyPlan": [],
       "verifyNoplan": []
@@ -32,7 +46,9 @@
       "id": "ctl-long-content",
       "title": "Clean page with a long transcript",
       "lint": [],
-      "verifyPlan": [],
+      "verifyPlan": [
+        "layout-shift"
+      ],
       "verifyNoplan": [
         "layout-shift"
       ]
@@ -769,7 +785,9 @@
       "principle": "memory",
       "layer": "judgment",
       "what": "Ten peers at one level, more than can be held in mind",
-      "expect": [],
+      "expect": [
+        "too-many-peers"
+      ],
       "surface": "page",
       "lint": {
         "fired": [],
@@ -787,8 +805,8 @@
         ],
         "caught": []
       },
-      "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule, incidental signal"
+      "status": "other signal",
+      "statusNoPlan": "other signal"
     },
     {
       "case": "mem-flat-nav",
@@ -827,7 +845,9 @@
       "principle": "choice",
       "layer": "judgment",
       "what": "Rare actions shown beside the constant one slow every decision",
-      "expect": [],
+      "expect": [
+        "too-many-peers"
+      ],
       "surface": "page",
       "lint": {
         "fired": [],
@@ -835,16 +855,23 @@
       },
       "verifyPlan": {
         "fired": [
-          "weak-grouping"
+          "weak-grouping",
+          "too-many-peers"
         ],
-        "caught": []
+        "caught": [
+          "too-many-peers"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "too-many-peers"
+        ],
+        "caught": [
+          "too-many-peers"
+        ]
       },
-      "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule"
+      "status": "caught",
+      "statusNoPlan": "caught"
     },
     {
       "case": "cho-frequent-hidden",
@@ -1180,15 +1207,19 @@
         "caught": []
       },
       "verifyPlan": {
-        "fired": [],
+        "fired": [
+          "surface-offscreen"
+        ],
         "caught": []
       },
       "verifyNoplan": {
-        "fired": [],
+        "fired": [
+          "surface-offscreen"
+        ],
         "caught": []
       },
-      "status": "silent",
-      "statusNoPlan": "silent"
+      "status": "other signal",
+      "statusNoPlan": "other signal"
     },
     {
       "case": "leg-placeholder-label",
@@ -1625,7 +1656,9 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "An irreversible rare action placed among frequent ones, styled the same",
-      "expect": [],
+      "expect": [
+        "destructive-unseparated"
+      ],
       "surface": "page",
       "lint": {
         "fired": [],
@@ -1642,8 +1675,8 @@
         "fired": [],
         "caught": []
       },
-      "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule"
+      "status": "other signal",
+      "statusNoPlan": "silent"
     },
     {
       "case": "csq-vague-labels",
@@ -2145,15 +2178,23 @@
         "caught": []
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
       },
-      "status": "other signal",
-      "statusNoPlan": "other signal"
+      "status": "caught",
+      "statusNoPlan": "caught"
     },
     {
       "case": "srf-menu-tiny-items",
@@ -2177,11 +2218,15 @@
         ]
       },
       "verifyPlan": {
-        "fired": [],
+        "fired": [
+          "small-target"
+        ],
         "caught": []
       },
       "verifyNoplan": {
-        "fired": [],
+        "fired": [
+          "small-target"
+        ],
         "caught": []
       },
       "status": "caught",
@@ -2283,12 +2328,24 @@
         ]
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
       },
       "status": "caught",
       "statusNoPlan": "caught"
@@ -2370,12 +2427,22 @@
         ]
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
       },
       "status": "caught",
       "statusNoPlan": "caught"
@@ -2442,22 +2509,32 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Irreversible item not separated, not marked, no second step",
-      "expect": [],
+      "expect": [
+        "destructive-unseparated"
+      ],
       "surface": "#more-menu",
       "lint": {
         "fired": [],
         "caught": []
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
       },
-      "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "status": "caught",
+      "statusNoPlan": "caught"
     },
     {
       "case": "srf-menu-delete-mixed",
@@ -2467,22 +2544,32 @@
       "principle": "consequence",
       "layer": "judgment",
       "what": "Irreversible item not separated, not marked, no second step",
-      "expect": [],
+      "expect": [
+        "destructive-unseparated"
+      ],
       "surface": "#more-menu",
       "lint": {
         "fired": [],
         "caught": []
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
       },
-      "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "status": "caught",
+      "statusNoPlan": "caught"
     },
     {
       "case": "srf-menu-emoji",
@@ -2505,12 +2592,20 @@
         ]
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
       },
       "status": "caught",
       "statusNoPlan": "caught"
@@ -2571,15 +2666,23 @@
         "caught": []
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
       },
-      "status": "silent",
-      "statusNoPlan": "silent"
+      "status": "caught",
+      "statusNoPlan": "caught"
     },
     {
       "case": "srf-dialog-two-primaries",
@@ -2621,7 +2724,8 @@
       "what": "Dialog wider than the phone",
       "expect": [
         "horizontal-scroll",
-        "text-overflow"
+        "text-overflow",
+        "surface-offscreen"
       ],
       "surface": "#settings",
       "lint": {
@@ -2649,7 +2753,8 @@
       "what": "Dialog wider than the phone",
       "expect": [
         "horizontal-scroll",
-        "text-overflow"
+        "text-overflow",
+        "surface-offscreen"
       ],
       "surface": "#settings",
       "lint": {
@@ -2684,15 +2789,23 @@
         "caught": []
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
       },
-      "status": "silent",
-      "statusNoPlan": "silent"
+      "status": "caught",
+      "statusNoPlan": "caught"
     },
     {
       "case": "srf-dialog-unlabelled",
@@ -2809,15 +2922,29 @@
       },
       "verifyPlan": {
         "fired": [
-          "small-target"
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
         ],
-        "caught": []
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
       },
       "verifyNoplan": {
         "fired": [
-          "small-target"
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
         ],
-        "caught": []
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
       },
       "status": "caught",
       "statusNoPlan": "caught"
@@ -2847,15 +2974,27 @@
       },
       "verifyPlan": {
         "fired": [
-          "small-target"
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
         ],
-        "caught": []
+        "caught": [
+          "underived-size"
+        ]
       },
       "verifyNoplan": {
         "fired": [
-          "small-target"
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
         ],
-        "caught": []
+        "caught": [
+          "underived-size"
+        ]
       },
       "status": "caught",
       "statusNoPlan": "caught"
@@ -2987,7 +3126,8 @@
       "verifyPlan": {
         "fired": [
           "slow-motion",
-          "small-target"
+          "small-target",
+          "slow-response"
         ],
         "caught": [
           "slow-motion"
@@ -3069,12 +3209,20 @@
         ]
       },
       "verifyPlan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
       },
       "verifyNoplan": {
-        "fired": [],
-        "caught": []
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
       },
       "status": "caught",
       "statusNoPlan": "caught"

@@ -38,7 +38,10 @@
       "layer": "render",
       "what": "Breakdown popover covers the tip and total it explains; cut off at 390px",
       "selector": "#pop-fees",
-      "expect": []
+      "expect": [
+        "surface-offscreen"
+      ],
+      "expectNote": "surface-offscreen mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "fees popover",
@@ -137,8 +140,11 @@
       "layer": "judgment",
       "what": "23 slots in one undivided grid; focus ring on 'Today' looks like a selection",
       "selector": "#days, #slots",
-      "expect": [],
-      "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
+      "expect": [
+        "too-many-peers"
+      ],
+      "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input.",
+      "expectNote": "too-many-peers mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "payment sheet",

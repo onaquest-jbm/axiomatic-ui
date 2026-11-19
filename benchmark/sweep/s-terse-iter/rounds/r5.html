@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Supervisor</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#16181d;--mute:#667085;--line:#e3e6eb;--acc:#3b5bdb;--ok:#2f9e44;--warn:#e8890c;--bad:#d6336c;--shadow:0 8px 28px rgba(0,0,0,.16)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#101216;--panel:#181b21;--ink:#e8eaee;--mute:#9099a8;--line:#2a2f38;--acc:#7c93ff;--shadow:0 8px 28px rgba(0,0,0,.6)}}
+:root[data-theme=dark]{--bg:#101216;--panel:#181b21;--ink:#e8eaee;--mute:#9099a8;--line:#2a2f38;--acc:#7c93ff;--shadow:0 8px 28px rgba(0,0,0,.6);color-scheme:dark}
+:root[data-theme=light]{color-scheme:light}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--acc)}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.row:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+button.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+button.ghost{border-color:transparent;background:transparent}
+header{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+header h1{font-size:16px;margin:0;flex:1}
+.layout{flex:1;display:flex;min-height:0}
+nav{width:220px;background:var(--panel);border-right:1px solid var(--line);padding:12px;overflow:auto}
+nav h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:8px 6px}
+nav button{display:flex;width:100%;justify-content:space-between;border:0;background:none;text-align:left;margin:1px 0}
+nav button.on{background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc)}
+main{flex:1;overflow:auto;padding:16px;min-width:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.stat b{font-size:22px;display:block}.stat span{color:var(--mute);font-size:12px}
+.bar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.bar input{flex:1;min-width:140px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.list{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.row{display:grid;grid-template-columns:18px 14px 1fr auto auto;gap:12px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.row:last-child{border:0}.row:hover{background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--mute)}
+.running .dot{background:var(--ok);animation:p 1.4s infinite}.waiting .dot{background:var(--warn)}.failed .dot{background:var(--bad)}
+@keyframes p{50%{opacity:.35}}@media(prefers-reduced-motion:reduce){.dot{animation:none!important}}
+.t{font-weight:600}.sub{color:var(--mute);font-size:12px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--mute)}
+.empty{padding:30px;text-align:center;color:var(--mute)}
+.menu,.pop{position:fixed;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:4px;z-index:30;min-width:170px}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none}
+.menu button:hover{background:var(--bg)}
+.pop{width:320px;padding:10px;max-height:70vh;overflow:auto}.pop h3{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:6px 0 2px;display:flex;justify-content:space-between;align-items:center}.pop .n.unread{border-left:3px solid var(--acc);padding-left:8px}.pop .n.k-failed b{color:var(--bad)}.pop .n.k-done b{color:var(--ok)}.pop .n{padding:6px 0;border-bottom:1px solid var(--line)}.pop .n:last-child{border:0}
+#bulk-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:var(--panel);border:1px solid var(--acc);border-radius:8px;flex-wrap:wrap}#bulk-bar .sp{flex:1}.row .sel,#sel-all{width:16px;height:16px;margin:0}.archived .dot{opacity:.4}
+[hidden]{display:none!important}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);padding:20px;width:min(460px,92vw);box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog label,.drawer label{display:block;margin:10px 0 3px;font-size:12px;color:var(--mute)}
+#settings-dialog{max-height:90vh;overflow:auto}#settings-dialog fieldset{border:1px solid var(--line);border-radius:8px;margin:12px 0 0;padding:4px 12px 10px}#settings-dialog legend{font-size:12px;color:var(--mute);padding:0 4px}
+dialog input[type=checkbox]{width:auto}
+dialog input,dialog select,dialog textarea,.drawer select,.drawer input[type=text]{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.side{position:fixed;top:0;bottom:0;width:min(420px,100vw);background:var(--panel);border-left:1px solid var(--line);box-shadow:var(--shadow);z-index:50;padding:16px;overflow:auto;transition:transform .2s;right:0}
+.side[hidden]{display:block!important;transform:translateX(105%);visibility:hidden}
+.side header{padding:0 0 10px;background:none;border:0}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;max-height:280px;overflow:auto;font:12px/1.5 ui-monospace,Consolas,monospace;white-space:pre-wrap}
+#toasts{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:60}
+.toast{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:center}
+.toast button{background:none;color:inherit;border-color:currentColor;padding:2px 8px}
+#palette{padding:10px;width:min(520px,92vw);margin-top:12vh}#pal-list{margin-top:8px;max-height:50vh;overflow:auto}#pal-list button{display:flex;width:100%;justify-content:space-between;border:0;background:none;text-align:left}#pal-list button.sel{background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--acc)}
+#usage-dialog{width:min(620px,94vw);max-height:90vh;overflow:auto}#usage-dialog .seg{display:flex;gap:6px;margin:10px 0}#usage-dialog .seg button.on{background:var(--acc);color:#fff;border-color:var(--acc)}#usage-svg{width:100%;height:auto;display:block}#usage-svg text{fill:var(--ink);font-size:12px}#usage-svg rect.b{fill:var(--acc)}#usage-tbl{width:100%;border-collapse:collapse;margin-top:10px}#usage-tbl th,#usage-tbl td{text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}#usage-tbl th:first-child,#usage-tbl td:first-child{text-align:left}#usage-tbl th{font-size:12px;color:var(--mute);font-weight:500}
+.sw{display:flex;align-items:center;gap:8px;margin:10px 0}.sw input{width:auto}
+@media(max-width:720px){nav{display:none}.row{grid-template-columns:18px 14px 1fr auto}.row .tag{display:none}}
+</style></head><body>
+<header><h1>Agent Supervisor</h1>
+<button id="new-agent-btn" class="primary">+ New agent</button>
+<button id="notif-btn" aria-haspopup="true" aria-expanded="false" aria-label="Notifications" title="Notifications"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> <span id="notif-count" class="tag" aria-label="unread">0</span></button>
+<button id="palette-btn" aria-keyshortcuts="Control+K" title="Command palette (Ctrl+K)">Commands <span class="tag">Ctrl+K</span></button>
+<button id="usage-btn">Usage</button>
+<button id="settings-btn">Settings</button></header>
+<div class="layout">
+<nav><h2>Projects</h2><div id="projects"></div></nav>
+<main>
+<div class="stats" id="stats"></div>
+<div class="bar"><input id="search" type="search" placeholder="Search agents or tasks" aria-label="Search agents"><button id="filter-btn" aria-haspopup="true" aria-expanded="false">Status: All</button></div>
+<div id="bulk-bar" role="toolbar" aria-label="Bulk actions" hidden><input type="checkbox" id="sel-all" aria-label="Select all shown agents"><b id="bulk-count">0 selected</b><span class="sp"></span><button id="b-stop">Stop</button><button id="b-archive">Archive</button><button id="b-delete">Delete</button><button id="b-clear" class="ghost">Clear</button></div>
+<div class="list" id="list"></div>
+</main></div>
+
+<div id="filter-menu" class="menu" role="menu" hidden></div>
+<div id="row-menu" class="menu" role="menu" hidden>
+<button data-a="open" role="menuitem">Open details</button><button data-a="pause" role="menuitem">Pause / resume</button><button data-a="restart" role="menuitem">Restart</button><button data-a="stop" role="menuitem">Stop</button><button data-a="duplicate" role="menuitem">Duplicate</button><button data-a="delete" role="menuitem">Delete</button></div>
+<div id="notif-popover" class="pop" role="dialog" aria-label="Alerts" hidden></div>
+
+<dialog id="new-dialog"><form method="dialog" id="new-form"><h2 style="margin:0">New agent</h2>
+<label for="n-task">Task</label><textarea id="n-task" rows="3" required placeholder="e.g. Fix flaky auth tests"></textarea>
+<label for="n-proj">Project</label><select id="n-proj"></select>
+<label for="n-model">Model</label><select id="n-model"><option>Sonnet</option><option>Opus</option><option>Codex</option></select>
+<label for="n-perm">Permissions</label><select id="n-perm"><option>Ask before edits</option><option>Auto-accept edits</option><option>Read-only</option></select>
+<div class="acts"><button type="button" id="n-cancel">Cancel</button><button class="primary" type="submit">Start agent</button></div></form></dialog>
+
+<dialog id="confirm-dialog" aria-labelledby="confirm-title"><h2 id="confirm-title" style="margin:0">Delete agents?</h2><p id="confirm-msg"></p><div class="acts"><button type="button" id="confirm-cancel">Cancel</button><button type="button" id="confirm-ok" class="primary">Delete</button></div></dialog>
+
+<dialog id="palette" aria-label="Command palette"><input id="pal-q" type="text" placeholder="Type a command or agent" aria-label="Command" autocomplete="off" role="combobox" aria-controls="pal-list" aria-expanded="true"><div id="pal-list" role="listbox"></div></dialog>
+<aside id="detail-panel" class="side" hidden aria-label="Agent details"></aside>
+<dialog id="settings-dialog" aria-labelledby="settings-title"><form method="dialog" id="settings-form" autocomplete="off"><h2 id="settings-title" style="margin:0">Settings</h2>
+<label for="s-name">Display name</label><input id="s-name" type="text" value="Me">
+<label for="s-model">Default model</label><select id="s-model"><option>Sonnet</option><option>Opus</option><option>Codex</option></select>
+<label for="s-theme">Theme</label><select id="s-theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+<label for="s-max">Max concurrent agents</label><select id="s-max"><option>2</option><option selected>4</option><option>8</option></select>
+<fieldset><legend>Notifications</legend>
+<div class="sw"><input type="checkbox" id="s-notify" checked><label for="s-notify" style="margin:0">Alert when an agent needs approval</label></div>
+<div class="sw"><input type="checkbox" id="s-notify-done" checked><label for="s-notify-done" style="margin:0">Notify when an agent finishes</label></div>
+<div class="sw"><input type="checkbox" id="s-notify-fail" checked><label for="s-notify-fail" style="margin:0">Notify when an agent fails or is stopped</label></div>
+</fieldset>
+<div class="sw"><input type="checkbox" id="s-auto"><label for="s-auto" style="margin:0">Auto-approve read-only commands</label></div>
+<fieldset><legend>API keys</legend>
+<label for="k-anthropic">Anthropic API key</label><input id="k-anthropic" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-...">
+<label for="k-openai">OpenAI API key (Codex)</label><input id="k-openai" type="password" autocomplete="off" spellcheck="false" placeholder="sk-...">
+<div class="sub" style="margin-top:6px">Stored only in this browser (localStorage), unencrypted.</div>
+</fieldset>
+<div class="acts"><button type="button" id="settings-close">Cancel</button><button class="primary" type="submit" id="s-save">Save</button></div></form></dialog>
+<dialog id="usage-dialog" aria-labelledby="usage-title"><h2 id="usage-title" style="margin:0">Usage by project</h2>
+<div class="sub">Estimated from tokens and model rates (Opus $30, Sonnet $6, Codex $8 per 1M tokens).</div>
+<div class="seg" role="group" aria-label="Chart metric"><button type="button" id="u-spend" class="on" aria-pressed="true">Spend</button><button type="button" id="u-tokens" aria-pressed="false">Tokens</button></div>
+<div id="usage-chart"></div><table id="usage-tbl"></table>
+<div class="acts"><button type="button" id="usage-close" class="primary">Close</button></div></dialog>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+let projects=["All projects","web-store","api-gateway","ml-pipeline","docs-site"];
+let notifs=[],nseq=0;
+let sel=new Set();let cur="All projects",filter="All",q="",menuId=null,openId=null,seq=8;
+let agents=[
+{id:1,tok:412000,task:"Migrate checkout to new payments SDK",proj:"web-store",st:"running",model:"Opus",prog:62,log:["Reading src/checkout/*","Edited cart.ts","Running tests: 41 passed"]},
+{id:2,tok:96000,task:"Fix flaky auth tests",proj:"api-gateway",st:"waiting",model:"Sonnet",prog:40,log:["Found race in token refresh","Needs approval: run `npm run test:integration`"],ask:"Run `npm run test:integration`?"},
+{id:3,tok:188000,task:"Add retry logic to batch loader",proj:"ml-pipeline",st:"running",model:"Codex",prog:25,failAt:45,log:["Planning change","Editing loader.py"]},
+{id:4,tok:254000,task:"Rewrite install guide",proj:"docs-site",st:"done",model:"Sonnet",prog:100,log:["Updated 6 pages","Opened PR #212"]},
+{id:5,tok:131000,task:"Upgrade lint config",proj:"web-store",st:"failed",model:"Sonnet",prog:70,log:["eslint plugin conflict","Exited with code 1"]},
+{id:6,tok:77000,task:"Triage rate-limit bug",proj:"api-gateway",st:"waiting",model:"Opus",prog:55,log:["Needs approval: delete cache dir"],ask:"Delete .cache/ ?"},
+{id:7,tok:60000,task:"Profile slow dataset join",proj:"ml-pipeline",st:"paused",model:"Codex",prog:33,log:["Paused by user"]}];
+const label={running:"Running",waiting:"Needs approval",done:"Done",failed:"Failed",paused:"Paused",archived:"Archived"};
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(msg,act){const t=document.createElement("div");t.className="toast";t.innerHTML="<span>"+esc(msg)+"</span>";
+ if(act){const b=document.createElement("button");b.textContent=act.l;b.onclick=()=>{act.f();t.remove()};t.append(b)}
+ $("#toasts").append(t);setTimeout(()=>t.remove(),4500)}
+function notify(kind,a,msg){notifs.unshift({id:++nseq,kind,aid:a.id,msg,task:a.task,t:new Date(),read:false});if(notifs.length>30)notifs.pop();
+ toast(msg+": "+a.task,{l:"View",f:()=>detail(a.id)});if(!$("#notif-popover").hidden)fillNotif()}
+function fillNotif(){const w=settings.notify===false?[]:agents.filter(a=>a.st=="waiting"),tm=d=>d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+ $("#notif-popover").innerHTML=(w.length?'<h3>Needs approval</h3>'+w.map(a=>`<div class="n"><b>${esc(a.task)}</b><div class="sub">${esc(a.ask||"")}</div><button data-open="${a.id}" style="margin-top:4px">Review</button></div>`).join(""):"")
+ +'<h3>Recent'+(notifs.length?'<button id="notif-clear" class="ghost" style="padding:0 4px">Clear</button>':'')+'</h3>'
+ +(notifs.length?notifs.map(n=>`<div class="n k-${n.kind} ${n.read?"":"unread"}"><b>${esc(n.msg)}</b> <span class="sub">${tm(n.t)}</span><div class="sub">${esc(n.task)}</div><button data-open="${n.aid}" style="margin-top:4px">View</button></div>`).join(""):'<div class="sub" style="padding:6px 0">No notifications yet.</div>');
+ notifs.forEach(n=>n.read=true);updCount()}
+function updCount(){const w=settings.notify===false?0:agents.filter(a=>a.st=="waiting").length;$("#notif-count").textContent=w+notifs.filter(n=>!n.read).length}
+function vis(){return agents.filter(a=>(cur=="All projects"||a.proj==cur)&&(filter=="All"?a.st!="archived":a.st==filter)&&(a.task+a.proj).toLowerCase().includes(q))}
+function render(){
+ $("#projects").innerHTML=projects.map(p=>`<button data-p="${p}" class="${p==cur?"on":""}"><span>${p}</span><span class="sub">${p=="All projects"?agents.length:agents.filter(a=>a.proj==p).length}</span></button>`).join("");
+ const base=agents.filter(a=>cur=="All projects"||a.proj==cur),c=s=>base.filter(a=>a.st==s).length;
+ $("#stats").innerHTML=["running","waiting","failed","done"].map(s=>`<div class="stat"><b>${c(s)}</b><span>${label[s]}</span></div>`).join("");
+ const v=vis();sel=new Set([...sel].filter(i=>v.some(a=>a.id==i)));
+ $("#list").innerHTML=v.length?v.map(a=>`<div class="row ${a.st}" tabindex="0" data-id="${a.id}"><input type="checkbox" class="sel" data-id="${a.id}" ${sel.has(a.id)?"checked":""} aria-label="Select ${esc(a.task)}"><span class="dot"></span><div><div class="t">${esc(a.task)}</div><div class="sub">${a.proj} · ${a.model} · ${a.prog}%</div></div><span class="tag">${label[a.st]}</span><button class="ghost row-menu-btn" data-id="${a.id}" aria-haspopup="true" aria-label="Actions for ${esc(a.task)}">&#8943;</button></div>`).join(""):'<div class="empty">No agents match.</div>';
+ updCount();updBulk(v);
+ $("#filter-btn").textContent="Status: "+(filter=="All"?"All":label[filter]);
+ if(openId)detail(openId);
+ if($("#usage-dialog").open)fillUsage();
+}
+function updBulk(v){const n=sel.size;$("#bulk-bar").hidden=!n;$("#bulk-count").textContent=n+" selected";const s=$("#sel-all");s.checked=n>0&&n==v.length;s.indeterminate=n>0&&n<v.length}
+function bulk(a){const ids=[...sel],gs=agents.filter(g=>ids.includes(g.id));if(!gs.length)return;
+ if(a=="stop"||a=="archive"){const olds=gs.map(g=>[g,g.st]);gs.forEach(g=>{g.st=a=="stop"?"failed":"archived";g.log.push(a=="stop"?"Stopped by user":"Archived")});sel.clear();toast(gs.length+(a=="stop"?" stopped":" archived"),{l:"Undo",f:()=>{olds.forEach(([g,o])=>g.st=o);render()}})}
+ if(a=="delete"){const idx=gs.map(g=>[g,agents.indexOf(g)]);agents=agents.filter(g=>!gs.includes(g));if(gs.some(g=>g.id==openId))closeDetail();sel.clear();toast(gs.length+" deleted",{l:"Undo",f:()=>{idx.sort((x,y)=>x[1]-y[1]).forEach(([g,i])=>agents.splice(i,0,g));render()}})}
+ render()}
+const RATE={Opus:30,Sonnet:6,Codex:8};let uMetric="spend";
+const fmtT=n=>n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?Math.round(n/1e3)+"k":""+n,fmtS=n=>"$"+n.toFixed(2);
+function fillUsage(){const rows=projects.slice(1).map(p=>{const l=agents.filter(a=>a.proj==p);return{p,n:l.length,tok:l.reduce((s,a)=>s+a.tok,0),sp:l.reduce((s,a)=>s+a.tok*RATE[a.model]/1e6,0)}});
+ const k=uMetric=="spend"?"sp":"tok",f=uMetric=="spend"?fmtS:fmtT,max=Math.max(1,...rows.map(r=>r[k])),W=520,L=100,R=70,h=rows.length*34+8;
+ $("#usage-chart").innerHTML=`<svg id="usage-svg" viewBox="0 0 ${W} ${h}" role="img" aria-label="${uMetric=="spend"?"Spend":"Tokens"} per project">`+rows.map((r,i)=>{const y=i*34+4,w=Math.max(2,(W-L-R)*r[k]/max);return`<text x="${L-8}" y="${y+17}" text-anchor="end">${esc(r.p)}</text><rect class="b" x="${L}" y="${y+3}" width="${w}" height="20" rx="3"/><text x="${L+w+6}" y="${y+17}">${f(r[k])}</text>`}).join("")+"</svg>";
+ const T=rows.reduce((a,r)=>({n:a.n+r.n,tok:a.tok+r.tok,sp:a.sp+r.sp}),{n:0,tok:0,sp:0});
+ $("#usage-tbl").innerHTML="<tr><th>Project</th><th>Agents</th><th>Tokens</th><th>Spend</th></tr>"+rows.map(r=>`<tr><td>${esc(r.p)}</td><td>${r.n}</td><td>${fmtT(r.tok)}</td><td>${fmtS(r.sp)}</td></tr>`).join("")+`<tr><td><b>Total</b></td><td><b>${T.n}</b></td><td><b>${fmtT(T.tok)}</b></td><td><b>${fmtS(T.sp)}</b></td></tr>`;
+ $("#u-spend").className=uMetric=="spend"?"on":"";$("#u-tokens").className=uMetric=="tokens"?"on":"";$("#u-spend").setAttribute("aria-pressed",uMetric=="spend");$("#u-tokens").setAttribute("aria-pressed",uMetric=="tokens")}
+function place(el,btn){const r=btn.getBoundingClientRect();el.hidden=false;el.style.top=r.bottom+4+"px";el.style.left=Math.max(8,Math.min(innerWidth-el.offsetWidth-8,r.right-el.offsetWidth))+"px"}
+function closePops(){["#filter-menu","#row-menu","#notif-popover"].forEach(s=>$(s).hidden=true);$("#notif-btn").setAttribute("aria-expanded","false");$("#filter-btn").setAttribute("aria-expanded","false")}
+function detail(id){const a=agents.find(x=>x.id==id);if(!a){closeDetail();return}openId=id;const p=$("#detail-panel");p.hidden=false;
+ p.innerHTML=`<header><h1>${esc(a.task)}</h1><button id="detail-close" class="ghost">Close</button></header><p class="sub">${a.proj} · ${a.model} · <span class="tag">${label[a.st]}</span></p><progress value="${a.prog}" max="100" style="width:100%"></progress>
+ ${a.ask?`<p><b>${esc(a.ask)}</b></p><div class="acts" style="justify-content:flex-start;margin:0 0 12px"><button class="primary" id="approve-btn">Approve</button><button id="deny-btn">Deny</button></div>`:""}
+ <h2 style="font-size:13px">Activity</h2><pre>${a.log.map(esc).join("\n")}</pre>
+ <label for="d-msg" style="display:block;font-size:12px;color:var(--mute)">Message the agent</label><input id="d-msg" style="width:100%;padding:7px;border:1px solid var(--line);border-radius:6px;background:var(--bg)"><div class="acts"><button id="d-send" class="primary">Send</button></div>`}
+function closeDetail(){openId=null;$("#detail-panel").hidden=true}
+function act(id,a){const g=agents.find(x=>x.id==id);if(!g)return;
+ if(a=="open")detail(id);
+ if(a=="pause"){g.st=g.st=="paused"?"running":"paused";g.log.push(g.st=="paused"?"Paused by user":"Resumed");toast(g.st=="paused"?"Agent paused":"Agent resumed")}
+ if(a=="restart"){g.st="running";g.prog=0;g.log.push("Restarted");toast("Agent restarted")}
+ if(a=="stop"){const old=g.st;g.st="failed";g.log.push("Stopped by user");if(settings.notifyFail!==false){notify("failed",g,"Agent stopped");toast("Undo stop?",{l:"Undo",f:()=>{g.st=old;render()}})}}
+ render()}
+function act2(id,a){const g=agents.find(x=>x.id==id);if(!g)return;
+ if(a=="duplicate"){const c={...g,id:++seq,task:g.task+" (copy)",st:"running",tok:0,prog:0,log:["Duplicated from #"+g.id]};delete c.ask;delete c.failAt;agents.splice(agents.indexOf(g),0,c);toast("Agent duplicated");render();return}
+ if(a=="delete"){const i=agents.indexOf(g);agents.splice(i,1);if(openId==id)closeDetail();toast("Agent deleted",{l:"Undo",f:()=>{agents.splice(i,0,g);render()}});render();return}
+ act(id,a)}
+function cmds(){const c=[{l:"New agent",f:()=>$("#new-agent-btn").click()},{l:"Settings",f:()=>$("#settings-btn").click()},{l:"Usage",f:()=>$("#usage-btn").click()},{l:"Toggle notifications",f:()=>$("#notif-btn").click()}];
+ ["All",...Object.keys(label)].forEach(s=>c.push({l:"Filter: "+(s=="All"?"All":label[s]),f:()=>{filter=s;render()}}));
+ projects.forEach(p=>c.push({l:"Project: "+p,f:()=>{cur=p;render()}}));
+ agents.forEach(a=>{c.push({l:"Open: "+a.task,f:()=>detail(a.id)});["restart","stop","duplicate","delete"].forEach(x=>c.push({l:x[0].toUpperCase()+x.slice(1)+": "+a.task,f:()=>act2(a.id,x)}))});return c}
+let palSel=0,palItems=[];
+function palFill(){const k=$("#pal-q").value.toLowerCase();palItems=cmds().filter(c=>c.l.toLowerCase().includes(k)).slice(0,30);palSel=Math.min(palSel,Math.max(0,palItems.length-1));
+ $("#pal-list").innerHTML=palItems.length?palItems.map((c,i)=>`<button role="option" data-i="${i}" class="${i==palSel?"sel":""}" aria-selected="${i==palSel}">${esc(c.l)}</button>`).join(""):'<div class="empty">No matches.</div>'}
+function palOpen(){closePops();const d=$("#palette");if(!d.open)d.showModal();$("#pal-q").value="";palSel=0;palFill();$("#pal-q").focus()}
+function palRun(i){const c=palItems[i];if(!c)return;$("#palette").close();c.f()}
+$("#palette-btn").onclick=palOpen;
+$("#pal-q").addEventListener("input",()=>{palSel=0;palFill()});
+$("#pal-q").addEventListener("keydown",e=>{if(e.key=="ArrowDown"||e.key=="ArrowUp"){e.preventDefault();palSel=(palSel+(e.key=="ArrowDown"?1:-1)+palItems.length)%(palItems.length||1);palFill();const s=$("#pal-list .sel");if(s)s.scrollIntoView({block:"nearest"})}else if(e.key=="Enter"){e.preventDefault();palRun(palSel)}});
+$("#pal-list").addEventListener("click",e=>{const b=e.target.closest("button");if(b)palRun(+b.dataset.i)});
+$("#palette").addEventListener("click",e=>{if(e.target.id=="palette")e.target.close()});
+document.addEventListener("click",e=>{
+ const t=e.target,mb=t.closest(".row-menu-btn");
+ if(mb){e.stopPropagation();const same=!$("#row-menu").hidden&&menuId==mb.dataset.id;closePops();if(!same){menuId=mb.dataset.id;place($("#row-menu"),mb)}return}
+ if(t.classList.contains("sel")){const i=+t.dataset.id;t.checked?sel.add(i):sel.delete(i);updBulk(vis());return}
+ if(t.id=="sel-all"){sel=t.checked?new Set(vis().map(a=>a.id)):new Set();render();return}
+ if(t.id=="b-clear"){sel.clear();render();return}
+ if(t.id=="b-stop"){bulk("stop");return}
+ if(t.id=="b-archive"){bulk("archive");return}
+ if(t.id=="b-delete"){if(!sel.size)return;$("#confirm-msg").textContent="Permanently delete "+sel.size+" selected agent"+(sel.size>1?"s":"")+"? Undo is offered briefly afterwards.";$("#confirm-dialog").showModal();$("#confirm-cancel").focus();return}
+ if(t.id=="confirm-cancel"){$("#confirm-dialog").close();return}
+ if(t.id=="confirm-ok"){$("#confirm-dialog").close();bulk("delete");return}
+ if(t.closest("#row-menu button")){const a=t.closest("button").dataset.a;closePops();act2(menuId,a);return}
+ if(t.closest("#filter-btn")){const o=$("#filter-menu").hidden;closePops();if(o){$("#filter-menu").innerHTML=["All",...Object.keys(label)].map(s=>`<button data-f="${s}" role="menuitem">${s=="All"?"All":label[s]}</button>`).join("");place($("#filter-menu"),$("#filter-btn"));$("#filter-btn").setAttribute("aria-expanded","true")}return}
+ if(t.closest("#filter-menu button")){filter=t.closest("button").dataset.f;closePops();render();return}
+ if(t.closest("#notif-btn")){const o=$("#notif-popover").hidden;closePops();if(o){fillNotif();place($("#notif-popover"),$("#notif-btn"));$("#notif-btn").setAttribute("aria-expanded","true")}return}
+ if(t.id=="notif-clear"){notifs=[];fillNotif();return}
+ if(t.dataset.open){closePops();detail(t.dataset.open);return}
+ if(!t.closest(".menu,.pop"))closePops();
+ const pb=t.closest("[data-p]");if(pb){cur=pb.dataset.p;render();return}
+ const row=t.closest(".row");if(row){detail(row.dataset.id);return}
+ if(t.id=="new-agent-btn"){$("#n-proj").innerHTML=projects.slice(1).map(p=>`<option>${p}</option>`).join("");$("#new-dialog").showModal();$("#n-task").focus()}
+ if(t.id=="n-cancel")$("#new-dialog").close();
+ if(t.id=="settings-btn"){loadSettings();$("#settings-dialog").showModal()}
+ if(t.id=="usage-btn"){fillUsage();$("#usage-dialog").showModal()}
+ if(t.id=="usage-close")$("#usage-dialog").close();
+ if(t.id=="u-spend"||t.id=="u-tokens"){uMetric=t.id=="u-spend"?"spend":"tokens";fillUsage()}
+ if(t.id=="settings-close")$("#settings-dialog").close();
+ if(t.id=="detail-close")closeDetail();
+ if(t.id=="approve-btn"||t.id=="deny-btn"){const g=agents.find(x=>x.id==openId),ok=t.id=="approve-btn";g.st=ok?"running":"paused";g.log.push(ok?"Approved: "+g.ask:"Denied: "+g.ask);delete g.ask;toast(ok?"Approved, agent continuing":"Denied, agent paused");render()}
+ if(t.id=="d-send"){const i=$("#d-msg");if(i.value.trim()){const g=agents.find(x=>x.id==openId);g.log.push("You: "+i.value);toast("Message sent");render()}}
+});
+$("#new-dialog").addEventListener("click",e=>{if(e.target.id=="new-dialog")e.target.close()});
+$("#new-dialog").addEventListener("close",()=>{});
+const SKEYS={name:"#s-name",model:"#s-model",theme:"#s-theme",max:"#s-max",notify:"#s-notify",notifyDone:"#s-notify-done",notifyFail:"#s-notify-fail",auto:"#s-auto",kAnthropic:"#k-anthropic",kOpenai:"#k-openai"};
+let settings={};
+try{settings=JSON.parse(localStorage.getItem("agent-supervisor-settings")||"{}")}catch(e){}
+function applySettings(){const th=settings.theme||"system";if(th=="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",th);
+ if(settings.model)$("#n-model").value=settings.model}
+function loadSettings(){for(const k in SKEYS){const el=$(SKEYS[k]);if(!(k in settings))continue;if(el.type=="checkbox")el.checked=!!settings[k];else el.value=settings[k]}}
+$("#settings-form").addEventListener("submit",()=>{for(const k in SKEYS){const el=$(SKEYS[k]);settings[k]=el.type=="checkbox"?el.checked:el.value}
+ try{localStorage.setItem("agent-supervisor-settings",JSON.stringify(settings))}catch(e){}
+ applySettings();render();toast("Settings saved")});
+$("#usage-dialog").addEventListener("click",e=>{if(e.target.id=="usage-dialog")e.target.close()});
+$("#settings-dialog").addEventListener("click",e=>{if(e.target.id=="settings-dialog")e.target.close()});
+applySettings();
+$("#new-form").addEventListener("submit",()=>{const task=$("#n-task").value.trim();if(!task)return;
+ agents.unshift({id:++seq,task,proj:$("#n-proj").value,st:"running",model:$("#n-model").value,tok:0,prog:0,log:["Started ("+$("#n-perm").value+")"]});$("#n-task").value="";toast("Agent started");render()});
+$("#search").oninput=e=>{q=e.target.value.toLowerCase();render()};
+document.addEventListener("keydown",e=>{
+ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()=="k"){e.preventDefault();const o=document.querySelector("dialog[open]");if(!o)palOpen();else if(o.id=="palette")o.close();return}
+ if(e.key=="Enter"&&e.target.classList.contains("row")){detail(e.target.dataset.id)}
+ if(e.key=="Escape"){closePops();if(openId&&!document.querySelector("dialog[open]"))closeDetail()}});
+setInterval(()=>{agents.forEach(a=>{if(a.st=="running"){a.prog=Math.min(100,a.prog+2);a.tok+=6000;if(a.prog>=100){a.st="done";a.log.push("Completed");if(settings.notifyDone!==false)notify("done",a,"Agent finished")}else if(a.failAt&&a.prog>=a.failAt){a.st="failed";delete a.failAt;a.log.push("Exited with code 1");if(settings.notifyFail!==false)notify("failed",a,"Agent failed")}}});if(!document.activeElement.closest("#detail-panel")&&$("#row-menu").hidden)render()},3000);
+render();
+</script></body></html>

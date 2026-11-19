@@ -102,7 +102,9 @@ function apply(base, c, variant) {
 function pages() {
   const out = [];
   const add = (c, kind, variant) => out.push({ c, kind, variant, slug: c.id + (variant === 'base' ? '' : `--${variant}`) });
-  for (const c of CONTROLS) add(c, 'control', c.openOnly ? 'open' : 'base');
+  // Surface controls are built both ways too: verify probes what a click reveals, so a case
+  // opened by a click is diffed against the clean surface opened by the same click.
+  for (const c of CONTROLS) { if (c.openOnly) { add(c, 'control', 'step'); add(c, 'control', 'open'); } else add(c, 'control', 'base'); }
   for (const c of CASES) {
     if (c.surface) { add(c, 'case', 'step'); add(c, 'case', 'open'); } else add(c, 'case', 'base');
   }
@@ -112,8 +114,8 @@ function pages() {
 // Which control a page is diffed against: open surfaces against the same surface open and clean.
 function controlFor(p) {
   if (p.kind === 'control') return p.slug === 'ctl-base' ? null : 'ctl-base';
-  if (p.variant !== 'open') return 'ctl-base';
-  return p.c.surface.target === '#settings' ? 'ctl-dialog-open--open' : 'ctl-menu-open--open';
+  if (p.variant === 'base') return 'ctl-base';
+  return (p.c.surface.target === '#settings' ? 'ctl-dialog-open--' : 'ctl-menu-open--') + p.variant;
 }
 
 function scenarioFor(p, mode) {

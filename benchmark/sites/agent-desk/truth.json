@@ -57,7 +57,10 @@
       "layer": "source",
       "what": "About nine header icon buttons, mostly rare and duplicated in More; seven sidebar nav items ahead of the chat list",
       "selector": ".head .actions, .side-actions",
-      "expect": []
+      "expect": [
+        "too-many-peers"
+      ],
+      "expectNote": "too-many-peers mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "page",
@@ -140,7 +143,10 @@
       "layer": "source",
       "what": "'Stop agent' sits under 'Export transcript' with only red text, no separator or confirmation",
       "selector": "#more-menu [data-act=\"export\"], #more-menu [data-act=\"stop\"]",
-      "expect": []
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "chat context menu",

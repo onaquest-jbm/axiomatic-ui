@@ -99,7 +99,10 @@
       "layer": "render",
       "what": "Picker opens above its trigger and covers the field label and other inputs",
       "selector": "#timezone-popover",
-      "expect": []
+      "expect": [
+        "covers-trigger"
+      ],
+      "expectNote": "covers-trigger mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "timezone popover",
@@ -107,7 +110,10 @@
       "layer": "judgment",
       "what": "About 400 ungrouped zone names with no offsets; five rows visible",
       "selector": "#timezone-options",
-      "expect": []
+      "expect": [
+        "too-many-peers"
+      ],
+      "expectNote": "too-many-peers mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "role menu",
@@ -139,7 +145,10 @@
       "layer": "render",
       "what": "Toast covers the Save button just clicked, at both widths",
       "selector": "#toast, #save-profile",
-      "expect": []
+      "expect": [
+        "covers-trigger"
+      ],
+      "expectNote": "covers-trigger mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "invite dialog",

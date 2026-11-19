@@ -2,7 +2,33 @@
 
 Written 2026-11-19, after the first benchmark run (`benchmark/`). Part A is the plan for what to do next. Part B is a roadmap for four larger questions; nothing in Part B is being acted on yet.
 
-## What the benchmark showed
+## Update, same day: Part A steps 1, 3 (partly) and 4 done
+
+Measured by re-running the benchmark (`benchmark/results/`, frozen as the run "v0.4 surfaces + attach" in the viewer):
+
+- **Step 1, done.** `verify` now checks what every click reveals (menus, dialogs, popovers, panels, new views), reports only what wasn't already on the page, and lists which likely openers were never exercised. `--explore` clicks every likely opener on a fresh load and checks each. Planted surface defects opened by a click, counting `verify` alone: **11 of 14 caught**, against 1 of 14 in the baseline run. The same defects already open at load: 10 of 14, against 9. The click path now scores at least as well as the open path, which was the done criterion. With `lint`, 12 of 14 are caught on the click path. The modal-primary false alarm is gone on the click path, because a surface is checked on its own.
+- **Step 3, partly.** New checks:
+  - `too-many-peers` (more than twice the derived `visibleActionsPerGroup` undivided actions);
+  - `destructive-unseparated` (an irreversible action placed among routine ones, with no separator and the same fill and weight);
+  - `covers-trigger` (a non-modal overlay covering the control that opened it);
+  - `surface-offscreen` (a fixed panel that doesn't fit the window).
+
+  `groupsPerLevel` is still unchecked.
+- **Step 4, done.** `verify --attach <port>` checks a running app, and works on the owner's Electron app through its new inspect fixture (private results):
+  - 9 menus and dialogs checked at two widths, against none before;
+  - new floor problems on rare surfaces (13 px checkboxes, a 20 px tall menu);
+  - a destructive action beside a routine one.
+
+  The meaning problems that make that app look worst are still not caught (about 1 of 7).
+- **Overall:**
+  - Planted: 50 of 70 caught (was 45).
+  - Generated sites: 19 of 118 (was 14). The new rules catch 4 of the 12 reviewed problems mapped to them. The mapping was made after the rules were written, for every problem of that kind and not only the ones they caught. One of the 4 (a Delete placed directly under Archive) came after `destructive-unseparated` was changed to ignore text colour as separation, so that number was tuned on the test set.
+  - Known false alarms: `destructive-unseparated` fires on "Remove <item>" beside "Add note" in a cart, where removal is routine and has undo, so reversibility needs judgment. `layout-shift` on the long-transcript control now fires with a plan too (timing, flaky).
+  - Still silent: plan-dependent salience (step 2), and judgment.
+- **Gap analysis:** `benchmark/results/gap-analysis.md` (by gpt-6.2-sol, read-only) clusters the 79 no-rule problems, rates each cluster as programmatic, LLM or human-judged, and gives the cause of each silent case.
+- **Prompt sweep** (`benchmark/results/sweep-findings.md`): the same app built 12 ways. Adding one sentence, "make it look modern, stunning and premium", to a one-line brief roughly triples the problems at desktop width (mean 25 against 7). Blind reviewers rated the worst "stunning" page 4/10 but did not separate the other three pages. Building feature by feature in six fresh sessions did not make things worse; long accretion across files is untested.
+
+## What the benchmark showed (first run)
 
 Full tables: `benchmark/results/planted.md` and `benchmark/results/sites.md`; visual comparison: `benchmark/viewer/`.
 

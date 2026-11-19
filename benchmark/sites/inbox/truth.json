@@ -95,7 +95,10 @@
       "layer": "judgment",
       "what": "Discard draft is a bare trash icon next to a close X that saves; no visible difference",
       "selector": "#discard-draft, #compose-window .dialog-close",
-      "expect": []
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "compose window",
@@ -119,7 +122,10 @@
       "layer": "judgment",
       "what": "Delete directly under Archive with no gap; unclear if permanent",
       "selector": "#message-menu [data-action=\"archive\"], #message-menu [data-action=\"delete\"]",
-      "expect": []
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "snooze picker",

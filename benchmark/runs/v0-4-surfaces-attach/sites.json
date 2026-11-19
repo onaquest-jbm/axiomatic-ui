@@ -1,0 +1,1957 @@
+{
+  "generatedAt": "2026-11-19T21:57:40.310Z",
+  "sites": [
+    {
+      "site": "agent-desk",
+      "builder": "Claude Sonnet (subagent)",
+      "lint": {
+        "floor": 0,
+        "meaning": 6,
+        "derivation": 227,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 47,
+        "meaning": 0,
+        "derivation": 12
+      },
+      "lintFairRules": [
+        "decorative-depth",
+        "decorative-color"
+      ]
+    },
+    {
+      "site": "food-checkout",
+      "builder": "Claude Sonnet (subagent)",
+      "lint": {
+        "floor": 0,
+        "meaning": 2,
+        "derivation": 144,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 42,
+        "meaning": 12,
+        "derivation": 12
+      },
+      "lintFairRules": [
+        "decorative-depth"
+      ]
+    },
+    {
+      "site": "inbox",
+      "builder": "gpt-6.2-sol (Codex CLI)",
+      "lint": {
+        "floor": 0,
+        "meaning": 1,
+        "derivation": 248,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 26,
+        "meaning": 4,
+        "derivation": 12
+      },
+      "lintFairRules": [
+        "decorative-depth"
+      ]
+    },
+    {
+      "site": "onboarding-wizard",
+      "builder": "Claude Sonnet (subagent)",
+      "lint": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 114,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 24,
+        "meaning": 4,
+        "derivation": 12
+      },
+      "lintFairRules": []
+    },
+    {
+      "site": "revenue-dash",
+      "builder": "Claude Sonnet (subagent)",
+      "lint": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 153,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 58,
+        "meaning": 4,
+        "derivation": 12
+      },
+      "lintFairRules": []
+    },
+    {
+      "site": "ticket-admin",
+      "builder": "Claude Sonnet (subagent)",
+      "lint": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 186,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 42,
+        "meaning": 2,
+        "derivation": 12
+      },
+      "lintFairRules": []
+    },
+    {
+      "site": "tracewell-landing",
+      "builder": "gpt-6.2-sol (Codex CLI)",
+      "lint": {
+        "floor": 0,
+        "meaning": 6,
+        "derivation": 165,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 20,
+        "meaning": 28,
+        "derivation": 12
+      },
+      "lintFairRules": [
+        "decorative-depth",
+        "decorative-color",
+        "decorative-symbol"
+      ]
+    },
+    {
+      "site": "workspace-settings",
+      "builder": "gpt-6.2-sol (Codex CLI)",
+      "lint": {
+        "floor": 0,
+        "meaning": 3,
+        "derivation": 257,
+        "finish": 0
+      },
+      "verifyPage": {
+        "floor": 32,
+        "meaning": 8,
+        "derivation": 12
+      },
+      "lintFairRules": [
+        "decorative-color",
+        "decorative-depth"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Pending approval (blocking, constant) sits below the fold; only a small badge shows at load",
+      "expect": [
+        "primary-not-first",
+        "salience-inversion"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "Solid accent 'New chat' is the loudest element, louder than Approve; accent reused for logo, send, avatar, selection",
+      "expect": [
+        "competing-primaries",
+        "unearned-salience"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "choice",
+      "layer": "source",
+      "what": "About nine header icon buttons, mostly rare and duplicated in More; seven sidebar nav items ahead of the chat list",
+      "expect": [
+        "too-many-peers"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "source",
+      "what": "Approve/Deny/Always allow are ordinary small buttons with no shortcuts; Always allow sits right next to Approve",
+      "expect": [
+        "pointing-order"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "'Always allow' grants a standing rule beside one-time Approve with no confirmation; scope text does not cover the chained command",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Chat status by small low-contrast dot colour alone; waiting chats not grouped above idle",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Group headers, footnote, sub-lines and key chip are small and low contrast",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "On phone the approval card is even further below the fold; send button wraps to its own row",
+      "expect": [
+        "primary-not-first"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "judgment",
+      "what": "On phone the 'waiting for you' badge is hidden, title truncated, goal bar wraps awkwardly",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "text-on-gradient"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "permission menu",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "'Full auto' is one click away in a plain list with no warning or confirmation",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "permission menu",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Permission mode is a tiny muted pill with an unexplained coloured dot; menu offset hard-coded on phone",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "model menu",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Model, effort and permission are three near-identical peer pills; effort loses its label on phone",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "more menu",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "'Stop agent' sits under 'Export transcript' with only red text, no separator or confirmation",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "chat context menu",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Delete removes a chat immediately with no confirmation or undo; kebab invisible until hover",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "settings dialog",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Toggles, select and read-only usage stats in one list with identical separators",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "settings dialog",
+      "principle": "convention",
+      "layer": "source",
+      "what": "Focus lands on the X with a heavy ring; both X and Cancel; no pending-change state",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "agent-desk",
+      "surface": "copy toast",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Toast covers the composer's effort and permission controls and duplicates in-button feedback",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "fees popover",
+      "principle": "encoding",
+      "layer": "render",
+      "what": "An empty 'Promo' row shows in the summary because [hidden] is overridden by display:flex",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "fees popover",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Breakdown popover covers the tip and total it explains; cut off at 390px",
+      "expect": [
+        "surface-offscreen"
+      ],
+      "verifyFired": [],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "fees popover",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Fee breakdown only reachable through a 22px info button",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Order summary and total sit at the bottom after seven cards; never visible on phone without scrolling",
+      "expect": [
+        "primary-not-first"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "On phone 'Remove' wraps to its own line, leaving ragged loosely attached action rows",
+      "expect": [
+        "weak-grouping"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Remove is a muted link with a ~28px hit area; minus at quantity 1 silently removes the item",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "At 390px the long address runs under the 'Change' link",
+      "expect": [
+        "text-overflow"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Brand red used for primary, links, selection and (almost) error, so red says nothing",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Section headings and sub-amounts are small and low contrast",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "page",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Place order commits with no recap beside it; confirmation's back link allows placing it again",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "destructive-unseparated",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "address sheet",
+      "principle": "convention",
+      "layer": "source",
+      "what": "Sheet has no close or cancel; new address commits silently on Done",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "slow-motion"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "schedule picker",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Disabled 'Confirm time' label hard to read in both themes",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "slow-motion",
+        "too-many-peers",
+        "covers-trigger",
+        "small-target"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "schedule picker",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "23 slots in one undivided grid; focus ring on 'Today' looks like a selection",
+      "expect": [
+        "too-many-peers"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "slow-motion",
+        "too-many-peers",
+        "covers-trigger",
+        "small-target"
+      ],
+      "caught": [
+        "too-many-peers"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "payment sheet",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "'Default wallet' label contradicts the preselected default card",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "slow-motion"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "food-checkout",
+      "surface": "undo snackbar",
+      "principle": "response",
+      "layer": "render",
+      "what": "Undo toast covers cards for six seconds while the total jumps with no other signal",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "10px timestamps and chips, 11.5px snippets in faint grey in a list read all day",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Star and more buttons about 26px; more invisible until hover",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Archive and delete, the main triage actions, are not on rows",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Reply sits at the end of the message in secondary style",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "One accent means brand, primary, selection, unread and danger; avatar tints mean nothing",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Account avatar and message count each shown two or three times",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "On phone, row buttons, Compose and toolbar buttons about 33px",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "inbox",
+      "surface": "compose window",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Discard draft is a bare trash icon next to a close X that saves; no visible difference",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "slow-response"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "inbox",
+      "surface": "compose window",
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "Compose is modal, blocking the message being replied to; no Cc, Bcc or attach",
+      "expect": [],
+      "verifyFired": [
+        "slow-response"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "message menu",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Order reverses frequency; duplicates the toolbar",
+      "expect": [],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "message menu",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Delete directly under Archive with no gap; unclear if permanent",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
+      "caught": [
+        "destructive-unseparated"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "inbox",
+      "surface": "snooze picker",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Icons switch meaning; focus lands on the close X",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "archive toast",
+      "principle": "response",
+      "layer": "render",
+      "what": "Toast covers content, does not say which message, small Undo",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "flat-emphasis"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "inbox",
+      "surface": "shortcuts dialog",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Omits frequent triage shortcuts; help shown on touch phones",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "inbox",
+      "surface": "advanced search",
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "Unlabeled opener; popover covers headers; missing common filters",
+      "expect": [
+        "unlabelled-field"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "Current step in the progress bar is drawn faintest; segments unlabeled",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Programmatic focus puts a heavy ring on the heading at load",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "At 390px the gap between stacked fields is larger than elsewhere; misstated grouping",
+      "expect": [
+        "weak-grouping"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Exit, the fiscal-year hint and an inline 'Why' link compete; the 'Why' modal hides text that could be inline",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Help '?' button 36px and 'Why' link 32px tall, under the phone minimum",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "source",
+      "what": "Two overlapping help mechanisms explain the same step",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "convention",
+      "layer": "source",
+      "what": "Back, Skip and Next in three styles; optional steps not marked until an error",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Muted hint, progress and placeholder text small and low contrast, especially dark",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "slow-motion",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "help popover",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Popover covers the field it explains; no arrow, no close",
+      "expect": [
+        "covers-trigger"
+      ],
+      "verifyFired": [],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "help popover",
+      "principle": "encoding",
+      "layer": "render",
+      "what": "Popover drawn like the card, so in dark mode it blends in",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "why dialog",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Muted body copy; no close control; 'Got it' only",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "exit dialog",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Harmless 'exit and save' styled as danger, louder than Keep going",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "exit dialog",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Dialog promises progress is saved, but only the step number is",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "onboarding-wizard",
+      "surface": "exit dialog",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Dark mode: white text on salmon fill, weak contrast",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "low-contrast"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Share is the only filled control and the loudest thing, though the main task is reading the trend",
+      "expect": [
+        "unearned-salience",
+        "primary-not-first"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Colours have no stable meaning: plan colours reuse the MRR/accent blue, each sparkline an arbitrary hue",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Cohort heatmap labels fail contrast in light and especially dark mode",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Cohort table shows an empty current-month row that reads as broken",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "On phone the toolbar wraps into uneven rows and KPI trend context is dropped",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "date popover",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Quick ranges wrap unevenly and are out of order; popover covers the KPIs it changes",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "date popover",
+      "principle": "response",
+      "layer": "source",
+      "what": "Quick ranges apply instantly but custom range needs Apply; reversed range swapped silently",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "export menu",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Immediate downloads and a persistent schedule setup in one flat list; focus ring reads as selection",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "customer drawer",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Close button 34px, under the 44px touch minimum; no outside-tap exit on phone",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "customer drawer",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Drawer padded with made-up rows and a status that never varies; no action",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "share dialog",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "'Remove' is an option inside the role select and applies immediately with no confirmation or undo",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
+      "caught": [
+        "destructive-unseparated"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "share dialog",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Link field opens scrolled to the end; small grey access text; unlabeled toggles",
+      "expect": [
+        "low-contrast",
+        "unlabelled-field"
+      ],
+      "verifyFired": [
+        "destructive-unseparated",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "plan-mix tooltip",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Tooltip repeats legend figures; hover earns little",
+      "expect": [],
+      "verifyFired": [
+        "covers-trigger"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "revenue-dash",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Delta badges contradict the chart, and arrow direction and colour are read two ways",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "low-contrast",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Default sort by updated scatters SLA-breaching tickets; 'SLA at risk' is a quiet fifth tab",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Priority and status are look-alike coloured pills with overlapping hues",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "render",
+      "what": "Identical avatars and bold subjects everywhere: emphasis distinguishes nothing",
+      "expect": [
+        "flat-emphasis"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [
+        "flat-emphasis"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "11px uppercase headers, 12px mono IDs and disabled pager arrows are low contrast",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [
+        "low-contrast"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "16px checkboxes, 28px kebab and pager buttons; under 44px on phone",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "convention",
+      "layer": "render",
+      "what": "At 390px the table is cut off with no cue, tabs clipped, buttons collapse to unlabeled icons",
+      "expect": [
+        "horizontal-scroll",
+        "text-overflow"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "'New ticket' is the most saturated element on a triage screen where it is rarely used",
+      "expect": [
+        "unearned-salience"
+      ],
+      "verifyFired": [
+        "low-contrast",
+        "small-target",
+        "flat-emphasis"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "filter popover",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Three steps per filter that duplicate the tabs; no quick filters",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "filter popover",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Odd 'Is' label; popover covers headers; no match preview",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "row actions menu",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Frequent actions (assign to me, resolve) hidden behind a 28px kebab; rare 'Open details' leads",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "row actions menu",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Delete sits two rows under Merge with a hairline; no undo for resolve or assign",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "column menu",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Column picker serves almost no triage task and takes prime toolbar space",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "column menu",
+      "principle": "convention",
+      "layer": "render",
+      "what": "On phone toggling hidden columns does nothing, so the menu misstates what shows",
+      "expect": [],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "ticket side panel",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "No reply box; resolve is emphasised before any response is written",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "covers-trigger"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "ticket side panel",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Labels far from values; SLA due drawn like created/updated",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "covers-trigger"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "ticket-admin",
+      "surface": "ticket side panel",
+      "principle": "response",
+      "layer": "source",
+      "what": "Scrim blocks the list; no next/previous, so close-and-reopen per ticket",
+      "expect": [],
+      "verifyFired": [
+        "low-contrast",
+        "covers-trigger"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "The main task (book a demo) is a quiet secondary button; the only filled primary just scrolls the page",
+      "expect": [
+        "primary-not-first",
+        "unearned-salience"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "A dark code snippet dominates the fold; the product itself is below it",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "choice",
+      "layer": "render",
+      "what": "On phone the main conversion action is hidden inside the collapsed menu",
+      "expect": [
+        "plan-missing"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "demo dialog",
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "'Book a demo' leads to downloading a text file; label, heading and outcome disagree",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "demo dialog",
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Required and optional fields look the same; small labels; browser-default errors only",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "copy toast",
+      "principle": "response",
+      "layer": "render",
+      "what": "Copy only selects text; the toast is far from the button and confirms nothing",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "copy toast",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "A loud lime selection colour used nowhere else, hard to read on the snippet",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "11-12px chart and trace labels in muted colour, hard to read in dark mode; hero letters nearly touch",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "product menu",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Dropdown hides three in-page anchors and mixes navigation levels",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "faq answer",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Large empty heading column; faint toggle far from the question",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Pricing repeats prices and labels like 'View quickstart' do not say what happens",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Invented, unattributed testimonials take a full section",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "tracewell-landing",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "The strongest call to action is in pricing, not in the hero",
+      "expect": [
+        "salience-inversion"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "decorative-depth",
+        "decorative-symbol",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Decorative 157px hero banner with orbit rings repeats the title and pushes the form down",
+      "expect": [
+        "unearned-salience",
+        "primary-not-first"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Danger zone is a peer of routine sections in the nav",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "42px title outweighs the fields people came to change; a rare avatar action gets a full panel",
+      "expect": [
+        "primary-not-first",
+        "salience-inversion"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "memory",
+      "layer": "judgment",
+      "what": "Saving split across a panel button, a floating bar and a status label with different wording",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Active nav item marked four ways; decorative label styling and tile",
+      "expect": [],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "On phone, 38px-high 12px tabs in a 3x2 grid take the first screen",
+      "expect": [
+        "small-target"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [
+        "small-target"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Much supporting text is 10-12px muted grey; low-contrast footer",
+      "expect": [
+        "low-contrast"
+      ],
+      "verifyFired": [
+        "flat-emphasis",
+        "redundant-enclosure",
+        "text-on-gradient",
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "timezone popover",
+      "principle": "convention",
+      "layer": "render",
+      "what": "Picker opens above its trigger and covers the field label and other inputs",
+      "expect": [
+        "covers-trigger"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "timezone popover",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "About 400 ungrouped zone names with no offsets; five rows visible",
+      "expect": [
+        "too-many-peers"
+      ],
+      "verifyFired": [
+        "small-target"
+      ],
+      "caught": [],
+      "status": "silent"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "role menu",
+      "principle": "legibility",
+      "layer": "judgment",
+      "what": "Roles listed without what they can do; current role marked twice",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "remove member dialog",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Does not say what happens to the person's content, whether it can be undone, or billing; red trash always visible per row",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "delete workspace dialog",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Copy understates a permanent deletion; button looks active before the name is typed",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "save toast",
+      "principle": "salience",
+      "layer": "render",
+      "what": "Toast covers the Save button just clicked, at both widths",
+      "expect": [
+        "covers-trigger"
+      ],
+      "verifyFired": [
+        "small-target",
+        "covers-trigger"
+      ],
+      "caught": [
+        "covers-trigger"
+      ],
+      "status": "caught"
+    },
+    {
+      "site": "workspace-settings",
+      "surface": "invite dialog",
+      "principle": "legibility",
+      "layer": "judgment",
+      "what": "Roles unexplained, jargon copy, unclear if an email is sent or a seat billed; dark radios look disabled",
+      "expect": [],
+      "verifyFired": [],
+      "caught": [],
+      "status": "no-rule"
+    }
+  ]
+}

@@ -117,7 +117,10 @@
       "layer": "source",
       "what": "Delete sits two rows under Merge with a hairline; no undo for resolve or assign",
       "selector": "#rowMenu [data-act=\"merge\"], #rowMenu [data-act=\"delete\"]",
-      "expect": []
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
     },
     {
       "surface": "column menu",
