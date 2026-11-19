@@ -1,208 +1,224 @@
 'use strict';
+// Benchmark viewer. Data: window.BENCH = { original, runs[] } from build.js.
+// "original" is the unmodified generated sites (reviewed problems, no tool results).
 (function () {
   const B = window.BENCH || { runs: [] };
-  const runs = B.runs;
+  const runs = B.runs || [];
+  const ORIG = B.original || null;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const main = $('main');
-  const view = { name: 'overview', site: null, width: '1280', pf: { principle: '', layer: '', level: '', changed: false }, plan: 'plan' };
-
-  const norm = (s) => (!s ? 'none' : /^caught/.test(s) ? 'caught' : /^silent/.test(s) ? 'silent' : /^no-rule/.test(s) ? 'norule' : 'other');
-  const LABEL = { caught: 'caught', silent: 'silent', norule: 'no rule', other: 'other signal', none: 'n/a' };
-  const stHTML = (k, raw) => `<span class="st st-${k}" title="${esc(raw || '')}">${LABEL[k]}</span>`;
   const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const none = '<span class="muted">(none)</span>';
+  const main = $('main');
+  const state = { view: 'overview', width: {}, open: new Set(), pf: { principle: '', layer: '', level: '', plan: 'plan', changed: false } };
 
-  const bSel = $('before'), aSel = $('after');
-  if (runs.length) {
-    const opts = runs.map((r, i) => `<option value="${i}">${esc(r.label)} (${esc((r.createdAt || '').slice(0, 10))})</option>`).join('');
-    bSel.innerHTML = opts; aSel.innerHTML = opts;
-    aSel.value = String(runs.length - 1);
-    bSel.value = String(Math.max(0, runs.length - 2));
+  // ---------- sources (the unmodified sites, or a run) ----------
+  const sources = [];
+  if (ORIG && Object.keys(ORIG.truth || {}).length) sources.push(ORIG);
+  for (const r of runs.slice().reverse()) sources.push(r);
+  const nameOf = (s) => (s.original ? 'Unmodified sites' : s.label);
+  const aSel = $('a'), bSel = $('b');
+  const opts = sources.map((s, i) => `<option value="${i}">${esc(nameOf(s))}</option>`).join('');
+  aSel.innerHTML = opts; bSel.innerHTML = opts;
+  // Default: the unmodified sites compared with the latest run.
+  aSel.value = '0';
+  bSel.value = String(sources.length > 1 ? 1 : 0);
+  const A = () => sources[+aSel.value], Bs = () => sources[+bSel.value];
+  const same = () => aSel.value === bSel.value;
+
+  // ---------- statuses ----------
+  const norm = (s) => (!s ? 'none' : /^caught/.test(s) ? 'caught' : /^silent/.test(s) ? 'silent' : /^no-rule/.test(s) ? 'norule' : 'other');
+  const LABEL = { caught: 'Caught', silent: 'Missed', norule: 'No rule', other: 'Other signal', none: '—', found: 'Found by review' };
+  const HELP = {
+    caught: 'A rule meant for this problem fired.',
+    silent: 'A rule exists for this problem but did not fire.',
+    norule: 'No rule is designed to catch this problem.',
+    other: 'Something fired, but not a rule meant for this problem.',
+    none: 'Not in this source.',
+    found: 'Listed by the blind review. The unmodified sites have no tool results.',
+  };
+  const st = (k) => `<span class="st st-${k}" title="${esc(HELP[k])}">${LABEL[k]}</span>`;
+
+  const siteRows = (s) => (s && s.sites && s.sites.rows) || [];
+  const siteKey = (site, surface, what) => `${site}|${surface}|${what}`;
+  function siteStatus(src, site, d) {
+    if (!src) return 'none';
+    if (src.original) return (src.truth[site] && src.truth[site].defects.some((x) => x.surface === d.surface && x.what === d.what)) ? 'found' : 'none';
+    const r = siteRows(src).find((x) => siteKey(x.site, x.surface, x.what) === siteKey(site, d.surface, d.what));
+    return r ? norm(r.status) : 'none';
   }
-  const single = () => runs.length < 2 || bSel.value === aSel.value;
-  const getB = () => runs[+bSel.value], getA = () => runs[+aSel.value];
+  const plantedRows = (s) => (s && s.planted && s.planted.rows) || [];
+  const pKey = (r) => `${r.case}|${r.variant}|${r.defect}`;
+  const pStat = (r) => norm(state.pf.plan === 'plan' ? r.status : r.statusNoPlan);
 
-  const plantedKey = (r) => `${r.case}|${r.variant}|${r.defect}`;
-  const plantedRows = (run) => (run && run.planted && run.planted.rows) || [];
-  const pStatus = (r) => (view.plan === 'plan' ? r.status : r.statusNoPlan);
-  const siteRows = (run) => (run && run.sites && run.sites.rows) || [];
-  const siteKey = (r) => `${r.site}|${r.surface}|${r.what}`;
-  function counts(list) {
-    const c = { total: list.length, caught: 0, silent: 0, norule: 0, other: 0 };
-    for (const k of list) if (k in c) c[k]++;
-    return c;
-  }
-  const pCounts = (run) => counts(plantedRows(run).map((r) => norm(pStatus(r))));
-  const sCounts = (run) => counts(siteRows(run).map((r) => norm(r.status)));
-
-  const when = (run) => esc((run.createdAt || '').slice(0, 16).replace('T', ' '));
-  function head(run, tag) {
-    return `<div class="row"><strong>${tag}: ${esc(run.label)}</strong><span class="meta">${when(run)}${run.gitCommit ? ' / commit ' + esc(run.gitCommit) : ''}</span></div>` + (run.note ? `<div class="muted">${esc(run.note)}</div>` : '');
-  }
-  const delta = (d) => (d === 0 ? '<span class="muted">0</span>' : `<span>${d > 0 ? '+' : ''}${d}</span>`);
-
-  function overview() {
-    if (!runs.length) return '<div class="note">No runs yet. Run <code>node benchmark/viewer/snapshot.js --label "name"</code> then <code>node benchmark/viewer/build.js</code>.</div>';
-    const B_ = getB(), A_ = getA(), one = single();
-    let h = '';
-    if (one) h += '<div class="note">Only one run is available (or the same run is chosen twice), so it is shown alone. Take another snapshot after a change to compare.</div>' + head(A_, 'Run');
-    else h += head(B_, 'Before') + head(A_, 'After');
-    const block = (title, cf, has) => {
-      const cells = (run) => {
-        if (!has(run)) return '<td colspan="4" class="muted">no results in this run</td>';
-        const c = cf(run);
-        return `<td class="num">${c.total}</td><td class="num st-caught">${c.caught}</td><td class="num st-silent">${c.silent}</td><td class="num st-norule">${c.norule}${c.other ? ` <span class="meta">(+${c.other} other)</span>` : ''}</td>`;
-      };
-      let t = '';
-      if (one) return `<tr><th scope="row">${title}</th><td>${esc(A_.label)}</td>${cells(A_)}</tr>`;
-      t += `<tr><th scope="row">${title}</th><td>Before: ${esc(B_.label)}</td>${cells(B_)}</tr>`;
-      t += `<tr><td></td><td>After: ${esc(A_.label)}</td>${cells(A_)}</tr>`;
-      if (has(A_) && has(B_)) {
-        const a = cf(A_), b = cf(B_);
-        t += `<tr><td></td><td class="muted">Change</td><td class="num">${delta(a.total - b.total)}</td><td class="num">${delta(a.caught - b.caught)}</td><td class="num">${delta(a.silent - b.silent)}</td><td class="num">${delta(a.norule - b.norule)}</td></tr>`;
-      }
-      return t;
-    };
-    h += '<h2>Defects caught, silent, no rule</h2><div class="scroll"><table><thead><tr><th></th><th>Run</th><th class="num">Defects</th><th class="num">Caught</th><th class="num">Silent</th><th class="num">No rule</th></tr></thead><tbody>';
-    h += block('Planted set', pCounts, (r) => plantedRows(r).length > 0);
-    h += block('Generated sites', sCounts, (r) => siteRows(r).length > 0);
-    h += '</tbody></table></div>';
-    h += `<p class="meta">Caught: a rule designed for the defect fired. Silent: a rule was designed for it but did not fire. No rule: no rule is designed to catch it. Planted set uses the ${view.plan === 'plan' ? 'with-plan' : 'no-plan'} status (switch on the Planted tab).</p>`;
-    if (!siteRows(A_).length && !(!one && siteRows(B_).length)) h += '<div class="note">No generated-site results in this run.</div>';
-    if (!one) {
-      const ch = changes();
-      h += `<h2>Status changes (${ch.length})</h2>`;
-      if (!ch.length) h += '<p class="muted">No defect changed status between these runs.</p>';
-      else h += '<div class="scroll"><table><thead><tr><th>Set</th><th>Where</th><th>Defect</th><th>Before</th><th>After</th></tr></thead><tbody>' + ch.map((c) => `<tr class="changed"><td>${c.set}</td><td>${esc(c.where)}</td><td>${esc(c.what)}</td><td>${stHTML(c.b, c.braw)}</td><td>${stHTML(c.a, c.araw)}</td></tr>`).join('') + '</tbody></table></div>';
-    }
-    h += '<h2>Runs</h2><div class="scroll"><table><thead><tr><th>Label</th><th>Created</th><th>Commit</th><th class="num">Sites</th><th>Note</th></tr></thead><tbody>' + runs.map((r) => `<tr><td>${esc(r.label)}</td><td>${when(r)}</td><td>${esc(r.gitCommit || '')}</td><td class="num">${Object.keys(r.siteVersions || {}).length}</td><td>${esc(r.note)}</td></tr>`).join('') + '</tbody></table></div>';
-    return h;
-  }
-
-  function changes() {
-    const B_ = getB(), A_ = getA(), out = [];
-    const pb = new Map(plantedRows(B_).map((r) => [plantedKey(r), r]));
-    for (const r of plantedRows(A_)) {
-      const o = pb.get(plantedKey(r)); if (!o) continue;
-      const a = norm(pStatus(r)), b = norm(pStatus(o));
-      if (a !== b) out.push({ set: 'planted', where: `${r.case} (${r.variant})`, what: r.what, a, b, araw: pStatus(r), braw: pStatus(o) });
-    }
-    const sb = new Map(siteRows(B_).map((r) => [siteKey(r), r]));
-    for (const r of siteRows(A_)) {
-      const o = sb.get(siteKey(r)); if (!o) continue;
-      const a = norm(r.status), b = norm(o.status);
-      if (a !== b) out.push({ set: 'generated', where: `${r.site} / ${r.surface}`, what: r.what, a, b, araw: r.status, braw: o.status });
-    }
-    return out;
-  }
-
-  function planted() {
-    if (!runs.length) return '<div class="note">No runs yet.</div>';
-    const A_ = getA(), B_ = getB(), one = single();
-    const rowsA = plantedRows(A_), rowsB = one ? [] : plantedRows(B_);
-    if (!rowsA.length && !rowsB.length) return '<div class="note">No planted-set results in the chosen run(s).</div>';
-    const mapB = new Map(rowsB.map((r) => [plantedKey(r), r]));
-    const all = rowsA.length ? rowsA : rowsB;
-    const uniq = (f) => [...new Set(all.map(f))].sort();
-    const sel = (key, label, vals) => `<label>${label} <select data-pf="${key}"><option value="">all</option>${vals.map((v) => `<option${String(view.pf[key]) === String(v) ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select></label>`;
-    let h = '<div class="filters">' + sel('principle', 'Principle', uniq((r) => r.principle)) + sel('layer', 'Layer', uniq((r) => r.layer)) + sel('level', 'Level', uniq((r) => r.level))
-      + `<label>Status basis <select id="pfplan"><option value="plan"${view.plan === 'plan' ? ' selected' : ''}>with screen plan</option><option value="noplan"${view.plan === 'noplan' ? ' selected' : ''}>without plan</option></select></label>`
-      + `<label><input type="checkbox" id="pfchanged"${view.pf.changed ? ' checked' : ''}> only changed</label></div>`;
-    const f = view.pf;
-    const rows = all.filter((r) => (!f.principle || r.principle === f.principle) && (!f.layer || r.layer === f.layer) && (!f.level || String(r.level) === f.level));
-    let body = '', shown = 0;
-    for (const r of rows) {
-      const o = one ? null : mapB.get(plantedKey(r));
-      const cur = norm(pStatus(r)), prev = o ? norm(pStatus(o)) : null;
-      const changed = !one && prev !== null && prev !== cur;
-      if (f.changed && !changed) continue;
-      shown++;
-      const status = one ? stHTML(cur, pStatus(r)) : `${o ? stHTML(prev, pStatus(o)) : stHTML('none')}<span class="arrow">&rarr;</span>${stHTML(cur, pStatus(r))}`;
-      body += `<tr${changed ? ' class="changed"' : ''}><td><code>${esc(r.case)}</code></td><td>${esc(r.variant)}</td><td class="num">${esc(r.level)}</td><td>${esc(r.principle)}</td><td>${esc(r.layer)}</td><td>${esc(r.surface)}</td><td>${esc(r.what)}</td><td>${status}</td><td>${esc((r.expect || []).join(', ')) || none}</td></tr>`;
-    }
-    h += `<p class="meta">${shown} of ${rows.length} rows${one ? '' : '. Status column reads before &rarr; after'}. Variant: base = defect on the page, step = after a click step, open = surface already open at load.</p>`;
-    h += `<div class="scroll"><table><thead><tr><th>Case</th><th>Variant</th><th class="num">Level</th><th>Principle</th><th>Layer</th><th>Surface</th><th>Defect</th><th>${one ? 'Status' : 'Before &rarr; After'}</th><th>Expected rules</th></tr></thead><tbody>${body}</tbody></table></div>`;
-    const ctl = (A_.planted && A_.planted.controls) || [];
-    if (ctl.length) {
-      const cell = (x) => esc((x || []).join(', ')) || '<span class="muted">none</span>';
-      h += '<h2>Clean controls (false positives)</h2><div class="scroll"><table><thead><tr><th>Control</th><th>Lint fired</th><th>Verify (plan)</th><th>Verify (no plan)</th></tr></thead><tbody>' + ctl.map((c) => `<tr><td>${esc(c.title)}</td><td>${cell(c.lint)}</td><td>${cell(c.verifyPlan)}</td><td>${cell(c.verifyNoplan)}</td></tr>`).join('') + '</tbody></table></div><p class="meta">Controls are clean pages, so anything listed is a false positive. Shown for the After run.</p>';
-    }
-    return h;
-  }
-
-  const shotName = (surface) => (surface === 'page' ? 'page' : slug(surface));
-  function shotFig(run, site, surface, tag) {
-    const file = `${shotName(surface)}-${view.width}-light.png`;
-    const has = run.shots && run.shots[site] && run.shots[site].indexOf(file) >= 0;
-    const cap = `<figcaption>${tag}: ${esc(run.label)}</figcaption>`;
-    if (!has) return `<figure>${cap}<div class="missing">No screenshot in this run</div></figure>`;
-    const src = `../runs/${encodeURIComponent(run.slug)}/shots/${encodeURIComponent(site)}/${encodeURIComponent(file)}`;
-    return `<figure>${cap}<a href="${src}" target="_blank" rel="noopener"><img loading="lazy" src="${src}" alt="${esc(site)} ${esc(surface)} at ${view.width}px, run ${esc(run.label)}"></a></figure>`;
-  }
-
-  function sites() {
-    if (!runs.length) return '<div class="note">No runs yet.</div>';
-    const A_ = getA(), B_ = getB(), one = single();
+  function siteList() {
     const names = new Set();
-    for (const r of one ? [A_] : [B_, A_]) Object.keys(r.truth || {}).forEach((s) => names.add(s));
-    const list = [...names].sort();
-    if (!list.length) return '<div class="note">No generated-site results in this run.</div>';
-    if (!view.site || list.indexOf(view.site) < 0) view.site = list[0];
-    const s = view.site;
-    let h = '<div class="filters"><label>Site <select id="sitesel">' + list.map((n) => `<option${n === s ? ' selected' : ''}>${esc(n)}</option>`).join('') + '</select></label>'
-      + `<span class="row"><button data-w="1280" aria-pressed="${view.width === '1280'}">1280 wide</button><button data-w="390" aria-pressed="${view.width === '390'}">390 wide</button></span></div>`;
-    if (!siteRows(A_).length) h += '<div class="note">No generated-site results in the After run; ground truth and screenshots are shown where they exist.</div>';
-    const t = (A_.truth || {})[s] || (B_.truth || {})[s];
-    if (!t) return h + '<p class="muted">This site has no ground truth in the chosen runs.</p>';
-    const vB = B_.siteVersions && B_.siteVersions[s], vA = A_.siteVersions && A_.siteVersions[s];
-    h += `<h2>${esc(s)}</h2><div class="row"><span class="tag">built by ${esc(t.builder)}</span>${t.reviewer ? `<span class="tag">reviewed by ${esc(t.reviewer)}</span>` : ''}`;
-    if (!one) h += !vB || !vA ? '<span class="tag">page not in both runs</span>' : vA !== vB ? '<span class="tag page-changed">Page itself changed between runs</span>' : '<span class="tag">Page unchanged; only the tools differ</span>';
-    h += '</div>';
-    h += `<p><span class="muted">Brief:</span> ${esc(t.brief)}</p>`;
-    const rowsFor = (run) => new Map(siteRows(run).filter((r) => r.site === s).map((r) => [siteKey(r), r]));
-    const mA = rowsFor(A_), mB = one ? new Map() : rowsFor(B_);
-    const surfaces = ['page'].concat((t.surfaces || []).map((x) => x.name));
-    const known = new Set(surfaces);
-    for (const d of t.defects || []) if (!known.has(d.surface)) { known.add(d.surface); surfaces.push(d.surface); }
-    for (const sf of surfaces) {
-      const ds = (t.defects || []).filter((d) => d.surface === sf);
-      h += `<section class="surface"><h3>${esc(sf)}</h3><div class="pair${one ? ' single' : ''}${view.width === '390' ? ' narrow' : ''}">`;
-      h += one ? shotFig(A_, s, sf, 'Run') : shotFig(B_, s, sf, 'Before') + shotFig(A_, s, sf, 'After');
-      h += '</div>';
-      if (!ds.length) h += '<p class="meta">No ground-truth defects planted on this surface.</p>';
-      else {
-        h += `<div class="scroll"><table><thead><tr><th>Principle</th><th>Layer</th><th>Defect</th><th>${one ? 'Status' : 'Before &rarr; After'}</th><th>Expected rules</th></tr></thead><tbody>`;
-        for (const d of ds) {
-          const k = `${s}|${d.surface}|${d.what}`, ra = mA.get(k), rb = mB.get(k);
-          const a = ra ? norm(ra.status) : 'none', b = rb ? norm(rb.status) : 'none';
-          const ch = !one && ra && rb && a !== b;
-          const st = one ? stHTML(a, ra && ra.status) : `${stHTML(b, rb && rb.status)}<span class="arrow">&rarr;</span>${stHTML(a, ra && ra.status)}`;
-          h += `<tr${ch ? ' class="changed"' : ''}><td>${esc(d.principle)}</td><td>${esc(d.layer)}</td><td>${esc(d.what)}</td><td>${st}</td><td>${esc((d.expect || []).join(', ')) || none}</td></tr>`;
-        }
-        h += '</tbody></table></div>';
+    for (const s of [A(), Bs()]) for (const k of Object.keys((s && s.truth) || {})) names.add(k);
+    return [...names].sort();
+  }
+  const truthOf = (site) => (Bs() && Bs().truth[site]) || (A() && A().truth[site]) || null;
+  function defectsOf(site) {
+    const seen = new Map();
+    for (const s of [A(), Bs()]) for (const d of ((s && s.truth[site]) || {}).defects || []) {
+      const k = `${d.surface}|${d.what}`;
+      if (!seen.has(k)) seen.set(k, d);
+    }
+    return [...seen.values()];
+  }
+  const caughtCount = (src, site, list) => (src && !src.original ? list.filter((d) => siteStatus(src, site, d) === 'caught').length : null);
+  const pair = (a, b) => (a === null && b === null ? '—' : a === null ? String(b) : b === null ? String(a) : same() ? String(b) : `${a} → ${b}`);
+
+  // ---------- details that stay open across re-renders ----------
+  const det = (key, cls, summary, body) => `<details class="${cls}" data-key="${esc(key)}"${state.open.has(key) ? ' open' : ''}><summary>${summary}</summary><div class="body">${body}</div></details>`;
+  main.addEventListener('toggle', (e) => {
+    const k = e.target.getAttribute && e.target.getAttribute('data-key');
+    if (!k) return;
+    if (e.target.open) state.open.add(k); else state.open.delete(k);
+  }, true);
+
+  // ---------- overview ----------
+  function overview() {
+    if (!sources.length) return '<p class="note">No runs yet. Run <code>node benchmark/viewer/snapshot.js --label "name"</code>, then <code>node benchmark/viewer/build.js</code>.</p>';
+    const a = A(), b = Bs();
+    const sites = siteList();
+    const siteTotal = (s) => (s ? sites.reduce((n, x) => n + (((s.truth[x] || {}).defects || []).length), 0) : 0);
+    const siteCaught = (s) => (s && !s.original ? sites.reduce((n, x) => n + caughtCount(s, x, defectsOf(x)), 0) : null);
+    const pc = (s) => { const r = plantedRows(s).filter((x) => x.variant !== 'open'); return r.length ? r.filter((x) => pStat(x) === 'caught').length : null; };
+    const pt = (s) => plantedRows(s).filter((x) => x.variant !== 'open').length || null;
+    const cell = (v) => (v === null ? '<td class="num muted">—</td>' : `<td class="num">${v}</td>`);
+    const dlt = (x, y) => (x === null || y === null || same() ? '<td class="num muted"></td>' : `<td class="num ${y > x ? 'up' : y < x ? 'down' : 'muted'}">${y - x > 0 ? '+' : ''}${y - x}</td>`);
+    const cols = same() ? `<th class="num">${esc(nameOf(a))}</th>` : `<th class="num">${esc(nameOf(a))}</th><th class="num">${esc(nameOf(b))}</th><th class="num">Change</th>`;
+    const row = (label, f) => `<tr><th scope="row">${label}</th>${same() ? cell(f(a)) : cell(f(a)) + cell(f(b)) + dlt(f(a), f(b))}</tr>`;
+    let h = `<p class="lede">${same() ? `Showing <strong>${esc(nameOf(a))}</strong>.` : `Comparing <strong>${esc(nameOf(a))}</strong> with <strong>${esc(nameOf(b))}</strong>.`}</p>`;
+    h += `<table class="summary"><thead><tr><th></th>${cols}</tr></thead><tbody>`;
+    h += row('Problems on the generated sites', (s) => (s ? siteTotal(s) : null));
+    h += row('… caught by the tools', siteCaught);
+    h += row('Planted defects', pt);
+    h += row('… caught by the tools', pc);
+    h += '</tbody></table>';
+    h += det('ov-help', 'aside', 'How to read this', `
+      <ul class="plain">
+        <li><strong>Unmodified sites</strong> are the pages as the models built them, with the problems a blind reviewer found. They have no tool results, so compare them with a run to see what the tools catch, or with a run where pages were fixed to see before and after.</li>
+        <li><strong>Caught</strong>: a rule meant for the problem fired. <strong>Missed</strong>: a rule exists but didn't fire. <strong>No rule</strong>: nothing is designed to catch it.</li>
+        <li>Planted counts use the page and click-opened variants (surfaces already open at load are in the Planted tab).</li>
+      </ul>`);
+    const runRows = runs.slice().reverse().map((r) => `<tr><td>${esc(r.label)}</td><td>${esc((r.createdAt || '').slice(0, 16).replace('T', ' '))}</td><td><code>${esc(r.gitCommit || '')}</code></td><td>${esc(r.note || '')}</td></tr>`).join('');
+    h += det('ov-runs', 'aside', `All runs <span class="meta">${runs.length}</span>`, `<table><thead><tr><th>Label</th><th>Created</th><th>Commit</th><th>Note</th></tr></thead><tbody>${runRows}</tbody></table>`);
+    return h;
+  }
+
+  // ---------- sites ----------
+  function shot(src, site, surface, width) {
+    if (!src) return '<div class="noshot">—</div>';
+    const from = src.original ? (src.shotsFrom || {})[site] : src.slug;
+    const file = `${slug(surface)}-${width}-light.png`;
+    if (!from || !((src.shots || {})[site] || []).includes(file)) return '<div class="noshot">No screenshot</div>';
+    return `<img loading="lazy" src="../runs/${esc(from)}/shots/${esc(site)}/${esc(file)}" alt="${esc(site)}, ${esc(surface)}, ${width} px">`;
+  }
+  function sitesView() {
+    const sites = siteList();
+    if (!sites.length) return '<p class="note">No generated-site results in this selection.</p>';
+    const a = A(), b = Bs();
+    let h = `<p class="lede">${sites.length} sites. Open one to see its screens and problems.</p><div class="list">`;
+    for (const site of sites) {
+      const t = truthOf(site) || {};
+      const defs = defectsOf(site);
+      const changed = !same() && a && b && a.siteVersions && b.siteVersions && a.siteVersions[site] && b.siteVersions[site] && a.siteVersions[site] !== b.siteVersions[site];
+      const ca = caughtCount(a, site, defs), cb = caughtCount(b, site, defs);
+      const summary = `<span class="name">${esc(site)}</span><span class="meta">${esc(t.builder || '')}</span><span class="facts">${defs.length} problems · caught ${pair(ca, cb)}${changed ? ' · <span class="tag">page changed</span>' : ''}</span>`;
+      const w = state.width[site] || '1280';
+      const surfaces = ['page', ...((t.surfaces || []).map((s) => s.name))];
+      let body = `<p class="brief">${esc(t.brief || '')}${t.reviewer ? ` <span class="meta">Reviewed by ${esc(t.reviewer)}.</span>` : ''}</p>`;
+      body += `<div class="seg" role="group" aria-label="Screenshot width"><button type="button" data-site="${esc(site)}" data-width="1280" aria-pressed="${w === '1280'}">Desktop</button><button type="button" data-site="${esc(site)}" data-width="390" aria-pressed="${w === '390'}">Phone</button></div>`;
+      for (const surf of surfaces) {
+        const sd = defs.filter((d) => d.surface === surf);
+        const sa = caughtCount(a, site, sd), sb = caughtCount(b, site, sd);
+        const sum = `<span class="name">${esc(surf === 'page' ? 'Main page' : surf)}</span><span class="facts">${sd.length} problem${sd.length === 1 ? '' : 's'}${sd.length ? ` · caught ${pair(sa, sb)}` : ''}</span>`;
+        let inner = `<div class="shots${same() ? ' one' : ''}">`;
+        inner += `<figure><figcaption>${esc(nameOf(a))}</figcaption>${shot(a, site, surf, w)}</figure>`;
+        if (!same()) inner += `<figure><figcaption>${esc(nameOf(b))}</figcaption>${shot(b, site, surf, w)}</figure>`;
+        inner += '</div>';
+        if (sd.length) {
+          const sides = (same() ? [b] : [a, b]).filter((x) => x && !x.original);
+          inner += `<table class="defects"><thead><tr><th>Problem</th>${sides.map((x) => `<th>${esc(sides.length > 1 ? nameOf(x) : 'Tools: ' + nameOf(x))}</th>`).join('')}</tr></thead><tbody>`;
+          for (const d of sd) {
+            const x = siteStatus(a, site, d), y = siteStatus(b, site, d);
+            const moved = !same() && x !== y && x !== 'found' && y !== 'found';
+            inner += `<tr${moved ? ' class="moved"' : ''}><td>${esc(d.what)}<div class="meta">${esc(d.principle)} · ${esc(d.layer)}${d.expect && d.expect.length ? ` · rules: ${esc(d.expect.join(', '))}` : ''}${d.note ? ` · ${esc(d.note)}` : ''}</div></td>${sides.map((src) => `<td>${st(siteStatus(src, site, d))}</td>`).join('')}</tr>`;
+          }
+          inner += '</tbody></table>';
+        } else inner += '<p class="muted">No problems listed for this surface.</p>';
+        body += det(`s:${site}:${surf}`, 'surface', sum, inner);
       }
-      h += '</section>';
+      h += det(`s:${site}`, 'site', summary, body);
+    }
+    return h + '</div>';
+  }
+
+  // ---------- planted ----------
+  function plantedView() {
+    const a = A(), b = Bs();
+    const has = (s) => plantedRows(s).length > 0;
+    if (!has(a) && !has(b)) return '<p class="note">The unmodified sites have no planted set. Pick a run.</p>';
+    const L = has(a) ? a : b, R = has(b) ? b : a;
+    const one = L === R;
+    const f = state.pf;
+    const rowsL = new Map(plantedRows(L).map((r) => [pKey(r), r]));
+    let rows = plantedRows(R).filter((r) => (!f.principle || r.principle === f.principle) && (!f.layer || r.layer === f.layer) && (!f.level || String(r.level) === f.level));
+    if (f.changed && !one) rows = rows.filter((r) => { const l = rowsL.get(pKey(r)); return !l || pStat(l) !== pStat(r); });
+    const all = plantedRows(R);
+    const opt = (vals, cur) => '<option value="">All</option>' + [...new Set(vals)].sort().map((v) => `<option${String(v) === cur ? ' selected' : ''}>${esc(v)}</option>`).join('');
+    let h = `<p class="lede">${one ? `Showing <strong>${esc(nameOf(R))}</strong>.` : `Comparing <strong>${esc(nameOf(L))}</strong> with <strong>${esc(nameOf(R))}</strong>.`} ${rows.length} defects.</p>`;
+    h += `<div class="filters">
+      <label>Principle <select data-f="principle">${opt(all.map((r) => r.principle), f.principle)}</select></label>
+      <label>Needs <select data-f="layer">${opt(all.map((r) => r.layer), f.layer)}</select></label>
+      <label>Level <select data-f="level">${opt(all.map((r) => r.level), f.level)}</select></label>
+      <label>Plan <select data-f="plan"><option value="plan"${f.plan === 'plan' ? ' selected' : ''}>With screen plan</option><option value="noplan"${f.plan === 'noplan' ? ' selected' : ''}>Without</option></select></label>
+      ${one ? '' : `<label class="check"><input type="checkbox" data-f="changed"${f.changed ? ' checked' : ''}> Only changes</label>`}
+    </div>`;
+    const groups = {};
+    for (const r of rows) (groups[r.principle] = groups[r.principle] || []).push(r);
+    h += '<div class="list">';
+    for (const [p, g] of Object.entries(groups).sort()) {
+      const cR = g.filter((r) => pStat(r) === 'caught').length;
+      const cL = g.filter((r) => { const l = rowsL.get(pKey(r)); return l && pStat(l) === 'caught'; }).length;
+      const sum = `<span class="name">${esc(p)}</span><span class="facts">${g.length} defect${g.length === 1 ? "" : "s"} · caught ${one ? cR : `${cL} → ${cR}`}</span>`;
+      let t = `<table class="defects"><thead><tr><th>Defect</th>${one ? '<th>Status</th>' : `<th>${esc(nameOf(L))}</th><th>${esc(nameOf(R))}</th>`}</tr></thead><tbody>`;
+      for (const r of g) {
+        const l = rowsL.get(pKey(r));
+        const x = l ? pStat(l) : 'none', y = pStat(r);
+        const where = r.variant === 'base' ? '' : r.variant === 'step' ? ' · opened by a click' : ' · open at load';
+        t += `<tr${!one && x !== y ? ' class="moved"' : ''}><td>${esc(r.what)}<div class="meta"><code>${esc(r.case)}</code>${where} · ${esc(r.layer)} · level ${esc(r.level)}${r.expect.length ? ` · rules: ${esc(r.expect.join(', '))}` : ''}</div></td>${one ? `<td>${st(y)}</td>` : `<td>${st(x)}</td><td>${st(y)}</td>`}</tr>`;
+      }
+      h += det(`p:${p}`, 'site', sum, t + '</tbody></table>');
+    }
+    h += '</div>';
+    const ctl = (R.planted && R.planted.controls) || [];
+    if (ctl.length) {
+      const any = (c) => [...c.lint, ...c.verifyPlan, ...c.verifyNoplan];
+      const alarms = ctl.filter((c) => any(c).length).length;
+      h += det('p:controls', 'aside', `Clean pages (false alarms) <span class="meta">${alarms} of ${ctl.length} drew a finding</span>`,
+        `<table><thead><tr><th>Clean page</th><th>lint</th><th>verify, plan</th><th>verify, no plan</th></tr></thead><tbody>${ctl.map((c) => `<tr><td>${esc(c.title)}</td><td>${esc(c.lint.join(', ') || '0')}</td><td>${esc(c.verifyPlan.join(', ') || '0')}</td><td>${esc(c.verifyNoplan.join(', ') || '0')}</td></tr>`).join('')}</tbody></table>`);
     }
     return h;
   }
 
+  // ---------- render + events ----------
   function render() {
-    for (const b of document.querySelectorAll('#nav button')) b.setAttribute('aria-pressed', String(b.dataset.view === view.name));
-    main.innerHTML = view.name === 'overview' ? overview() : view.name === 'sites' ? sites() : planted();
+    for (const b of document.querySelectorAll('.tabs button')) b.setAttribute('aria-pressed', String(b.dataset.view === state.view));
+    main.innerHTML = state.view === 'sites' ? sitesView() : state.view === 'planted' ? plantedView() : overview();
   }
-
-  $('nav').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { view.name = b.dataset.view; render(); } });
-  bSel.addEventListener('change', render); aSel.addEventListener('change', render);
+  document.querySelector('.tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { state.view = b.dataset.view; render(); } });
+  aSel.addEventListener('change', render);
+  bSel.addEventListener('change', render);
+  main.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-width]');
+    if (b) { state.width[b.dataset.site] = b.dataset.width; render(); }
+  });
   main.addEventListener('change', (e) => {
-    const t = e.target;
-    if (t.id === 'sitesel') view.site = t.value;
-    else if (t.id === 'pfplan') view.plan = t.value;
-    else if (t.id === 'pfchanged') view.pf.changed = t.checked;
-    else if (t.dataset && t.dataset.pf) view.pf[t.dataset.pf] = t.value;
-    else return;
+    const k = e.target.dataset && e.target.dataset.f;
+    if (!k) return;
+    state.pf[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     render();
   });
-  main.addEventListener('click', (e) => { const b = e.target.closest('button[data-w]'); if (b) { view.width = b.dataset.w; render(); } });
   render();
 })();

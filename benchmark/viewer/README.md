@@ -13,3 +13,7 @@ A run is a frozen copy of the benchmark state for one approach or iteration of t
 Pick a Before and an After run at the top (default: the two most recent). The Generated sites tab says whether a site's page changed between the runs (sha differs) or only the tools did.
 
 Runs are not meant to be edited by hand. `benchmark/runs/*/shots` is about 8 MB per run; consider ignoring it in git.
+
+## Comparing with the unmodified sites
+
+Both pickers include **Unmodified sites**: the generated pages as the models built them, with the problems the blind review found and no tool results. Compare it with a run to see what the tools catch on each site, or with a run whose pages were fixed (their hash differs, marked "page changed") to see before and after. Details are collapsed by default; open a site, then a surface, to see screenshots and problems.

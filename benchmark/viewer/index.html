@@ -11,13 +11,13 @@
 <header class="bar">
   <h1>Benchmark results</h1>
   <div class="pickers">
-    <label>Before <select id="before"></select></label>
-    <label>After <select id="after"></select></label>
+    <label><span>Compare</span> <select id="a"></select></label>
+    <label><span>with</span> <select id="b"></select></label>
   </div>
-  <nav class="tabs" id="nav">
-    <button data-view="overview" aria-pressed="true">Overview</button>
-    <button data-view="sites" aria-pressed="false">Generated sites</button>
-    <button data-view="planted" aria-pressed="false">Planted set</button>
+  <nav class="tabs" aria-label="Views">
+    <button type="button" data-view="overview" aria-pressed="true">Overview</button>
+    <button type="button" data-view="sites" aria-pressed="false">Sites</button>
+    <button type="button" data-view="planted" aria-pressed="false">Planted</button>
   </nav>
 </header>
 <main id="main"></main>
