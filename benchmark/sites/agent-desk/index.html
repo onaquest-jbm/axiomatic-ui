@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agent Desk</title>
+<style>
+:root{
+  --bg:#f6f6f4;--surface:#ffffff;--surface-2:#f0efec;--sidebar:#efeeea;--border:#e1dfda;--border-strong:#cfccc5;
+  --text:#1c1b19;--muted:#6b6862;--faint:#9a968e;--accent:#c2562d;--accent-ink:#ffffff;--accent-soft:#f7e6dd;
+  --run:#2f8f5b;--wait:#c98a00;--idle:#9a968e;--danger:#c2372d;--code-bg:#1f1e1c;--code-text:#ecebe6;
+  --shadow:0 8px 28px rgba(30,25,15,.16),0 1px 3px rgba(30,25,15,.1);--radius:10px;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#161615;--surface:#1e1e1c;--surface-2:#262624;--sidebar:#1a1a18;--border:#2f2f2c;--border-strong:#413f3b;
+  --text:#ecebe6;--muted:#a09d95;--faint:#77746d;--accent:#e07a4f;--accent-ink:#1a0e08;--accent-soft:#3a2418;
+  --run:#4cc083;--wait:#e3a928;--idle:#77746d;--danger:#ef6a5f;--code-bg:#111110;--code-text:#e6e5e0;
+  --shadow:0 10px 30px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.4);}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible,[tabindex]:focus-visible,summary:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+[hidden]{display:none!important}
+.app{display:flex;height:100%}
+/* sidebar */
+.sidebar{width:288px;flex:none;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.brand{display:flex;align-items:center;gap:9px;padding:14px 14px 8px;font-weight:650;letter-spacing:-.01em}
+.logo{width:24px;height:24px;border-radius:7px;background:var(--accent);display:grid;place-items:center;color:var(--accent-ink)}
+.logo svg{width:14px;height:14px;stroke-width:2.2}
+.side-actions{padding:6px 10px;display:flex;flex-direction:column;gap:2px}
+.nav{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:8px;color:var(--text);text-align:left;width:100%}
+.nav:hover{background:var(--surface-2)}
+.nav .count{margin-left:auto;font-size:11.5px;color:var(--muted);background:var(--surface-2);padding:0 7px;border-radius:99px}
+.nav.primary{background:var(--accent);color:var(--accent-ink);font-weight:600;margin-bottom:6px}
+.nav.primary:hover{filter:brightness(1.07);background:var(--accent)}
+.nav svg{color:var(--muted)}.nav.primary svg{color:inherit}
+.nav .count.warn{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chats{flex:1;overflow:auto;padding:6px 10px 12px;min-height:0}
+.group-h{display:flex;align-items:center;gap:6px;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:12px 9px 4px;font-weight:600}
+.chat{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;cursor:pointer;position:relative}
+.chat:hover{background:var(--surface-2)}
+.chat.active{background:var(--surface);box-shadow:0 0 0 1px var(--border)}
+.chat .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat .sub{font-size:11.5px;color:var(--muted)}
+.chat .meta{min-width:0;flex:1}
+.chat .pin{color:var(--faint);width:12px;height:12px}
+.chat .kebab{opacity:0;width:24px;height:24px;display:grid;place-items:center;border-radius:6px;color:var(--muted)}
+.chat:hover .kebab,.chat:focus-within .kebab{opacity:1}
+.kebab:hover{background:var(--border)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--idle)}
+.dot.running{background:var(--run);animation:pulse 1.6s infinite}
+.dot.waiting{background:var(--wait)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--run) 55%,transparent)}100%{box-shadow:0 0 0 7px transparent}}
+.user-row{border-top:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:13px}
+.avatar{width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-weight:600;font-size:11px;border:1px solid var(--border)}
+/* main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+.head{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);min-height:56px}
+.menu-btn{display:none}
+.title-wrap{min-width:0;flex:1}
+.title{font-weight:650;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumbs{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center;white-space:nowrap;overflow:hidden}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:1px 8px;border-radius:99px;background:var(--accent-soft);color:var(--accent);font-weight:600}
+.actions{display:flex;align-items:center;gap:2px}
+.icon-btn{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;color:var(--muted);position:relative}
+.icon-btn:hover,.icon-btn[aria-expanded=true]{background:var(--surface-2);color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface);font-weight:550;font-size:13px}
+.btn:hover{background:var(--surface-2)}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.solid:hover{filter:brightness(1.07);background:var(--accent)}
+.btn.danger{color:var(--danger)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--surface-2)}
+.sep{width:1px;height:20px;background:var(--border);margin:0 6px}
+.goal-bar{display:flex;align-items:center;gap:10px;padding:7px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:12.5px;color:var(--muted)}
+.goal-bar b{color:var(--text);font-weight:600}
+.progress{height:5px;width:90px;background:var(--border);border-radius:9px;overflow:hidden;flex:none}.progress i{display:block;height:100%;width:62%;background:var(--run)}
+.transcript{flex:1;overflow:auto;padding:22px 16px 10px;scroll-behavior:smooth}
+.col{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.msg.user{align-self:flex-end;max-width:85%;background:var(--surface-2);border:1px solid var(--border);padding:10px 14px;border-radius:14px 14px 4px 14px}
+.msg.agent{display:flex;gap:12px}
+.msg.agent .av{width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none;margin-top:2px}
+.msg.agent .av svg{width:15px;height:15px;stroke-width:2.2}
+.body{min-width:0;flex:1}
+.body h3{margin:2px 0 6px;font-size:16px;letter-spacing:-.01em}
+.body h4{margin:16px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.body p{margin:6px 0}.body ul,.body ol{margin:6px 0;padding-left:22px}.body li{margin:3px 0}
+code{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);border:1px solid var(--border);padding:0 5px;border-radius:5px}
+.codeblock{margin:10px 0;border-radius:10px;overflow:hidden;background:var(--code-bg);color:var(--code-text);border:1px solid var(--border)}
+.codeblock .bar{display:flex;align-items:center;justify-content:space-between;padding:5px 8px 5px 12px;font-size:12px;color:#9d9a92;border-bottom:1px solid rgba(255,255,255,.08)}
+.codeblock .copy-btn{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;color:#c9c6bd;font-size:12px}
+.codeblock .copy-btn:hover{background:rgba(255,255,255,.1)}
+.codeblock pre{margin:0;padding:12px;overflow:auto;font:12.5px/1.6 var(--mono)}
+.k{color:#e58a63}.s{color:#9ccf8e}.c{color:#7c796f}.f{color:#8fb7ee}
+.step{margin:8px 0;border:1px solid var(--border);border-radius:9px;background:var(--surface)}
+.step summary{list-style:none;display:flex;align-items:center;gap:9px;padding:7px 11px;cursor:pointer;font-size:13px;color:var(--muted);user-select:none}
+.step summary::-webkit-details-marker{display:none}
+.step summary .chev{transition:transform .15s}
+.step[open] summary .chev{transform:rotate(90deg)}
+.step summary b{color:var(--text);font-weight:600;font-family:var(--mono);font-size:12.5px}
+.step summary .ok{margin-left:auto;color:var(--run);display:flex;gap:4px;align-items:center;font-size:12px}
+.step .out{border-top:1px solid var(--border);padding:9px 12px;font:12px/1.55 var(--mono);color:var(--muted);white-space:pre-wrap;overflow:auto;max-height:200px}
+.add{color:var(--run)}.del{color:var(--danger)}
+/* interactive cards */
+.card{border:1px solid var(--border-strong);border-radius:12px;background:var(--surface);box-shadow:0 2px 10px rgba(0,0,0,.05);overflow:hidden;margin:10px 0}
+.card.approval{border-color:var(--wait)}
+.card .ch{display:flex;align-items:center;gap:9px;padding:10px 14px;font-weight:600}
+.card.approval .ch{background:color-mix(in srgb,var(--wait) 12%,var(--surface));color:var(--text)}
+.card.approval .ch svg{color:var(--wait)}
+.card .cb{padding:4px 14px 14px}
+.cmd{font:12.5px/1.5 var(--mono);background:var(--code-bg);color:var(--code-text);padding:10px 12px;border-radius:8px;margin:8px 0;overflow:auto;white-space:pre-wrap;word-break:break-all}
+.cmd::before{content:"$ ";color:#7c796f}
+.card .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.card .hint{font-size:12px;color:var(--muted);margin-top:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--border);border-radius:9px;margin-top:8px;background:var(--surface)}
+.opt:hover{border-color:var(--border-strong);background:var(--surface-2)}
+.opt[aria-checked=true]{border-color:var(--accent);background:var(--accent-soft)}
+.opt .radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-strong);margin-top:2px;flex:none;display:grid;place-items:center}
+.opt[aria-checked=true] .radio{border-color:var(--accent)}
+.opt[aria-checked=true] .radio::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.opt small{display:block;color:var(--muted);font-size:12.5px}
+.resolved{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);padding:8px 12px;border:1px dashed var(--border-strong);border-radius:9px;margin:10px 0}
+.resolved svg{color:var(--run)}.resolved.no svg{color:var(--danger)}
+/* composer */
+.composer-wrap{padding:6px 16px 14px;background:linear-gradient(transparent,var(--bg) 20%)}
+.composer{max-width:780px;margin:0 auto;border:1px solid var(--border-strong);border-radius:14px;background:var(--surface);box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative}
+.composer:focus-within{border-color:var(--accent)}
+.composer textarea{width:100%;resize:none;border:0;background:transparent;color:inherit;font:inherit;padding:12px 14px 4px;min-height:48px;max-height:160px;outline:none;display:block}
+.cbar{display:flex;align-items:center;gap:4px;padding:6px 8px 8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:8px;font-size:12.5px;color:var(--muted);font-weight:550}
+.pill:hover,.pill[aria-expanded=true]{background:var(--surface-2);color:var(--text)}
+.pill svg{width:13px;height:13px}
+.pill .mode-dot{width:7px;height:7px;border-radius:50%;background:var(--wait)}
+.spacer{flex:1}
+.send{width:34px;height:34px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.send:hover{filter:brightness(1.08)}
+.send svg{stroke-width:2.2}
+.footnote{max-width:780px;margin:6px auto 0;font-size:11.5px;color:var(--faint);text-align:center}
+/* popovers */
+.popwrap{position:relative;display:inline-block}
+.menu{position:absolute;z-index:50;min-width:230px;background:var(--surface);border:1px solid var(--border-strong);border-radius:11px;box-shadow:var(--shadow);padding:5px;animation:pop .12s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(-3px) scale(.98)}}
+.menu.up{bottom:calc(100% + 6px);left:0}.menu.down{top:calc(100% + 6px);right:0}
+.menu.fixed{position:fixed}
+.mi{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:7px 10px;border-radius:7px;font-size:13.5px}
+.mi:hover,.mi:focus-visible{background:var(--surface-2);outline:0}
+.mi small{display:block;color:var(--muted);font-size:12px}
+.mi .grow{flex:1}.mi svg{color:var(--muted)}
+.mi .check{color:var(--accent);opacity:0}.mi[aria-checked=true] .check{opacity:1}
+.mi.danger,.mi.danger svg{color:var(--danger)}
+.mi kbd{font:11px var(--mono);color:var(--faint)}
+.menu hr{border:0;border-top:1px solid var(--border);margin:5px 2px}
+.menu .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);padding:6px 10px 3px;font-weight:600}
+#tooltip{position:fixed;z-index:200;background:#232321;color:#f1f0ec;font-size:12px;padding:4px 8px;border-radius:6px;pointer-events:none;box-shadow:var(--shadow);white-space:nowrap;opacity:0;transition:opacity .1s}
+#tooltip.show{opacity:1}#tooltip kbd{font:11px var(--mono);opacity:.65;margin-left:6px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:#232321;color:#f1f0ec;padding:10px 16px;border-radius:10px;box-shadow:var(--shadow);z-index:300;display:flex;gap:9px;align-items:center;opacity:0;pointer-events:none;transition:.2s;font-size:13px}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast svg{color:#6fd49c}
+dialog{border:1px solid var(--border-strong);border-radius:14px;background:var(--surface);color:var(--text);padding:0;box-shadow:var(--shadow);width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 32px)}
+dialog::backdrop{background:rgba(10,8,5,.45);backdrop-filter:blur(2px)}
+.dh{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);font-weight:650;font-size:15px}
+.db{padding:6px 18px 14px;overflow:auto;max-height:60vh}
+.df{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--border);background:var(--surface-2)}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--border)}
+.set-row:last-child{border:0}.set-row small{display:block;color:var(--muted)}
+.switch{width:38px;height:22px;border-radius:99px;background:var(--border-strong);position:relative;flex:none;transition:.15s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.switch[aria-checked=true]{background:var(--accent)}.switch[aria-checked=true]::after{left:18px}
+select,input[type=text]{font:inherit;color:inherit;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:6px 9px;min-width:0}
+input[type=text]{width:100%}
+.field{display:block;margin-top:12px;font-weight:550}
+.stats{display:flex;gap:16px;padding:10px 0;color:var(--muted);font-size:12.5px}
+/* phone */
+.scrim{display:none}
+@media (max-width:820px){
+  .sidebar{position:fixed;inset:0 auto 0 0;z-index:90;transform:translateX(-102%);transition:transform .2s;width:min(300px,86vw);box-shadow:var(--shadow)}
+  .sidebar.open{transform:none}
+  .scrim.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:80}
+  .menu-btn{display:grid}
+  .actions .hide-sm,.sep{display:none}
+  .chat .kebab{opacity:1}
+}
+@media (max-width:480px){
+  .head{padding:8px 10px;gap:6px}.transcript{padding:16px 12px 6px}.composer-wrap{padding:6px 10px 10px}
+  .actions .icon-btn{width:34px}.crumbs{display:none}.footnote{display:none}
+  .msg.agent{gap:9px}.msg.user{max-width:92%}
+  .goal-bar{padding:7px 12px}.goal-bar .progress{display:none}
+  .pill .lbl-t{display:none}.pill#perm-btn .lbl-t{display:inline}
+  .menu.up{left:auto}#model-menu,#effort-menu{left:0}#perm-menu{right:auto;left:-120px}
+  .menu{min-width:210px;max-width:calc(100vw - 20px)}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8.5 5 3.5-5 3.5z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7M10 20a2 2 0 0 0 4 0"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+<symbol id="i-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-hand" viewBox="0 0 24 24"><path d="M4 12h13M13 7l5 5-5 5M4 6v12"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
+<symbol id="i-term" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 10 3 2-3 2M12 15h5"/></symbol>
+<symbol id="i-diff" viewBox="0 0 24 24"><path d="M8 3v12M8 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM16 21V9M16 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><path d="m21 11-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="m15 4 5 5-3 1-3 4 1 4-2 2-4-4-5 5-1-1 5-5-4-4 2-2 4 1 4-3z"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM13 7l4 4"/></symbol>
+<symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8M10 12h4"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></symbol>
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6 6l3 3M15 15l3 3M18 6l-3 3M9 15l-3 3"/></symbol>
+<symbol id="i-q" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></symbol>
+</defs></svg>
+
+<div class="app">
+<aside class="sidebar" id="sidebar" aria-label="Sidebar">
+  <div class="brand"><span class="logo"><svg><use href="#i-spark"/></svg></span>Agent Desk</div>
+  <div class="side-actions">
+    <button class="nav primary" id="new-chat"><svg><use href="#i-plus"/></svg>New chat</button>
+    <button class="nav" id="search-btn"><svg><use href="#i-search"/></svg>Search<span class="count">Ctrl K</span></button>
+    <button class="nav" id="open-project"><svg><use href="#i-folder"/></svg>Open project</button>
+    <button class="nav" id="running-now"><svg><use href="#i-play"/></svg>Running now<span class="count">3</span></button>
+    <button class="nav" id="requests"><svg><use href="#i-bell"/></svg>Requests<span class="count warn" id="req-count">2</span></button>
+    <button class="nav" id="scoped-browser"><svg><use href="#i-globe"/></svg>Scoped browser</button>
+    <button class="nav" id="selected-window"><svg><use href="#i-window"/></svg>Selected window</button>
+  </div>
+  <div class="chats" id="chats" role="list"></div>
+  <div class="user-row"><span class="avatar">MK</span><span>Maya Kowalski</span><span class="spacer"></span><button class="icon-btn" id="side-settings" aria-label="Settings" data-tip="Settings"><svg><use href="#i-gear"/></svg></button></div>
+</aside>
+<div class="scrim" id="scrim"></div>
+
+<main class="main">
+  <header class="head">
+    <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open sidebar"><svg><use href="#i-menu"/></svg></button>
+    <div class="title-wrap">
+      <div class="title" id="chat-title">Migrate billing webhooks to queue worker</div>
+      <div class="crumbs"><span>stripe-gateway</span><span>·</span><span>branch feat/webhook-queue</span><span class="badge" id="head-badge"><span class="dot waiting"></span>Waiting for you</span></div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost hide-sm" id="goal-btn"><svg><use href="#i-target"/></svg>Set goal</button>
+      <span class="sep"></span>
+      <button class="icon-btn" id="handoff-btn" aria-label="Hand off" data-tip="Hand off to another agent"><svg><use href="#i-hand"/></svg></button>
+      <button class="icon-btn hide-sm" id="editor-btn" aria-label="Open in editor" data-tip="Open in editor"><svg><use href="#i-code"/></svg></button>
+      <button class="icon-btn hide-sm" id="terminal-btn" aria-label="Terminal" data-tip="Terminal"><svg><use href="#i-term"/></svg></button>
+      <button class="icon-btn" id="diff-btn" aria-label="Diff" data-tip="Review diff" data-kbd="Ctrl D"><svg><use href="#i-diff"/></svg></button>
+      <button class="icon-btn hide-sm" id="browser-btn" aria-label="Browser" data-tip="Open browser"><svg><use href="#i-globe"/></svg></button>
+      <button class="icon-btn hide-sm" id="share-btn" aria-label="Share" data-tip="Share chat"><svg><use href="#i-share"/></svg></button>
+      <button class="icon-btn hide-sm" id="settings-btn" aria-label="Settings" data-tip="Chat settings"><svg><use href="#i-gear"/></svg></button>
+      <div class="popwrap">
+        <button class="icon-btn" id="more-btn" aria-label="More" aria-haspopup="menu" aria-expanded="false" data-tip="More"><svg><use href="#i-more"/></svg></button>
+        <div class="menu down" id="more-menu" role="menu" hidden>
+          <button class="mi show-sm-only" role="menuitem" data-act="goal"><svg><use href="#i-target"/></svg><span class="grow">Set goal</span></button>
+          <button class="mi" role="menuitem" data-act="editor"><svg><use href="#i-code"/></svg><span class="grow">Open in editor</span></button>
+          <button class="mi" role="menuitem" data-act="terminal"><svg><use href="#i-term"/></svg><span class="grow">Open terminal</span></button>
+          <button class="mi" role="menuitem" data-act="share"><svg><use href="#i-share"/></svg><span class="grow">Share chat</span></button>
+          <button class="mi" role="menuitem" data-act="settings"><svg><use href="#i-gear"/></svg><span class="grow">Chat settings</span></button>
+          <hr>
+          <button class="mi" role="menuitem" data-act="copy-link"><svg><use href="#i-copy"/></svg><span class="grow">Copy chat link</span></button>
+          <button class="mi" role="menuitem" data-act="export"><svg><use href="#i-down"/></svg><span class="grow">Export transcript</span></button>
+          <button class="mi danger" role="menuitem" data-act="stop"><svg><use href="#i-x"/></svg><span class="grow">Stop agent</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="goal-bar" id="goal-bar"><svg><use href="#i-target"/></svg><span><b>Goal:</b> <span id="goal-text">All webhook handlers consumed from the queue, tests green</span></span><span class="spacer"></span><div class="progress"><i></i></div><span>5 of 8</span></div>
+
+  <section class="transcript" id="transcript" aria-label="Transcript">
+  <div class="col">
+    <div class="msg user">Our Stripe webhook handlers run inline in the request and time out under load. Move them onto the job queue with retries and idempotency, and keep the existing signature check.</div>
+
+    <div class="msg agent"><div class="av"><svg><use href="#i-spark"/></svg></div><div class="body">
+      <h3>Plan: queue-backed webhook processing</h3>
+      <p>I read through <code>src/webhooks/</code> and the queue setup. Handlers are called synchronously from <code>router.post('/stripe')</code>, so a slow DB write delays the 200 response past Stripe's 10s limit.</p>
+      <h4>Approach</h4>
+      <ol>
+        <li>Verify the signature, then persist the raw event and return <code>202</code> immediately.</li>
+        <li>Enqueue one job per event, keyed by <code>event.id</code> for idempotency.</li>
+        <li>Move each handler into <code>workers/stripe.ts</code> with exponential backoff.</li>
+      </ol>
+      <details class="step"><summary><svg class="chev"><use href="#i-chev"/></svg><b>Read</b> src/webhooks/router.ts<span class="ok"><svg><use href="#i-check"/></svg>218 lines</span></summary><div class="out">router.post('/stripe', verifySignature, async (req, res) => {
+  const event = req.body as Stripe.Event;
+  await handlers[event.type]?.(event);   // blocks the response
+  res.sendStatus(200);
+});</div></details>
+      <details class="step"><summary><svg class="chev"><use href="#i-chev"/></svg><b>Grep</b> "handlers\[" in src/<span class="ok"><svg><use href="#i-check"/></svg>6 matches</span></summary><div class="out">src/webhooks/router.ts:41
+src/webhooks/handlers/invoice.ts:12
+src/webhooks/handlers/subscription.ts:9
+src/webhooks/handlers/refund.ts:7
+test/webhooks.spec.ts:33
+test/webhooks.spec.ts:58</div></details>
+      <details class="step" open><summary><svg class="chev"><use href="#i-chev"/></svg><b>Edit</b> src/webhooks/router.ts<span class="ok"><svg><use href="#i-check"/></svg><span class="add">+14</span>&nbsp;<span class="del">-3</span></span></summary><div class="out"><span class="del">-  await handlers[event.type]?.(event);</span>
+<span class="add">+  await events.insertOnce(event.id, event);</span>
+<span class="add">+  await queue.add('stripe.event', { id: event.id }, {</span>
+<span class="add">+    jobId: event.id, attempts: 6, backoff: { type: 'exponential', delay: 2000 },</span>
+<span class="add">+  });</span>
+<span class="del">-  res.sendStatus(200);</span>
+<span class="add">+  res.sendStatus(202);</span></div></details>
+      <p>The new worker entry point looks like this:</p>
+      <div class="codeblock"><div class="bar"><span>workers/stripe.ts</span><button class="copy-btn" data-copy="stripe worker"><svg><use href="#i-copy"/></svg>Copy</button></div><pre><span class="k">export const</span> <span class="f">worker</span> = <span class="k">new</span> <span class="f">Worker</span>(<span class="s">'stripe.event'</span>, <span class="k">async</span> (job) =&gt; {
+  <span class="k">const</span> event = <span class="k">await</span> events.<span class="f">load</span>(job.data.id);
+  <span class="k">if</span> (event.processedAt) <span class="k">return</span>;      <span class="c">// idempotent replay</span>
+  <span class="k">await</span> handlers[event.type]?.(event);
+  <span class="k">await</span> events.<span class="f">markProcessed</span>(event.id);
+}, { connection, concurrency: <span class="s">8</span> });</pre></div>
+      <p>Next I want to run the webhook suite against a local Redis to confirm retries behave.</p>
+
+      <div class="card approval" id="approval-card" role="alertdialog" aria-labelledby="ap-t">
+        <div class="ch" id="ap-t"><svg><use href="#i-shield"/></svg>Agent wants to run a command</div>
+        <div class="cb">
+          <div style="color:var(--muted)">Runs in <code>~/code/stripe-gateway</code> with network disabled.</div>
+          <div class="cmd" id="ap-cmd">docker compose up -d redis &amp;&amp; npm test -- test/webhooks.spec.ts --runInBand</div>
+          <div class="row">
+            <button class="btn solid" id="ap-approve"><svg><use href="#i-check"/></svg>Approve</button>
+            <button class="btn" id="ap-deny">Deny</button>
+            <button class="btn ghost" id="ap-always">Always allow</button>
+          </div>
+          <div class="hint">"Always allow" applies to <code>npm test</code> in this project.</div>
+        </div>
+      </div>
+
+      <div class="card" id="question-card">
+        <div class="ch"><svg style="color:var(--accent)"><use href="#i-q"/></svg>Which retry policy should failed jobs use?</div>
+        <div class="cb">
+          <div role="radiogroup" aria-label="Retry policy">
+            <button class="opt" role="radio" aria-checked="true" data-v="Exponential backoff, 6 attempts"><span class="radio"></span><span><b>Exponential backoff, 6 attempts</b><small>2s, 4s, 8s ... then dead-letter. Matches Stripe's own retry window.</small></span></button>
+            <button class="opt" role="radio" aria-checked="false" data-v="Fixed 30s delay, 3 attempts"><span class="radio"></span><span><b>Fixed 30s delay, 3 attempts</b><small>Simpler to reason about, gives up sooner.</small></span></button>
+            <button class="opt" role="radio" aria-checked="false" data-v="No retries, alert on failure"><span class="radio"></span><span><b>No retries, alert on failure</b><small>Rely on Stripe re-delivery only.</small></span></button>
+          </div>
+          <div class="row" style="margin-top:12px"><button class="btn solid" id="q-submit">Answer</button><button class="btn ghost" id="q-skip">Skip</button></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+  </section>
+
+  <div class="composer-wrap">
+    <div class="composer">
+      <textarea id="input" rows="1" placeholder="Reply to the agent, or type / for commands" aria-label="Message"></textarea>
+      <div class="cbar">
+        <button class="icon-btn" id="attach-btn" aria-label="Attach" data-tip="Attach files"><svg><use href="#i-clip"/></svg></button>
+        <div class="popwrap"><button class="pill" id="model-btn" aria-haspopup="listbox" aria-expanded="false"><svg><use href="#i-spark"/></svg><span id="model-label">Sonnet 5.5</span><svg><use href="#i-down"/></svg></button>
+          <div class="menu up" id="model-menu" role="listbox" hidden>
+            <div class="lbl">Model</div>
+            <button class="mi" role="option" aria-checked="false" data-v="Opus 5"><span class="grow">Opus 5<small>Deepest reasoning, slowest</small></span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="true" data-v="Sonnet 5.5"><span class="grow">Sonnet 5.5<small>Balanced for daily coding</small></span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="false" data-v="Haiku 5"><span class="grow">Haiku 5<small>Fast and cheap for small edits</small></span><svg class="check"><use href="#i-check"/></svg></button>
+          </div></div>
+        <div class="popwrap"><button class="pill" id="effort-btn" aria-haspopup="listbox" aria-expanded="false"><span class="lbl-t">Effort:</span><span id="effort-label">Medium</span><svg><use href="#i-down"/></svg></button>
+          <div class="menu up" id="effort-menu" role="listbox" hidden>
+            <div class="lbl">Effort</div>
+            <button class="mi" role="option" aria-checked="false" data-v="Low"><span class="grow">Low</span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="true" data-v="Medium"><span class="grow">Medium</span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="false" data-v="High"><span class="grow">High</span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="false" data-v="Max"><span class="grow">Max</span><svg class="check"><use href="#i-check"/></svg></button>
+          </div></div>
+        <div class="popwrap"><button class="pill" id="perm-btn" aria-haspopup="listbox" aria-expanded="false"><span class="mode-dot"></span><span class="lbl-t" id="perm-label">Ask</span><svg><use href="#i-down"/></svg></button>
+          <div class="menu up" id="perm-menu" role="listbox" hidden>
+            <div class="lbl">Permission mode</div>
+            <button class="mi" role="option" aria-checked="true" data-v="Ask"><span class="grow">Ask<small>Confirm every command and edit</small></span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="false" data-v="Accept edits"><span class="grow">Accept edits<small>Auto-apply edits, ask for commands</small></span><svg class="check"><use href="#i-check"/></svg></button>
+            <button class="mi" role="option" aria-checked="false" data-v="Full auto"><span class="grow">Full auto<small>No prompts. Use in a sandbox.</small></span><svg class="check"><use href="#i-check"/></svg></button>
+          </div></div>
+        <span class="spacer"></span>
+        <button class="send" id="send-btn" aria-label="Send" data-tip="Send" data-kbd="Enter"><svg><use href="#i-send"/></svg></button>
+      </div>
+    </div>
+    <div class="footnote">Agents can make mistakes. Review diffs before merging.</div>
+  </div>
+</main>
+</div>
+
+<!-- context menu -->
+<div class="menu fixed" id="ctx-menu" role="menu" hidden>
+  <button class="mi" role="menuitem" data-act="rename"><svg><use href="#i-edit"/></svg><span class="grow">Rename</span></button>
+  <button class="mi" role="menuitem" data-act="pin"><svg><use href="#i-pin"/></svg><span class="grow" id="ctx-pin-l">Pin</span></button>
+  <button class="mi" role="menuitem" data-act="archive"><svg><use href="#i-archive"/></svg><span class="grow">Archive</span></button>
+  <hr>
+  <button class="mi danger" role="menuitem" data-act="delete"><svg><use href="#i-trash"/></svg><span class="grow">Delete</span></button>
+</div>
+
+<div id="tooltip" role="tooltip"></div>
+<div id="toast" role="status" aria-live="polite"><svg><use href="#i-check"/></svg><span id="toast-text"></span></div>
+
+<dialog id="settings-dialog" aria-labelledby="sd-t">
+  <div class="dh"><span id="sd-t">Chat settings</span><button class="icon-btn" data-close aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="db">
+    <div class="set-row"><div>Notify when the agent needs me<small>Desktop notification for approvals and questions</small></div><button class="switch" role="switch" aria-checked="true" aria-label="Notify"></button></div>
+    <div class="set-row"><div>Auto-run tests after edits<small>Runs the project's test command</small></div><button class="switch" role="switch" aria-checked="false" aria-label="Auto-run tests"></button></div>
+    <div class="set-row"><div>Expand tool steps by default<small>Show command output inline</small></div><button class="switch" role="switch" aria-checked="false" aria-label="Expand steps"></button></div>
+    <div class="set-row"><div>Working directory<small>~/code/stripe-gateway</small></div><select aria-label="Worktree"><option>Isolated worktree</option><option>Project root</option></select></div>
+    <div class="stats"><span>Tokens 48.2k</span><span>Cost $0.86</span><span>Runtime 14m 20s</span></div>
+  </div>
+  <div class="df"><button class="btn" data-close>Cancel</button><button class="btn solid" id="settings-save">Save</button></div>
+</dialog>
+
+<dialog id="goal-dialog" aria-labelledby="gd-t">
+  <div class="dh"><span id="gd-t">Set goal</span><button class="icon-btn" data-close aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="db"><label class="field">What should the agent keep working toward?<input type="text" id="goal-input" value="All webhook handlers consumed from the queue, tests green"></label><small style="color:var(--muted)">The agent keeps going until this is met or it needs you.</small></div>
+  <div class="df"><button class="btn" data-close>Cancel</button><button class="btn solid" id="goal-save">Set goal</button></div>
+</dialog>
+
+<dialog id="search-dialog" aria-labelledby="sr-t">
+  <div class="dh"><span id="sr-t">Search chats</span><button class="icon-btn" data-close aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="db"><input type="text" id="search-input" placeholder="Search titles and transcripts" aria-label="Search" style="margin-top:12px"><div id="search-results" style="margin-top:8px"></div></div>
+</dialog>
+
+<dialog id="rename-dialog" aria-labelledby="rn-t">
+  <div class="dh"><span id="rn-t">Rename chat</span><button class="icon-btn" data-close aria-label="Close"><svg><use href="#i-x"/></svg></button></div>
+  <div class="db"><input type="text" id="rename-input" aria-label="Chat name" style="margin-top:12px"></div>
+  <div class="df"><button class="btn" data-close>Cancel</button><button class="btn solid" id="rename-save">Rename</button></div>
+</dialog>
+
+<script>
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var chats=[
+ {id:1,p:'stripe-gateway',t:'Migrate billing webhooks to queue worker',s:'waiting',w:'needs approval',pin:true},
+ {id:2,p:'stripe-gateway',t:'Fix flaky invoice rounding test',s:'running',w:'running 4m'},
+ {id:3,p:'stripe-gateway',t:'Add idempotency keys to refunds',s:'idle',w:'2h ago'},
+ {id:4,p:'atlas-web',t:'Dark mode for the settings page',s:'running',w:'running 12m'},
+ {id:5,p:'atlas-web',t:'Replace moment with date-fns',s:'waiting',w:'1 question'},
+ {id:6,p:'atlas-web',t:'Audit unused CSS in dashboard',s:'idle',w:'yesterday'},
+ {id:7,p:'infra-scripts',t:'Rotate staging certificates',s:'running',w:'running 1m'},
+ {id:8,p:'infra-scripts',t:'Terraform drift report',s:'idle',w:'3d ago'}
+];
+var active=1,ctxId=null;
+var STATUS={running:'Running',waiting:'Waiting for you',idle:'Idle'};
+function esc(s){return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function renderChats(){
+  var h='',groups={};chats.filter(function(c){return !c.arch}).sort(function(a,b){return (b.pin?1:0)-(a.pin?1:0)}).forEach(function(c){(groups[c.p]=groups[c.p]||[]).push(c)});
+  Object.keys(groups).forEach(function(p){
+    h+='<div class="group-h"><svg style="width:13px;height:13px"><use href="#i-folder"/></svg>'+esc(p)+'</div>';
+    groups[p].forEach(function(c){
+      h+='<div class="chat'+(c.id===active?' active':'')+'" role="listitem" tabindex="0" data-id="'+c.id+'"><span class="dot '+c.s+'" title="'+STATUS[c.s]+'"></span><span class="meta"><span class="t" style="display:block">'+esc(c.t)+'</span><span class="sub">'+STATUS[c.s]+' · '+c.w+'</span></span>'+(c.pin?'<svg class="pin"><use href="#i-pin"/></svg>':'')+'<button class="kebab" aria-label="Chat actions" data-id="'+c.id+'"><svg><use href="#i-more"/></svg></button></div>';
+    });
+  });
+  $('#chats').innerHTML=h;
+}
+renderChats();
+
+/* popovers */
+var pops=[['#more-btn','#more-menu'],['#model-btn','#model-menu'],['#effort-btn','#effort-menu'],['#perm-btn','#perm-menu']];
+function closeMenus(except){
+  pops.forEach(function(p){if(p[1]===except)return;var m=$(p[1]);if(!m.hidden){m.hidden=true;$(p[0]).setAttribute('aria-expanded','false')}});
+  if(except!=='#ctx-menu')$('#ctx-menu').hidden=true;
+}
+pops.forEach(function(p){
+  $(p[0]).addEventListener('click',function(e){e.stopPropagation();hideTip();var m=$(p[1]);var open=m.hidden;closeMenus(open?p[1]:null);m.hidden=!open;this.setAttribute('aria-expanded',open);if(open){var f=$('.mi',m);f&&f.focus()}});
+});
+document.addEventListener('click',function(e){if(!e.target.closest('.menu'))closeMenus()});
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){closeMenus();hideTip();closeSidebar()}
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openDlg('#search-dialog')}
+  var m=e.target.closest&&e.target.closest('.menu');
+  if(m&&(e.key==='ArrowDown'||e.key==='ArrowUp')){e.preventDefault();var it=$$('.mi',m),i=it.indexOf(document.activeElement);it[(i+(e.key==='ArrowDown'?1:-1)+it.length)%it.length].focus()}
+});
+[['#model-menu','#model-label'],['#effort-menu','#effort-label'],['#perm-menu','#perm-label']].forEach(function(p){
+  $(p[0]).addEventListener('click',function(e){var b=e.target.closest('.mi');if(!b)return;$$('.mi',this).forEach(function(x){x.setAttribute('aria-checked',x===b)});$(p[1]).textContent=b.dataset.v;closeMenus();
+    if(p[0]==='#perm-menu'){var c={Ask:'var(--wait)','Accept edits':'var(--accent)','Full auto':'var(--danger)'};$('#perm-btn .mode-dot').style.background=c[b.dataset.v]}});
+});
+$('#more-menu').addEventListener('click',function(e){var b=e.target.closest('.mi');if(!b)return;closeMenus();var a=b.dataset.act;
+  if(a==='settings')openDlg('#settings-dialog');else if(a==='goal')openDlg('#goal-dialog');
+  else if(a==='copy-link')toast('Chat link copied');else if(a==='export')toast('Transcript exported to Downloads');
+  else if(a==='stop')toast('Agent stopped');else if(a==='share')toast('Share link copied');else toast('Opened '+a);});
+/* mobile: show goal item only on small */
+var sm=window.matchMedia('(max-width:820px)');function smSync(){$$('.show-sm-only').forEach(function(x){x.hidden=!sm.matches})}smSync();sm.addEventListener&&sm.addEventListener('change',smSync);
+
+/* context menu */
+function openCtx(x,y,id){
+  ctxId=id;var c=chats.filter(function(c){return c.id===id})[0];$('#ctx-pin-l').textContent=c.pin?'Unpin':'Pin';
+  closeMenus('#ctx-menu');var m=$('#ctx-menu');m.hidden=false;
+  var w=m.offsetWidth,h=m.offsetHeight;m.style.left=Math.max(8,Math.min(x,innerWidth-w-8))+'px';m.style.top=Math.max(8,Math.min(y,innerHeight-h-8))+'px';$('.mi',m).focus();
+}
+$('#chats').addEventListener('contextmenu',function(e){var c=e.target.closest('.chat');if(!c)return;e.preventDefault();openCtx(e.clientX,e.clientY,+c.dataset.id)});
+$('#chats').addEventListener('click',function(e){
+  var k=e.target.closest('.kebab');if(k){e.stopPropagation();var r=k.getBoundingClientRect();openCtx(r.left,r.bottom+4,+k.dataset.id);return}
+  var c=e.target.closest('.chat');if(c){selectChat(+c.dataset.id)}
+});
+$('#chats').addEventListener('keydown',function(e){var c=e.target.closest('.chat');if(c&&e.key==='Enter')selectChat(+c.dataset.id)});
+$('#ctx-menu').addEventListener('click',function(e){
+  var b=e.target.closest('.mi');if(!b)return;var c=chats.filter(function(c){return c.id===ctxId})[0];closeMenus();
+  switch(b.dataset.act){
+    case 'rename':$('#rename-input').value=c.t;openDlg('#rename-dialog');break;
+    case 'pin':c.pin=!c.pin;toast(c.pin?'Chat pinned':'Chat unpinned');break;
+    case 'archive':c.arch=true;toast('Archived "'+c.t+'"');break;
+    case 'delete':chats=chats.filter(function(x){return x!==c});toast('Chat deleted');break;
+  }
+  renderChats();
+});
+$('#rename-save').addEventListener('click',function(){var v=$('#rename-input').value.trim();if(v){chats.filter(function(c){return c.id===ctxId})[0].t=v;if(ctxId===active)$('#chat-title').textContent=v;renderChats();toast('Chat renamed')}$('#rename-dialog').close()});
+function selectChat(id){active=id;var c=chats.filter(function(c){return c.id===id})[0];if(!c)return;$('#chat-title').textContent=c.t;
+  $('#head-badge').innerHTML='<span class="dot '+c.s+'"></span>'+STATUS[c.s];$('.crumbs span',$('.title-wrap')).textContent=c.p;renderChats();closeSidebar()}
+
+/* tooltips */
+var tip=$('#tooltip'),tipT;
+function showTip(el){clearTimeout(tipT);tipT=setTimeout(function(){tip.innerHTML=esc(el.dataset.tip)+(el.dataset.kbd?'<kbd>'+el.dataset.kbd+'</kbd>':'');tip.classList.add('show');var r=el.getBoundingClientRect(),w=tip.offsetWidth;
+  tip.style.left=Math.max(6,Math.min(r.left+r.width/2-w/2,innerWidth-w-6))+'px';var below=r.top<60;tip.style.top=(below?r.bottom+8:r.top-tip.offsetHeight-8)+'px'},250)}
+function hideTip(){clearTimeout(tipT);tip.classList.remove('show')}
+$$('[data-tip]').forEach(function(el){el.addEventListener('mouseenter',function(){showTip(el)});el.addEventListener('mouseleave',hideTip);el.addEventListener('focus',function(){showTip(el)});el.addEventListener('blur',hideTip);el.addEventListener('click',hideTip)});
+
+/* toast */
+var toastT;function toast(t){$('#toast-text').textContent=t;$('#toast').classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){$('#toast').classList.remove('show')},2400)}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy-btn');if(!b)return;
+  var txt=b.closest('.codeblock').querySelector('pre').innerText;try{navigator.clipboard&&navigator.clipboard.writeText(txt).catch(function(){})}catch(_){}
+  toast('Copied to clipboard');var l=b.lastChild;var old=l.textContent;l.textContent='Copied';setTimeout(function(){l.textContent=old},1600)});
+
+/* dialogs */
+function openDlg(s){closeMenus();var d=$(s);if(!d.open)d.showModal();var i=$('input[type=text]',d);i&&i.focus()}
+$$('dialog').forEach(function(d){d.addEventListener('click',function(e){if(e.target===d||e.target.closest('[data-close]'))d.close()})});
+$('#settings-btn').addEventListener('click',function(){openDlg('#settings-dialog')});
+$('#side-settings').addEventListener('click',function(){openDlg('#settings-dialog')});
+$('#settings-save').addEventListener('click',function(){$('#settings-dialog').close();toast('Settings saved')});
+$$('.switch').forEach(function(s){s.addEventListener('click',function(){s.setAttribute('aria-checked',s.getAttribute('aria-checked')!=='true')})});
+$('#goal-btn').addEventListener('click',function(){openDlg('#goal-dialog')});
+$('#goal-save').addEventListener('click',function(){var v=$('#goal-input').value.trim();if(v){$('#goal-text').textContent=v;$('#goal-bar').hidden=false;toast('Goal set')}$('#goal-dialog').close()});
+$('#search-btn').addEventListener('click',function(){openDlg('#search-dialog');doSearch('')});
+function doSearch(q){q=q.toLowerCase();$('#search-results').innerHTML=chats.filter(function(c){return (c.t+' '+c.p).toLowerCase().indexOf(q)>-1}).map(function(c){return '<button class="mi" data-id="'+c.id+'"><span class="dot '+c.s+'"></span><span class="grow">'+esc(c.t)+'<small>'+esc(c.p)+'</small></span></button>'}).join('')||'<div style="color:var(--muted);padding:10px">No matches</div>'}
+$('#search-input').addEventListener('input',function(){doSearch(this.value)});
+$('#search-results').addEventListener('click',function(e){var b=e.target.closest('.mi');if(b){selectChat(+b.dataset.id);$('#search-dialog').close()}});
+
+/* header + sidebar quick actions */
+[['handoff-btn','Hand-off started'],['editor-btn','Opened in editor'],['terminal-btn','Terminal opened'],['diff-btn','Diff opened: 3 files changed'],['browser-btn','Browser opened'],['share-btn','Share link copied'],['attach-btn','Choose files to attach'],['new-chat','New chat created'],['open-project','Choose a project folder'],['running-now','3 agents running'],['scoped-browser','Scoped browser opened'],['selected-window','Pick a window to share']].forEach(function(p){$('#'+p[0]).addEventListener('click',function(){toast(p[1])})});
+$('#requests').addEventListener('click',function(){$('#approval-card').scrollIntoView({behavior:'smooth',block:'center'})});
+
+/* approval + question */
+var pending=2;
+function setPending(){$('#req-count').textContent=pending;$('#req-count').hidden=pending<=0;
+  if(pending<=0){var c=chats[0];c.s='running';c.w='running now';renderChats();$('#head-badge').innerHTML='<span class="dot running"></span>Running'}}
+function resolveCard(card,ok,msg){var d=document.createElement('div');d.className='resolved'+(ok?'':' no');d.innerHTML='<svg><use href="#'+(ok?'i-check':'i-x')+'"/></svg><span>'+msg+'</span>';card.replaceWith(d);pending--;setPending()}
+$('#ap-approve').addEventListener('click',function(){resolveCard($('#approval-card'),true,'Approved: <code>npm test -- test/webhooks.spec.ts</code> is running.')});
+$('#ap-deny').addEventListener('click',function(){resolveCard($('#approval-card'),false,'Denied. The agent will continue without running the command.')});
+$('#ap-always').addEventListener('click',function(){resolveCard($('#approval-card'),true,'Always allowed for <code>npm test</code> in this project. Command is running.')});
+$$('#question-card .opt').forEach(function(o){o.addEventListener('click',function(){$$('#question-card .opt').forEach(function(x){x.setAttribute('aria-checked',x===o)})})});
+$('#q-submit').addEventListener('click',function(){var v=$('#question-card .opt[aria-checked=true]').dataset.v;resolveCard($('#question-card'),true,'You answered: <b>'+esc(v)+'</b>')});
+$('#q-skip').addEventListener('click',function(){resolveCard($('#question-card'),false,'Question skipped.')});
+
+/* composer */
+var ta=$('#input');ta.addEventListener('input',function(){ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,160)+'px'});
+function send(){var v=ta.value.trim();if(!v)return;var m=document.createElement('div');m.className='msg user';m.textContent=v;$('.col').appendChild(m);ta.value='';ta.style.height='auto';var t=$('#transcript');t.scrollTop=t.scrollHeight}
+$('#send-btn').addEventListener('click',send);
+ta.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+
+/* sidebar drawer */
+function closeSidebar(){$('#sidebar').classList.remove('open');$('#scrim').classList.remove('show')}
+$('#menu-btn').addEventListener('click',function(){$('#sidebar').classList.add('open');$('#scrim').classList.add('show')});
+$('#scrim').addEventListener('click',closeSidebar);
+})();
+</script>
+</body>
+</html>

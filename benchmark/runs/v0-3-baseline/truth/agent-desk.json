@@ -1,0 +1,167 @@
+{
+  "builder": "Claude Sonnet (subagent)",
+  "brief": "desktop app for supervising AI coding agents",
+  "surfaces": [
+    {
+      "name": "model menu",
+      "opener": "#model-btn"
+    },
+    {
+      "name": "permission menu",
+      "opener": "#perm-btn"
+    },
+    {
+      "name": "more menu",
+      "opener": "#more-btn"
+    },
+    {
+      "name": "chat context menu",
+      "opener": ".chat",
+      "event": "contextmenu"
+    },
+    {
+      "name": "settings dialog",
+      "opener": "#settings-btn"
+    },
+    {
+      "name": "copy toast",
+      "opener": ".copy-btn"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Pending approval (blocking, constant) sits below the fold; only a small badge shows at load",
+      "expect": [
+        "primary-not-first",
+        "salience-inversion"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "Solid accent 'New chat' is the loudest element, louder than Approve; accent reused for logo, send, avatar, selection",
+      "expect": [
+        "competing-primaries",
+        "unearned-salience"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "choice",
+      "layer": "source",
+      "what": "About nine header icon buttons, mostly rare and duplicated in More; seven sidebar nav items ahead of the chat list",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "source",
+      "what": "Approve/Deny/Always allow are ordinary small buttons with no shortcuts; Always allow sits right next to Approve",
+      "expect": [
+        "pointing-order"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "'Always allow' grants a standing rule beside one-time Approve with no confirmation; scope text does not cover the chained command",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Chat status by small low-contrast dot colour alone; waiting chats not grouped above idle",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Group headers, footnote, sub-lines and key chip are small and low contrast",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "On phone the approval card is even further below the fold; send button wraps to its own row",
+      "expect": [
+        "primary-not-first"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "judgment",
+      "what": "On phone the 'waiting for you' badge is hidden, title truncated, goal bar wraps awkwardly",
+      "expect": []
+    },
+    {
+      "surface": "permission menu",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "'Full auto' is one click away in a plain list with no warning or confirmation",
+      "expect": []
+    },
+    {
+      "surface": "permission menu",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Permission mode is a tiny muted pill with an unexplained coloured dot; menu offset hard-coded on phone",
+      "expect": []
+    },
+    {
+      "surface": "model menu",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Model, effort and permission are three near-identical peer pills; effort loses its label on phone",
+      "expect": []
+    },
+    {
+      "surface": "more menu",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "'Stop agent' sits under 'Export transcript' with only red text, no separator or confirmation",
+      "expect": []
+    },
+    {
+      "surface": "chat context menu",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Delete removes a chat immediately with no confirmation or undo; kebab invisible until hover",
+      "expect": []
+    },
+    {
+      "surface": "settings dialog",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Toggles, select and read-only usage stats in one list with identical separators",
+      "expect": []
+    },
+    {
+      "surface": "settings dialog",
+      "principle": "convention",
+      "layer": "source",
+      "what": "Focus lands on the X with a heavy ring; both X and Cancel; no pending-change state",
+      "expect": [],
+      "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
+    },
+    {
+      "surface": "copy toast",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Toast covers the composer's effort and permission controls and duplicates in-button feedback",
+      "expect": []
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)",
+  "removed": []
+}

@@ -1,0 +1,150 @@
+{
+  "builder": "gpt-6.2-sol (Codex CLI)",
+  "brief": "web email client inbox",
+  "surfaces": [
+    {
+      "name": "advanced search",
+      "opener": "#advanced-toggle"
+    },
+    {
+      "name": "compose window",
+      "opener": ".compose-open"
+    },
+    {
+      "name": "message menu",
+      "opener": ".message-more"
+    },
+    {
+      "name": "snooze picker",
+      "opener": "#reader-snooze"
+    },
+    {
+      "name": "archive toast",
+      "opener": "#reader-archive"
+    },
+    {
+      "name": "shortcuts dialog",
+      "opener": "#shortcuts-toggle"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "10px timestamps and chips, 11.5px snippets in faint grey in a list read all day",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Star and more buttons about 26px; more invisible until hover",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Archive and delete, the main triage actions, are not on rows",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Reply sits at the end of the message in secondary style",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "One accent means brand, primary, selection, unread and danger; avatar tints mean nothing",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Account avatar and message count each shown two or three times",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "On phone, row buttons, Compose and toolbar buttons about 33px",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "compose window",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Discard draft is a bare trash icon next to a close X that saves; no visible difference",
+      "expect": []
+    },
+    {
+      "surface": "compose window",
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "Compose is modal, blocking the message being replied to; no Cc, Bcc or attach",
+      "expect": []
+    },
+    {
+      "surface": "message menu",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Order reverses frequency; duplicates the toolbar",
+      "expect": []
+    },
+    {
+      "surface": "message menu",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Delete directly under Archive with no gap; unclear if permanent",
+      "expect": []
+    },
+    {
+      "surface": "snooze picker",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Icons switch meaning; focus lands on the close X",
+      "expect": [],
+      "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
+    },
+    {
+      "surface": "archive toast",
+      "principle": "response",
+      "layer": "render",
+      "what": "Toast covers content, does not say which message, small Undo",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "shortcuts dialog",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Omits frequent triage shortcuts; help shown on touch phones",
+      "expect": []
+    },
+    {
+      "surface": "advanced search",
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "Unlabeled opener; popover covers headers; missing common filters",
+      "expect": [
+        "unlabelled-field"
+      ]
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)",
+  "removed": []
+}

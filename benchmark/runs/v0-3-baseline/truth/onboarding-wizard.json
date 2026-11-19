@@ -1,0 +1,129 @@
+{
+  "builder": "Claude Sonnet (subagent)",
+  "brief": "multi-step onboarding wizard for accounting software",
+  "surfaces": [
+    {
+      "name": "help popover",
+      "opener": "#help-btn-1"
+    },
+    {
+      "name": "why dialog",
+      "opener": "#why-btn"
+    },
+    {
+      "name": "exit dialog",
+      "opener": "#exit-btn"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "Current step in the progress bar is drawn faintest; segments unlabeled",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Programmatic focus puts a heavy ring on the heading at load",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "At 390px the gap between stacked fields is larger than elsewhere; misstated grouping",
+      "expect": [
+        "weak-grouping"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Exit, the fiscal-year hint and an inline 'Why' link compete; the 'Why' modal hides text that could be inline",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Help '?' button 36px and 'Why' link 32px tall, under the phone minimum",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "source",
+      "what": "Two overlapping help mechanisms explain the same step",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "convention",
+      "layer": "source",
+      "what": "Back, Skip and Next in three styles; optional steps not marked until an error",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Muted hint, progress and placeholder text small and low contrast, especially dark",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "help popover",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Popover covers the field it explains; no arrow, no close",
+      "expect": []
+    },
+    {
+      "surface": "help popover",
+      "principle": "encoding",
+      "layer": "render",
+      "what": "Popover drawn like the card, so in dark mode it blends in",
+      "expect": []
+    },
+    {
+      "surface": "why dialog",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Muted body copy; no close control; 'Got it' only",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "exit dialog",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Harmless 'exit and save' styled as danger, louder than Keep going",
+      "expect": []
+    },
+    {
+      "surface": "exit dialog",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Dialog promises progress is saved, but only the step number is",
+      "expect": []
+    },
+    {
+      "surface": "exit dialog",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Dark mode: white text on salmon fill, weak contrast",
+      "expect": [
+        "low-contrast"
+      ]
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)"
+}

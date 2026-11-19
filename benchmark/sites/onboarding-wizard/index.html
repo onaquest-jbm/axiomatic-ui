@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledgerly Setup</title>
+<style>
+:root{
+  --bg:#f4f5f8;--surface:#fff;--surface-2:#f7f8fb;--text:#14182a;--muted:#5a6178;--border:#dde0ea;
+  --accent:#3b5bdb;--accent-ink:#fff;--accent-soft:#e8edff;--danger:#c92a2a;--danger-soft:#fdecec;
+  --ok:#2b8a3e;--ok-soft:#e6f6ea;--shadow:0 1px 2px rgba(20,24,42,.06),0 8px 28px rgba(20,24,42,.08);
+  --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0e1118;--surface:#171b26;--surface-2:#1d2230;--text:#eceef6;--muted:#9aa2ba;--border:#2b3245;
+  --accent:#7c93ff;--accent-ink:#0b0f1d;--accent-soft:#222b4d;--danger:#ff8787;--danger-soft:#3a1d22;
+  --ok:#69db7c;--ok-soft:#183324;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.45)}
+}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:8px 0 16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+.logo{width:30px;height:30px;border-radius:9px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800}
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:10px;padding:10px 16px;cursor:pointer;font-weight:600;min-height:44px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.progress{margin-bottom:16px}
+.progress ol{list-style:none;margin:0;padding:0;display:flex;gap:6px}
+.progress li{flex:1;height:6px;border-radius:99px;background:var(--border);transition:background .3s}
+.progress li.done,.progress li.current{background:var(--accent)}
+.progress li.current{opacity:.55}
+.progress p{margin:8px 0 0;color:var(--muted);font-size:.875rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;position:relative}
+.step-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:4px}
+h1,h2{margin:0;letter-spacing:-.02em}
+h2{font-size:1.4rem;line-height:1.25}
+.lead{color:var(--muted);margin:6px 0 20px}
+.helpwrap{position:relative;flex:none}
+.help-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--surface-2);cursor:pointer;font-weight:700;color:var(--muted)}
+.popover{position:absolute;right:0;top:44px;width:min(300px,calc(100vw - 64px));background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;font-size:.9rem;z-index:20}
+.popover[hidden]{display:none}
+.popover strong{display:block;margin-bottom:4px}
+.field{margin-bottom:18px}
+label,.label{display:block;font-weight:600;margin-bottom:6px;font-size:.92rem}
+.input{width:100%;min-height:46px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface);}
+.input:focus{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.input[aria-invalid=true]{border-color:var(--danger)}
+.error{color:var(--danger);font-size:.85rem;margin:6px 0 0;display:flex;gap:6px;align-items:center}
+.error[hidden]{display:none}
+.error::before{content:"!";display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--danger);color:var(--surface);font-size:.7rem;font-weight:800;flex:none}
+.hint{color:var(--muted);font-size:.85rem;margin:6px 0 0}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.row{grid-template-columns:1fr}.card{padding:18px}}
+.linkbtn{background:none;border:0;color:var(--accent);cursor:pointer;padding:4px 0;font-weight:600;text-decoration:underline;min-height:32px}
+.banks{list-style:none;margin:10px 0 0;padding:0;border:1px solid var(--border);border-radius:12px;max-height:260px;overflow:auto}
+.banks li{border-bottom:1px solid var(--border)}
+.banks li:last-child{border:0}
+.bank-item{width:100%;display:flex;align-items:center;gap:12px;padding:12px;background:none;border:0;cursor:pointer;text-align:left;min-height:52px}
+.bank-item:hover{background:var(--surface-2)}
+.bank-item[aria-pressed=true]{background:var(--accent-soft)}
+.bank-ico{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+.bank-item .chk{margin-left:auto;color:var(--accent);font-weight:800}
+.empty{text-align:center;padding:24px 12px;color:var(--muted);border:1px dashed var(--border);border-radius:12px;margin-top:14px}
+.empty b{display:block;color:var(--text);margin-bottom:2px}
+.drop{border:2px dashed var(--border);border-radius:12px;padding:26px 16px;text-align:center;background:var(--surface-2);cursor:pointer;display:block}
+.drop.over,.drop:hover{border-color:var(--accent);background:var(--accent-soft)}
+.drop.bad{border-color:var(--danger);background:var(--danger-soft)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.contact-list{list-style:none;margin:12px 0 0;padding:0;border:1px solid var(--border);border-radius:12px}
+.contact-list li{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:.92rem}
+.contact-list li:last-child{border:0}
+.contact-list span:last-child{color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.badge{display:inline-block;background:var(--ok-soft);color:var(--ok);border-radius:99px;padding:2px 10px;font-size:.8rem;font-weight:600}
+footer.nav{display:flex;align-items:center;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border)}
+footer.nav .spacer{flex:1}
+.overlay{position:absolute;inset:0;background:color-mix(in srgb,var(--surface) 92%,transparent);border-radius:var(--radius);display:grid;place-content:center;justify-items:center;text-align:center;gap:10px;padding:24px;z-index:10}
+.overlay[hidden]{display:none}
+.spinner{width:44px;height:44px;border-radius:50%;border:4px solid var(--border);border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bar{width:220px;height:6px;border-radius:99px;background:var(--border);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+@media(prefers-reduced-motion:reduce){.spinner{animation-duration:3s}}
+.done-ico{width:64px;height:64px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;font-size:2rem;margin:0 auto 12px}
+dl.sum{margin:18px 0 0;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+dl.sum div{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border)}
+dl.sum div:last-child{border:0}
+dl.sum dt{color:var(--muted)}
+dl.sum dd{margin:0;font-weight:600;text-align:right;word-break:break-word}
+dialog{border:1px solid var(--border);border-radius:16px;background:var(--surface);color:var(--text);padding:24px;width:min(440px,calc(100vw - 32px));box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(10,12,22,.55)}
+dialog h2{font-size:1.2rem;margin-bottom:8px}
+dialog p{color:var(--muted);margin:0 0 12px}
+dialog ul{color:var(--muted);padding-left:20px;margin:0 0 16px}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="logo">L</span>Ledgerly</div>
+    <button class="btn ghost" id="exit-btn" type="button" aria-haspopup="dialog">Exit setup</button>
+  </header>
+
+  <nav class="progress" aria-label="Setup progress">
+    <ol id="progress-list"></ol>
+    <p id="progress-text" aria-live="polite"></p>
+  </nav>
+
+  <main class="card" id="card">
+    <!-- Step 1 -->
+    <section class="step" id="step-1" data-step="1" aria-labelledby="t1">
+      <div class="step-head"><h2 id="t1" tabindex="-1">Tell us about your business</h2>
+        <div class="helpwrap"><button type="button" class="help-btn" id="help-btn-1" aria-label="Help for this step" aria-expanded="false" aria-controls="help-pop-1">?</button>
+        <div class="popover" id="help-pop-1" role="dialog" aria-label="Help" hidden><strong>Need a hand?</strong>Use your registered business name as it appears on invoices and tax filings. You can change everything later in Settings.</div></div></div>
+      <p class="lead">This sets up your chart of accounts and tax defaults. <button type="button" class="linkbtn" id="why-btn" aria-haspopup="dialog">Why do we need this?</button></p>
+      <div class="field"><label for="biz-name">Business name</label>
+        <input class="input" id="biz-name" autocomplete="organization" placeholder="e.g. Harbor Street Bakery">
+        <p class="error" id="biz-name-err" hidden></p></div>
+      <div class="row">
+        <div class="field"><label for="biz-type">Business type</label>
+          <select class="input" id="biz-type"><option value="">Select a type…</option><option>Sole proprietor</option><option>Partnership</option><option>LLC</option><option>Corporation</option><option>Non-profit</option></select>
+          <p class="error" id="biz-type-err" hidden></p></div>
+        <div class="field"><label for="biz-country">Country</label>
+          <select class="input" id="biz-country"><option value="">Select a country…</option><option>United States</option><option>Canada</option><option>United Kingdom</option><option>Australia</option><option>Germany</option><option>France</option><option>India</option></select>
+          <p class="error" id="biz-country-err" hidden></p></div>
+      </div>
+      <div class="field"><label for="biz-fy">Fiscal year starts in</label>
+        <select class="input" id="biz-fy"></select>
+        <p class="hint">Most businesses use January.</p></div>
+    </section>
+
+    <!-- Step 2 -->
+    <section class="step" id="step-2" data-step="2" aria-labelledby="t2" hidden>
+      <div class="step-head"><h2 id="t2" tabindex="-1">Connect your bank</h2>
+        <div class="helpwrap"><button type="button" class="help-btn" id="help-btn-2" aria-label="Help for this step" aria-expanded="false" aria-controls="help-pop-2">?</button>
+        <div class="popover" id="help-pop-2" role="dialog" aria-label="Help" hidden><strong>Is this safe?</strong>Connections are read-only. We never see your bank login and can't move money.</div></div></div>
+      <p class="lead">Transactions will import automatically each day.</p>
+      <label for="bank-search">Search for your bank</label>
+      <input class="input" id="bank-search" type="search" placeholder="Type a bank name" autocomplete="off">
+      <ul class="banks" id="bank-list" aria-label="Banks"></ul>
+      <div class="empty" id="bank-empty" hidden><b>No banks match your search</b>Try a shorter name, or skip and connect later.</div>
+      <p class="error" id="bank-err" hidden></p>
+    </section>
+
+    <!-- Step 3 -->
+    <section class="step" id="step-3" data-step="3" aria-labelledby="t3" hidden>
+      <div class="step-head"><h2 id="t3" tabindex="-1">Import your contacts</h2>
+        <div class="helpwrap"><button type="button" class="help-btn" id="help-btn-3" aria-label="Help for this step" aria-expanded="false" aria-controls="help-pop-3">?</button>
+        <div class="popover" id="help-pop-3" role="dialog" aria-label="Help" hidden><strong>File format</strong>Upload a .csv with name and email columns. The first row must be a header.</div></div></div>
+      <p class="lead">Bring in customers and suppliers so invoices are ready to send.</p>
+      <label class="drop" id="dropzone"><input type="file" id="file-input" accept=".csv,text/csv">
+        <strong>Drop a CSV here or click to browse</strong><div class="hint">.csv up to 5 MB</div></label>
+      <div class="chips"><button type="button" class="btn" id="sample-csv">Use sample file</button><button type="button" class="btn" id="sample-bad">Try a bad file</button></div>
+      <p class="error" id="contacts-err" role="alert" hidden></p>
+      <div class="empty" id="contacts-empty"><b>No contacts yet</b>Upload a file and a preview will appear here.</div>
+      <div id="contacts-ok" hidden><p style="margin:14px 0 0"><span class="badge" id="contacts-count"></span></p><ul class="contact-list" id="contact-list"></ul>
+      <button type="button" class="linkbtn" id="clear-contacts">Remove file</button></div>
+    </section>
+
+    <!-- Step 4 -->
+    <section class="step" id="step-4" data-step="4" aria-labelledby="t4" hidden>
+      <div class="step-head"><h2 id="t4" tabindex="-1">Invite your accountant</h2>
+        <div class="helpwrap"><button type="button" class="help-btn" id="help-btn-4" aria-label="Help for this step" aria-expanded="false" aria-controls="help-pop-4">?</button>
+        <div class="popover" id="help-pop-4" role="dialog" aria-label="Help" hidden><strong>Roles</strong>Advisors can view and edit books. Viewers are read-only. You can revoke access anytime.</div></div></div>
+      <p class="lead">Give them access so year-end is painless. Optional.</p>
+      <div class="field"><label for="acc-email">Accountant's email</label>
+        <input class="input" id="acc-email" type="email" autocomplete="off" placeholder="name@firm.com">
+        <p class="error" id="acc-email-err" hidden></p></div>
+      <div class="field"><label for="acc-role">Role</label>
+        <select class="input" id="acc-role"><option value="Advisor">Advisor (view and edit)</option><option value="Viewer">Viewer (read-only)</option><option value="Bookkeeper">Bookkeeper (transactions only)</option></select></div>
+    </section>
+
+    <!-- Step 5 -->
+    <section class="step" id="step-5" data-step="5" aria-labelledby="t5" hidden>
+      <div style="text-align:center"><div class="done-ico" aria-hidden="true">&#10003;</div>
+      <h2 id="t5" tabindex="-1">You're all set</h2><p class="lead" style="margin-bottom:0">Here's what we set up for you.</p></div>
+      <dl class="sum" id="summary"></dl>
+    </section>
+
+    <footer class="nav" id="nav">
+      <button type="button" class="btn" id="back">Back</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" id="skip">Skip</button>
+      <button type="button" class="btn primary" id="next">Next</button>
+    </footer>
+
+    <div class="overlay" id="connecting" role="status" aria-live="polite" hidden>
+      <div class="spinner" aria-hidden="true"></div><strong id="connecting-title">Connecting…</strong>
+      <span class="hint" id="connecting-sub">Securely contacting your bank</span>
+      <div class="bar"><i id="connecting-bar"></i></div>
+    </div>
+  </main>
+</div>
+
+<dialog id="why-dialog" aria-labelledby="why-title">
+  <h2 id="why-title">Why do we need this?</h2>
+  <p>Your business details let us configure the right setup from day one:</p>
+  <ul><li>Business type decides your default tax forms.</li><li>Country sets currency, sales tax and report formats.</li><li>Fiscal year start defines your reporting periods.</li></ul>
+  <p>We never share this information with third parties.</p>
+  <div class="dlg-actions"><button class="btn primary" id="why-close" type="button">Got it</button></div>
+</dialog>
+
+<dialog id="exit-dialog" aria-labelledby="exit-title">
+  <h2 id="exit-title">Exit setup?</h2>
+  <p>Your progress will be saved on this device and you can pick up where you left off.</p>
+  <div class="dlg-actions"><button class="btn" id="exit-stay" type="button">Keep going</button><button class="btn danger" id="exit-confirm" type="button">Exit setup</button></div>
+</dialog>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const TOTAL=5, names=["Business","Bank","Contacts","Accountant","Done"];
+const state={step:1,bank:null,contacts:null,skipped:{}};
+const banks=[["Chase","#1c5fa8"],["Bank of America","#c1272d"],["Wells Fargo","#b5121b"],["Citibank","#1b4f9c"],["Capital One","#9c1b1b"],["US Bank","#2a3f80"],["TD Bank","#2e8b3a"],["PNC","#e07b1a"],["Barclays","#0a8dc4"],["HSBC","#c1272d"],["Lloyds","#2e6b3a"],["RBC","#1b3c8c"]];
+const months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+$("#biz-fy").innerHTML=months.map(m=>`<option>${m}</option>`).join("");
+
+// progress
+$("#progress-list").innerHTML=names.map(()=>"<li></li>").join("");
+function renderProgress(){
+  [...$("#progress-list").children].forEach((li,i)=>{li.className=i+1<state.step?"done":i+1===state.step?"current":""});
+  $("#progress-text").textContent=`Step ${state.step} of ${TOTAL} · ${names[state.step-1]}`;
+}
+
+// errors
+function setErr(id,msg,input){const e=$("#"+id);e.hidden=!msg;e.textContent=msg||"";if(input){input.setAttribute("aria-invalid",msg?"true":"false");msg?input.setAttribute("aria-describedby",id):input.removeAttribute("aria-describedby")}return !msg}
+
+// help popovers
+function closeHelp(){document.querySelectorAll(".popover").forEach(p=>p.hidden=true);document.querySelectorAll(".help-btn").forEach(b=>b.setAttribute("aria-expanded","false"))}
+document.querySelectorAll(".help-btn").forEach(b=>b.addEventListener("click",e=>{
+  e.stopPropagation();const p=$("#"+b.getAttribute("aria-controls")),open=p.hidden;closeHelp();if(open){p.hidden=false;b.setAttribute("aria-expanded","true")}}));
+document.addEventListener("click",e=>{if(!e.target.closest(".helpwrap"))closeHelp()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){const open=document.querySelector(".popover:not([hidden])");if(open){const b=document.querySelector(`[aria-controls="${open.id}"]`);closeHelp();b&&b.focus()}}});
+
+// dialogs
+function openDlg(d,opener){d.returnEl=opener;d.showModal()}
+const why=$("#why-dialog"),exitD=$("#exit-dialog");
+$("#why-btn").onclick=e=>openDlg(why,e.currentTarget);
+$("#why-close").onclick=()=>why.close();
+$("#exit-btn").onclick=e=>openDlg(exitD,e.currentTarget);
+$("#exit-stay").onclick=()=>exitD.close();
+$("#exit-confirm").onclick=()=>{exitD.close();try{localStorage.setItem("ledgerly-step",state.step)}catch(_){ }
+  document.body.innerHTML='<div class="wrap"><div class="card" style="text-align:center;margin-top:40px"><h2>Setup paused</h2><p class="lead">Your progress is saved. Reload this page to continue.</p><button class="btn primary" onclick="location.reload()">Resume setup</button></div></div>'};
+[why,exitD].forEach(d=>{d.addEventListener("click",e=>{if(e.target===d)d.close()});d.addEventListener("close",()=>d.returnEl&&d.returnEl.focus())});
+
+// banks
+function renderBanks(){
+  const q=$("#bank-search").value.trim().toLowerCase();
+  const list=banks.filter(b=>b[0].toLowerCase().includes(q));
+  $("#bank-list").innerHTML=list.map(b=>`<li><button type="button" class="bank-item" data-bank="${b[0]}" aria-pressed="${state.bank===b[0]}"><span class="bank-ico" style="background:${b[1]}">${b[0][0]}</span>${b[0]}<span class="chk">${state.bank===b[0]?"✓":""}</span></button></li>`).join("");
+  $("#bank-list").hidden=!list.length;$("#bank-empty").hidden=!!list.length;
+}
+$("#bank-search").addEventListener("input",renderBanks);
+$("#bank-list").addEventListener("click",e=>{const b=e.target.closest(".bank-item");if(!b)return;state.bank=b.dataset.bank;setErr("bank-err","");renderBanks();$(`[data-bank="${state.bank}"]`).focus()});
+
+// contacts
+const sample=[["Maria Alvarez","maria@alvarez.co"],["Dock & Co.","billing@dockco.com"],["Priya Nair","priya@nairdesign.io"],["Oakline Supply","ap@oakline.com"]];
+function showContacts(rows){
+  state.contacts=rows;setErr("contacts-err","");$("#dropzone").classList.remove("bad");
+  $("#contacts-empty").hidden=!!rows;$("#contacts-ok").hidden=!rows;
+  if(rows){$("#contacts-count").textContent=`${rows.length} contacts ready to import`;$("#contact-list").innerHTML=rows.map(r=>`<li><span>${r[0]}</span><span>${r[1]}</span></li>`).join("")}
+}
+function contactsError(m){state.contacts=null;showContacts(null);$("#dropzone").classList.add("bad");setErr("contacts-err",m)}
+$("#sample-csv").onclick=()=>showContacts(sample);
+$("#sample-bad").onclick=()=>contactsError("We couldn't read that file. Make sure it's a .csv with \"name\" and \"email\" columns.");
+$("#clear-contacts").onclick=()=>showContacts(null);
+function handleFile(f){if(!f)return;
+  if(!/\.csv$/i.test(f.name))return contactsError(`"${f.name}" isn't a CSV file. Please upload a .csv.`);
+  if(f.size>5*1048576)return contactsError("That file is larger than 5 MB.");
+  const r=new FileReader();r.onload=()=>{const lines=String(r.result).split(/\r?\n/).filter(Boolean);const rows=lines.slice(1).map(l=>l.split(",").map(s=>s.trim().replace(/^"|"$/g,""))).filter(c=>c[0]);
+    rows.length?showContacts(rows.slice(0,50).map(c=>[c[0],c[1]||""])):contactsError("That file has no contacts in it.")};r.readAsText(f)}
+$("#file-input").addEventListener("change",e=>handleFile(e.target.files[0]));
+const dz=$("#dropzone");
+["dragenter","dragover"].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.add("over")}));
+["dragleave","drop"].forEach(t=>dz.addEventListener(t,e=>{e.preventDefault();dz.classList.remove("over")}));
+dz.addEventListener("drop",e=>handleFile(e.dataTransfer.files[0]));
+
+// validation
+const validators={
+  1(){const n=$("#biz-name"),t=$("#biz-type"),c=$("#biz-country");
+    const a=setErr("biz-name-err",n.value.trim().length<2?"Enter your business name.":"",n);
+    const b=setErr("biz-type-err",t.value?"":"Choose a business type.",t);
+    const d=setErr("biz-country-err",c.value?"":"Choose a country.",c);
+    if(!a)n.focus();else if(!b)t.focus();else if(!d)c.focus();return a&&b&&d},
+  2(){if(!state.bank){setErr("bank-err","Select a bank to continue, or skip for now.");return false}return true},
+  3(){if(!state.contacts){setErr("contacts-err","Upload a contacts file to continue, or skip for now.");$("#dropzone").classList.add("bad");return false}return true},
+  4(){const e=$("#acc-email");const v=e.value.trim();
+    if(!v)return setErr("acc-email-err","Enter your accountant's email, or skip for now.",e)||(e.focus(),false);
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)){setErr("acc-email-err","That doesn't look like a valid email address.",e);e.focus();return false}
+    setErr("acc-email-err","",e);return true}
+};
+
+// loading
+let busy=false;
+function connectBank(cb){
+  busy=true;const ov=$("#connecting"),bar=$("#connecting-bar");
+  $("#connecting-title").textContent=`Connecting to ${state.bank}…`;ov.hidden=false;bar.style.width="0";
+  $("#next").disabled=$("#back").disabled=$("#skip").disabled=true;
+  const msgs=["Securely contacting your bank","Verifying read-only access","Fetching recent transactions"];
+  let i=0;const t0=Date.now(),D=3200;
+  const iv=setInterval(()=>{const p=Math.min(1,(Date.now()-t0)/D);bar.style.width=p*100+"%";$("#connecting-sub").textContent=msgs[Math.min(2,Math.floor(p*3))];
+    if(p>=1){clearInterval(iv);ov.hidden=true;busy=false;$("#next").disabled=$("#back").disabled=$("#skip").disabled=false;cb()}},100);
+}
+
+// navigation
+function go(n){
+  closeHelp();state.step=n;
+  document.querySelectorAll(".step").forEach(s=>s.hidden=+s.dataset.step!==n);
+  $("#back").hidden=n===1||n===TOTAL;$("#skip").hidden=n===1||n===TOTAL;
+  $("#next").textContent=n===TOTAL?"Go to dashboard":n===4?"Send invite":"Next";
+  renderProgress();if(n===TOTAL)renderSummary();
+  const h=$("#t"+n);h.focus();window.scrollTo({top:0})
+}
+function renderSummary(){
+  const rows=[["Business",($("#biz-name").value.trim()||"—")+" ("+$("#biz-type").value+")"],["Country",$("#biz-country").value],["Fiscal year starts",$("#biz-fy").value],
+    ["Bank",state.bank||"Skipped"],["Contacts",state.contacts?state.contacts.length+" imported":"Skipped"],
+    ["Accountant",state.skipped[4]||!$("#acc-email").value.trim()?"Skipped":$("#acc-email").value.trim()+" ("+$("#acc-role").value+")"]];
+  $("#summary").innerHTML=rows.map(r=>`<div><dt>${r[0]}</dt><dd></dd></div>`).join("");
+  [...$("#summary").querySelectorAll("dd")].forEach((d,i)=>d.textContent=rows[i][1]);
+}
+$("#next").onclick=()=>{
+  if(busy)return;const n=state.step;
+  if(n===TOTAL){$("#card").innerHTML='<div style="text-align:center;padding:20px"><h2>Welcome to Ledgerly</h2><p class="lead">This is where your dashboard would open.</p></div>';return}
+  if(!validators[n]())return;
+  state.skipped[n]=false;
+  if(n===2)connectBank(()=>go(3));else go(n+1);
+};
+$("#skip").onclick=()=>{if(busy)return;const n=state.step;state.skipped[n]=true;
+  if(n===2)state.bank=null,renderBanks();if(n===3)showContacts(null);if(n===4)$("#acc-email").value="";go(n+1)};
+$("#back").onclick=()=>{if(!busy&&state.step>1)go(state.step-1)};
+document.querySelectorAll("#step-1 .input").forEach(i=>i.addEventListener("input",()=>{const e=$("#"+i.id+"-err");e&&!e.hidden&&setErr(i.id+"-err","",i)}));
+$("#acc-email").addEventListener("keydown",e=>{if(e.key==="Enter")$("#next").click()});
+renderBanks();go(1);
+})();
+</script>
+</body>
+</html>

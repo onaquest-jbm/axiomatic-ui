@@ -4,3 +4,7 @@ node_modules/
 Thumbs.db
 # local verify output (the demo report is kept as an example)
 /axiomatic-report/
+
+# benchmark build output (results/ is kept)
+/benchmark/build/
+/benchmark/runs/*/shots/

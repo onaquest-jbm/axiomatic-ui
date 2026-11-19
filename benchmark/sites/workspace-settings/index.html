@@ -1,0 +1,1415 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Workspace settings · Relay</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --canvas: #f8f9fc; --surface: #fff; --sidebar: #f1f2f8; --soft: #f7f7fc;
+      --text: #201b35; --muted: #615b73; --faint: #68627b; --border: #e4e2ee; --input-border: #d8d5e5;
+      --accent: #6743cc; --accent-hover: #5633b8; --accent-text: #5836b5; --accent-soft: #eae3fc;
+      --hero-start: #f1edff; --hero-end: #e8e2fc; --hero-border: #e3dafa;
+      --orbit: #cbbcf4; --orbit-dot: #9676e3; --orbit-disc: #e1d5fc;
+      --danger: #a72d49; --danger-border: #ecc5ce; --danger-soft: #fff2f5;
+      --green: #197654; --green-soft: #e4f4eb; --shadow: 0 2px 4px #27204308;
+      --float-shadow: 0 18px 48px #241b4033, 0 4px 12px #241b4010;
+      --ring: #8b67eb; --radius: 15px; --rail: 246px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --canvas: #16141e; --surface: #201d2c; --sidebar: #1b1826; --soft: #252133;
+        --text: #f2eefc; --muted: #c0b8d0; --faint: #b1a8c3; --border: #363044; --input-border: #494057;
+        --accent: #7953da; --accent-hover: #8764e2; --accent-text: #c6afff; --accent-soft: #35264d;
+        --hero-start: #272039; --hero-end: #392953; --hero-border: #423354;
+        --orbit: #574370; --orbit-dot: #a88beb; --orbit-disc: #493265;
+        --danger: #ffa9bd; --danger-border: #643646; --danger-soft: #352231;
+        --green: #86d7ac; --green-soft: #203a31; --shadow: 0 2px 4px #0002;
+        --float-shadow: 0 18px 48px #0008, 0 4px 12px #0004; --ring: #b69afc;
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; color: var(--text); background: var(--canvas); font-size: 14px; line-height: 1.5; }
+    body, button, input { font-family: inherit; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { line-height: 1.22; }
+    h1 { font-size: clamp(32px, 4vw, 42px); font-weight: 740; letter-spacing: -.055em; }
+    h2 { font-size: 18px; font-weight: 700; letter-spacing: -.028em; }
+    h3 { font-size: 14px; font-weight: 680; }
+    button, input { font-size: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:disabled { opacity: .54; cursor: default; }
+    :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+    [hidden] { display: none !important; }
+    .icon { width: 19px; height: 19px; display: inline-block; flex: none; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+    .icon.sm { width: 16px; height: 16px; }
+    .icon.lg { width: 23px; height: 23px; }
+    .icon-library { position: absolute; width: 0; height: 0; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); }
+    .sidebar { position: sticky; top: 0; height: 100vh; height: 100dvh; min-height: 480px; display: flex; flex-direction: column; padding: 25px 17px 16px; background: var(--sidebar); border-right: 1px solid var(--border); }
+    .brand { display: flex; align-items: center; gap: 10px; margin: 0 0 28px 9px; font-size: 26px; line-height: 1; font-weight: 780; letter-spacing: -.075em; }
+    .brand-mark { position: relative; display: grid; width: 31px; height: 31px; place-items: center; border-radius: 10px; background: #6a45d1; box-shadow: inset 0 1px #ffffff38; }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; width: 13px; height: 6px; border: 1.7px solid #fff; border-radius: 5px; transform: rotate(-45deg); }
+    .brand-mark::before { translate: -3px -3px; }
+    .brand-mark::after { translate: 3px 3px; }
+    .workspace-tile, .account-tile { display: flex; align-items: center; min-width: 0; gap: 11px; }
+    .workspace-tile { padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+    .workspace-mark { position: relative; flex: none; width: 35px; height: 35px; display: grid; place-items: center; border-radius: 9px; background: #282138; color: #e4ff9f; }
+    .workspace-mark .icon { width: 23px; height: 23px; stroke-width: 1.5; }
+    .tile-name { display: block; font-weight: 680; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tile-sub { display: block; margin-top: 2px; color: var(--faint); font-size: 12px; line-height: 1.3; }
+    .settings-nav { margin-top: 27px; }
+    .nav-group + .nav-group { margin-top: 23px; }
+    .nav-label { margin: 0 0 7px 10px; color: var(--faint); font-size: 10px; font-weight: 760; letter-spacing: .13em; text-transform: uppercase; }
+    .nav-item { position: relative; display: flex; width: 100%; align-items: center; gap: 11px; padding: 0 11px; min-height: 43px; margin: 2px 0; border: 0; border-radius: 9px; background: transparent; color: var(--muted); text-align: left; font-weight: 580; white-space: nowrap; }
+    .nav-item:hover { background: var(--soft); color: var(--text); }
+    .nav-item[aria-current="page"] { color: var(--accent-text); background: var(--accent-soft); font-weight: 720; }
+    .nav-item[aria-current="page"]::after { content: ""; position: absolute; right: 10px; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .account-tile { margin-top: auto; padding: 15px 7px 2px; border-top: 1px solid var(--border); }
+    .tile-copy { min-width: 0; }
+    .topbar { min-height: 69px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 37px; border-bottom: 1px solid var(--border); background: var(--surface); }
+    .crumbs { display: flex; align-items: center; min-width: 0; gap: 10px; color: var(--muted); font-size: 13px; }
+    .crumbs .separator { color: var(--faint); }
+    .crumbs strong { color: var(--text); font-weight: 690; }
+    .save-status { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex: none; }
+    .save-status[data-dirty="true"] .status-dot { background: #d28c35; }
+    .main { width: min(100%, 1088px); margin-inline: auto; padding: 34px 48px 42px; scroll-margin-top: 16px; }
+    .hero { position: relative; isolation: isolate; display: flex; align-items: center; gap: 17px; min-height: 157px; padding: 25px 30px; margin-bottom: 24px; overflow: hidden; border: 1px solid var(--hero-border); border-radius: 19px; background: linear-gradient(110deg, var(--hero-start), var(--hero-end)); }
+    .hero-icon, .panel-icon { display: grid; flex: none; place-items: center; width: 41px; height: 41px; border-radius: 11px; background: var(--accent-soft); color: var(--accent-text); }
+    .hero-icon { width: 55px; height: 55px; border: 1px solid var(--hero-border); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+    .hero-icon .icon { width: 27px; height: 27px; }
+    .hero-copy { max-width: 520px; }
+    .hero-copy p { margin-top: 6px; color: var(--muted); font-size: 14px; }
+    .orbits { position: absolute; z-index: -1; right: 2%; top: 50%; width: 360px; height: 300px; transform: translateY(-49%); pointer-events: none; }
+    .orbits span { position: absolute; top: 50%; left: 64%; width: var(--size); aspect-ratio: 1; border: 1px solid var(--orbit); border-radius: 50%; transform: translate(-50%, -50%); }
+    .orbits span:nth-child(1) { --size: 75px; background: var(--orbit-disc); }
+    .orbits span:nth-child(2) { --size: 120px; }
+    .orbits span:nth-child(3) { --size: 166px; }
+    .orbits span:nth-child(4) { --size: 212px; }
+    .orbits span:nth-child(5) { --size: 262px; }
+    .orbits i { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--orbit-dot); box-shadow: 0 0 0 4px var(--orbit-disc); }
+    .orbits i:nth-of-type(1) { left: 28.5%; top: 46.5%; }
+    .orbits i:nth-of-type(2) { left: 72%; top: 30.5%; }
+    .orbits i:nth-of-type(3) { left: 81%; top: 62%; width: 5px; height: 5px; }
+    .orbits .icon { position: absolute; top: 50%; left: 64%; width: 31px; height: 31px; transform: translate(-50%, -50%); color: var(--accent-text); }
+    .section { display: grid; gap: 18px; }
+    .panel { min-width: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    .panel-head { padding: 20px 23px 15px; }
+    .panel-head p { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .panel-content { padding: 0 23px 21px; }
+    .panel-head.with-action, .split { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .avatar-row, .feature { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .avatar-row { flex-wrap: wrap; }
+    .avatar-meta { display: grid; gap: 5px; justify-items: start; }
+    .avatar { --avatar-bg: #e5d9ff; --avatar-ink: #5230a3; display: grid; flex: none; place-items: center; width: 36px; height: 36px; overflow: hidden; border-radius: 50%; background: var(--avatar-bg); color: var(--avatar-ink); font-weight: 760; font-size: 12px; letter-spacing: -.025em; }
+    .avatar.large { width: 68px; height: 68px; border: 3px solid var(--surface); outline: 1px solid var(--border); font-size: 23px; background: radial-gradient(circle at 26% 18%, #ffffff80, transparent 52%), var(--avatar-bg); }
+    .avatar[data-tone="blue"] { --avatar-bg: #dbe8ff; --avatar-ink: #2b4f9b; }
+    .avatar[data-tone="green"] { --avatar-bg: #d7efdd; --avatar-ink: #255b47; }
+    .avatar[data-tone="peach"] { --avatar-bg: #f8dfca; --avatar-ink: #824527; }
+    .avatar[data-tone="rose"] { --avatar-bg: #f7dae6; --avatar-ink: #8a3457; }
+    .avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 17px; row-gap: 15px; }
+    .field { display: grid; min-width: 0; align-content: start; gap: 6px; }
+    .field > label, .field-label, legend { font-size: 13px; font-weight: 680; }
+    input:not([type="radio"], [type="checkbox"], [type="file"]), .field-button { width: 100%; min-height: 43px; padding: 9px 11px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--surface); color: var(--text); }
+    input::placeholder { color: var(--faint); }
+    input:focus, .field-button:focus-visible { border-color: var(--ring); }
+    input[aria-invalid="true"] { border-color: var(--danger); }
+    .field-button { display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; }
+    .error { color: var(--danger); font-size: 12px; }
+    .panel-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 23px; border-top: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); background: var(--soft); }
+    .panel-foot p { display: flex; align-items: center; gap: 7px; }
+    .btn { display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 7px; min-height: 37px; padding: 7px 12px; border: 1px solid var(--input-border); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 13px; font-weight: 670; text-align: center; line-height: 1.3; text-decoration: none; }
+    .btn:hover:not(:disabled) { background: var(--soft); }
+    .btn.primary { color: #fff; background: var(--accent); border-color: transparent; box-shadow: 0 1px 2px #2d15692e; }
+    .btn.primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+    .btn.ghost:hover:not(:disabled) { color: var(--text); background: var(--accent-soft); }
+    .btn.danger { color: var(--danger); border-color: var(--danger-border); }
+    .btn.danger:hover:not(:disabled) { background: var(--danger-soft); }
+    .btn.danger-solid { color: #fff; background: #a12c48; border-color: transparent; }
+    .btn.danger-solid:hover:not(:disabled) { background: #862039; }
+    .icon-button { display: inline-grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--muted); flex: none; }
+    .icon-button:hover { background: var(--soft); color: var(--text); }
+    .badge { display: inline-flex; width: fit-content; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; background: var(--accent-soft); color: var(--accent-text); font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .badge.good { background: var(--green-soft); color: var(--green); }
+    .badge.neutral { background: var(--soft); color: var(--muted); }
+    .row-list { border-top: 1px solid var(--border); }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 13px; min-height: 68px; padding: 13px 23px; }
+    .setting-row + .setting-row { border-top: 1px solid var(--border); }
+    .setting-row h3 + p { margin-top: 4px; }
+    .toggle { position: relative; display: block; width: 42px; height: 24px; margin: 0; flex: none; appearance: none; border: 1px solid var(--input-border); border-radius: 20px; background: var(--soft); cursor: pointer; }
+    .toggle::before { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--faint); transition: transform .16s ease; }
+    .toggle:checked { border-color: transparent; background: var(--accent); }
+    .toggle:checked::before { background: white; transform: translateX(18px); }
+    .flow { display: grid; gap: 14px; }
+    .space-top { margin-top: 13px; }
+    .table-wrap { border-top: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { color: var(--muted); font-size: 11px; font-weight: 740; letter-spacing: .055em; text-transform: uppercase; background: var(--soft); }
+    th, td { padding: 11px 13px; }
+    th:first-child, td:first-child { padding-left: 23px; }
+    th:last-child, td:last-child { padding-right: 23px; }
+    tbody tr + tr { border-top: 1px solid var(--border); }
+    tbody tr:last-child td:first-child { border-bottom-left-radius: var(--radius); }
+    tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius); }
+    .member-name { font-weight: 680; overflow-wrap: anywhere; }
+    .member-email { overflow-wrap: anywhere; }
+    .member-pending-mobile { display: none; }
+    .role-trigger { min-width: 83px; justify-content: space-between; }
+    .row-action { width: 60px; text-align: right; }
+    .row-action .icon-button { color: var(--danger); }
+    .billing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .plan-cost { margin: 8px 0; font-size: 29px; font-weight: 740; letter-spacing: -.05em; }
+    .plan-cost span { font-size: 13px; color: var(--muted); font-weight: 520; letter-spacing: 0; }
+    .payment-mark { display: grid; place-items: center; width: 52px; height: 34px; border: 1px solid var(--border); border-radius: 6px; background: var(--soft); color: var(--accent-text); font-size: 11px; font-weight: 820; font-style: italic; letter-spacing: -.02em; }
+    .payment-mark + div > p { margin-top: 3px; }
+    .danger-panel { border-color: var(--danger-border); }
+    .danger-panel .panel-icon { color: var(--danger); background: var(--danger-soft); }
+    .change-bar { position: fixed; z-index: 3; right: 24px; bottom: 20px; left: calc(var(--rail) + 24px); width: min(calc(100% - var(--rail) - 48px), 720px); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 15px; border: 1px solid var(--input-border); border-radius: 13px; background: var(--surface); box-shadow: var(--float-shadow); }
+    .change-bar strong { font-size: 13px; }
+    .change-bar .feature { gap: 9px; }
+    .change-bar .panel-icon { width: 32px; height: 32px; border-radius: 7px; }
+    .actions { display: flex; flex: none; align-items: center; gap: 7px; }
+    body:has(.change-bar:not([hidden])) .main { padding-bottom: 115px; }
+    .toast { position: fixed; z-index: 7; right: 22px; bottom: 21px; display: flex; align-items: flex-start; gap: 10px; width: min(355px, calc(100% - 32px)); padding: 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); box-shadow: var(--float-shadow); }
+    body:has(.change-bar:not([hidden])) .toast { bottom: 91px; }
+    .toast .panel-icon { width: 34px; height: 34px; color: var(--green); background: var(--green-soft); }
+    .toast-copy { flex: 1; padding-block: 3px; }
+    .toast-copy strong { display: block; }
+    .toast-copy p { margin-top: 2px; }
+    .toast .icon-button { width: 29px; height: 29px; }
+    dialog { width: min(456px, calc(100% - 26px)); max-height: calc(100% - 26px); padding: 0; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); color: var(--text); box-shadow: var(--float-shadow); }
+    dialog::backdrop { background: #100b23a3; }
+    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 20px 10px; }
+    .dialog-head h2 { margin-top: 2px; font-size: 20px; }
+    .dialog-head p { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .dialog-head .icon-button { margin: -5px -6px 0 0; }
+    .dialog-body { padding: 9px 20px 18px; }
+    .dialog-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 13px 20px; border-top: 1px solid var(--border); background: var(--soft); }
+    fieldset { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+    legend { padding: 0; margin-bottom: 6px; }
+    .choices { display: flex; flex-wrap: wrap; gap: 7px; }
+    .choice { display: flex; align-items: center; gap: 7px; padding: 8px 10px; border: 1px solid var(--input-border); border-radius: 8px; cursor: pointer; }
+    .choice:has(input:checked) { border-color: var(--ring); background: var(--accent-soft); }
+    input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
+    .choice input { margin: 0; width: 15px; height: 15px; flex: none; }
+    input[type="file"] { max-width: 100%; color: var(--muted); }
+    input[type="file"]::file-selector-button { margin-right: 8px; padding: 6px 9px; border: 1px solid var(--input-border); border-radius: 6px; background: var(--soft); color: var(--text); font: inherit; cursor: pointer; }
+    .avatar-preview { margin: 1px auto 5px; }
+    .popover { position: fixed; z-index: 6; max-height: calc(100dvh - 16px); padding: 5px; border: 1px solid var(--input-border); border-radius: 10px; background: var(--surface); box-shadow: var(--float-shadow); overflow: auto; overscroll-behavior: contain; }
+    #role-menu { min-width: 142px; }
+    .menu-item { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 9px; padding: 8px 9px; border: 0; border-radius: 6px; background: transparent; color: var(--text); text-align: left; }
+    .menu-item:hover, .menu-item:focus-visible, .menu-item[aria-checked="true"], .menu-item[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-text); }
+    .menu-item:focus-visible { outline-offset: -2px; }
+    .timezone-popover { width: 310px; max-width: calc(100vw - 24px); padding: 7px; }
+    .timezone-popover label { display: block; margin: 1px 3px 4px; font-size: 12px; font-weight: 650; }
+    .timezone-list { max-height: 192px; overflow: auto; margin-top: 5px; }
+    .timezone-list .menu-item { font-size: 13px; }
+    .demo-code { display: inline-block; padding: 3px 7px; border-radius: 5px; background: var(--accent-soft); color: var(--accent-text); font-size: 13px; letter-spacing: .13em; }
+    .deleted { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+    .deleted .panel { width: min(420px, 100%); padding: 30px; }
+    .deleted h1 { margin: 14px 0 7px; font-size: 32px; }
+    .skip { position: fixed; z-index: 9; top: 8px; left: 8px; transform: translateY(-150%); }
+    .skip:focus { transform: none; }
+    @media (max-width: 1000px) {
+      .main { padding-inline: 30px; }
+      .orbits { right: -9%; opacity: .8; }
+    }
+    @media (max-width: 760px) {
+      .app { display: block; }
+      .sidebar { position: static; height: auto; min-height: 0; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; padding: 13px 14px 7px; border-right: 0; border-bottom: 1px solid var(--border); }
+      .brand { margin: 0; }
+      .workspace-tile { padding: 5px 7px; gap: 6px; }
+      .workspace-mark { width: 24px; height: 24px; border-radius: 6px; }
+      .workspace-mark .icon { width: 17px; height: 17px; }
+      .workspace-tile .tile-name { font-size: 12px; }
+      .workspace-tile .tile-sub, .account-tile, .nav-label { display: none; }
+      .settings-nav { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin: 0; }
+      .nav-group { display: contents; }
+      .nav-item { justify-content: center; min-height: 38px; margin: 0; padding: 0 5px; gap: 6px; font-size: 12px; }
+      .nav-item .icon { width: 15px; height: 15px; }
+      .nav-item[aria-current="page"]::after { display: none; }
+      .topbar { min-height: 46px; padding: 0 15px; }
+      .crumbs { gap: 6px; font-size: 12px; }
+      .save-status { font-size: 11px; }
+      .main { padding: 16px 14px 28px; }
+      .hero { min-height: 130px; padding: 17px 15px; gap: 11px; margin-bottom: 15px; border-radius: 14px; }
+      .hero-icon { width: 42px; height: 42px; border-radius: 11px; }
+      .hero-icon .icon { width: 22px; height: 22px; }
+      .hero-copy p { font-size: 13px; }
+      .orbits { right: -155px; opacity: .34; }
+      .section, .billing-grid { gap: 13px; }
+      .panel-head { padding: 16px 14px 12px; }
+      .panel-content { padding: 0 14px 16px; }
+      .panel-foot, .setting-row { padding-inline: 14px; }
+      .change-bar { left: 12px; right: 12px; bottom: 12px; width: auto; }
+      .toast { right: 12px; bottom: 13px; }
+    }
+    @media (max-width: 620px) {
+      .settings-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .nav-item { justify-content: flex-start; padding-inline: 9px; }
+    }
+    @media (max-width: 510px) {
+      .field-grid, .billing-grid { grid-template-columns: minmax(0, 1fr); }
+      .field-grid { row-gap: 12px; }
+      .panel-foot { padding-block: 10px; }
+      .panel-foot p .icon { display: none; }
+      .member-status { display: none; }
+      .member-pending-mobile { display: inline-flex; margin-top: 3px; }
+      th, td { padding-inline: 6px; }
+      th:first-child, td:first-child { padding-left: 12px; }
+      th:last-child, td:last-child { padding-right: 12px; }
+      .row-action { width: 42px; }
+      .member-row .feature { gap: 7px; }
+      .member-row .avatar { width: 30px; height: 30px; }
+      .role-trigger { min-width: 0; gap: 4px; padding-inline: 7px; }
+      .row-action .icon-button { width: 30px; }
+      .change-bar .panel-icon { display: none; }
+      .change-bar { padding-inline: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 6-2.5 6-2.5 8h17C20.5 14 18 14 18 8M10 20a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 22 2.8-1.7c3.7-2.3 5.2-4.8 5.2-8.6V5l-8-3-8 3v6.7c0 3.8 1.5 6.3 5.2 8.6L12 22Z"/><path d="m9.2 12 1.8 1.8 3.9-4"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 19v-1a4.5 4.5 0 0 1 4.5-4.5h3A4.5 4.5 0 0 1 15 18v1m2-14a3 3 0 0 1 0 6m1 2.5a4 4 0 0 1 3 4v1"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18m-14 5h3"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M10.3 4.3 3.2 17a2 2 0 0 0 1.7 3h14.2a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0ZM12 9v4m0 3.5v.1"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" style="fill:var(--surface)"/><circle cx="15" cy="17" r="2.5" style="fill:var(--surface)"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5c.8 6 3.5 8.7 9.5 9.5-6 .8-8.7 3.5-9.5 9.5-.8-6-3.5-8.7-9.5-9.5 6-.8 8.7-3.5 9.5-9.5Z"/></symbol>
+    <symbol id="i-studio" viewBox="0 0 24 24"><path d="M12 2.5v19m-9.5-9.5h19M5.3 5.3l13.4 13.4m0-13.4L5.3 18.7"/><circle cx="12" cy="12" r="7.2"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="m4 17 4-4 3 3 4.5-5L21 17"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></symbol>
+    <symbol id="i-screen" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M12 17v4m-4 0h8"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 17.5h2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 13H7L6 7m4 4v5m4-5v5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h16m-4-4 4 4-4 4m4 4H4m4-4-4 4 4 4"/></symbol>
+  </svg>
+
+  <a class="skip btn primary" href="#main">Skip to settings</a>
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span>relay</div>
+      <div class="workspace-tile">
+        <div class="workspace-mark"><svg class="icon" aria-hidden="true"><use href="#i-studio"/></svg></div>
+        <div class="tile-copy"><span class="tile-name">Studio North</span><span class="tile-sub">Pro workspace</span></div>
+      </div>
+      <nav class="settings-nav" aria-label="Settings">
+        <div class="nav-group">
+          <div class="nav-label">Account</div>
+          <button class="nav-item" type="button" data-section="profile" aria-controls="profile" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg>Profile</button>
+          <button class="nav-item" type="button" data-section="notifications" aria-controls="notifications"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg>Notifications</button>
+          <button class="nav-item" type="button" data-section="security" aria-controls="security"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Security</button>
+        </div>
+        <div class="nav-group">
+          <div class="nav-label">Workspace</div>
+          <button class="nav-item" type="button" data-section="members" aria-controls="members"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>Members</button>
+          <button class="nav-item" type="button" data-section="billing" aria-controls="billing"><svg class="icon" aria-hidden="true"><use href="#i-card"/></svg>Billing</button>
+          <button class="nav-item" type="button" data-section="danger" aria-controls="danger"><svg class="icon" aria-hidden="true"><use href="#i-warning"/></svg>Danger zone</button>
+        </div>
+      </nav>
+      <div class="account-tile">
+        <span class="avatar" id="sidebar-avatar" aria-hidden="true">AM</span>
+        <div class="tile-copy"><span class="tile-name" id="sidebar-name">Alex Morgan</span><span class="tile-sub" id="sidebar-role">Workspace owner</span></div>
+      </div>
+    </aside>
+
+    <div>
+      <header class="topbar">
+        <div class="crumbs"><svg class="icon sm" aria-hidden="true"><use href="#i-settings"/></svg><span>Settings</span><svg class="icon sm separator" aria-hidden="true"><use href="#i-chevron"/></svg><strong id="breadcrumb">Profile</strong></div>
+        <div class="save-status" id="save-status" aria-live="polite"><span class="status-dot" aria-hidden="true"></span><span id="save-status-text">All changes saved</span></div>
+      </header>
+
+      <main class="main" id="main" tabindex="-1">
+        <div class="hero">
+          <span class="hero-icon"><svg class="icon" aria-hidden="true"><use id="hero-icon" href="#i-user"/></svg></span>
+          <div class="hero-copy"><h1 id="page-title">Profile</h1><p id="page-description">Manage your personal information and how you appear to your team.</p></div>
+          <div class="orbits" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i></i><i></i><i></i><svg class="icon"><use href="#i-spark"/></svg></div>
+        </div>
+
+        <form class="section" id="profile" aria-label="Profile" novalidate>
+          <section class="panel" aria-labelledby="photo-title">
+            <div class="panel-head"><h2 id="photo-title">Profile photo</h2><p>A photo or initials help people recognize you in Relay.</p></div>
+            <div class="panel-content avatar-row">
+              <span class="avatar large" id="profile-avatar" aria-hidden="true">AM</span>
+              <div class="avatar-meta">
+                <button class="btn" id="change-avatar" type="button" aria-haspopup="dialog" aria-controls="avatar-dialog"><svg class="icon sm" aria-hidden="true"><use href="#i-image"/></svg>Change avatar</button>
+                <span class="small muted">JPG, PNG, or WebP. Up to 2 MB.</span>
+              </div>
+            </div>
+          </section>
+          <section class="panel" aria-labelledby="details-title">
+            <div class="panel-head"><h2 id="details-title">Personal details</h2><p>Update your name, email address, and local time zone.</p></div>
+            <div class="panel-content field-grid">
+              <div class="field"><label for="full-name">Full name</label><input id="full-name" name="name" value="Alex Morgan" autocomplete="name" maxlength="70" required aria-describedby="full-name-error"><p class="error" id="full-name-error" hidden></p></div>
+              <div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" value="alex@studionorth.design" autocomplete="email" maxlength="254" required aria-describedby="email-error"><p class="error" id="email-error" hidden></p></div>
+              <div class="field"><span class="field-label" id="timezone-label">Time zone</span><button class="field-button" id="timezone-trigger" type="button" aria-labelledby="timezone-label timezone-value" aria-expanded="false" aria-haspopup="dialog" aria-controls="timezone-popover"><span id="timezone-value">Central Time (Chicago)</span><svg class="icon sm" aria-hidden="true"><use href="#i-down"/></svg></button></div>
+            </div>
+            <div class="panel-foot">
+              <p class="small muted"><svg class="icon sm" aria-hidden="true"><use href="#i-lock"/></svg>Only you can edit your profile.</p>
+              <button class="btn primary" id="save-profile" type="submit">Save changes</button>
+            </div>
+          </section>
+        </form>
+
+        <form class="section" id="notifications" aria-label="Notifications" hidden>
+          <div class="section" id="notification-channels"></div>
+          <div class="split"><span class="small muted">Preferences apply to your account.</span><button class="btn primary" id="save-notifications" type="submit">Save preferences</button></div>
+        </form>
+
+        <div class="section" id="security" hidden>
+          <form class="panel" id="password-form" aria-labelledby="password-title" novalidate>
+            <div class="panel-head"><h2 id="password-title">Change password</h2><p>Choose a new password with at least 12 characters.</p></div>
+            <div class="panel-content field-grid">
+              <div class="field"><label for="current-password">Current password</label><input id="current-password" type="password" autocomplete="current-password" required aria-describedby="current-password-error"><p class="error" id="current-password-error" hidden></p></div>
+              <div class="field"><label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" minlength="12" required aria-describedby="new-password-error"><p class="error" id="new-password-error" hidden></p></div>
+              <div class="field"><label for="repeat-password">Confirm new password</label><input id="repeat-password" type="password" autocomplete="new-password" required aria-describedby="repeat-password-error"><p class="error" id="repeat-password-error" hidden></p></div>
+            </div>
+            <div class="panel-foot"><p class="small muted"><svg class="icon sm" aria-hidden="true"><use href="#i-lock"/></svg>Offline preview. Passwords are never stored.</p><button class="btn primary" id="save-password" type="submit">Update password</button></div>
+          </form>
+          <section class="panel" aria-labelledby="two-factor-title">
+            <div class="panel-head with-action"><div><h2 id="two-factor-title">Two-factor authentication</h2><p>Require a verification code at sign-in.</p></div><span class="badge neutral" id="two-factor-status">Off</span></div>
+            <div class="panel-content"><button class="btn" id="open-two-factor" type="button" aria-haspopup="dialog" aria-controls="two-factor-dialog">Set up 2FA</button></div>
+          </section>
+          <section class="panel" aria-labelledby="sessions-title">
+            <div class="panel-head"><h2 id="sessions-title">Active sessions</h2><p>Review devices signed in to your account.</p></div>
+            <div class="row-list" id="sessions-list"></div>
+          </section>
+        </div>
+
+        <div class="section" id="members" hidden>
+          <section class="panel" aria-labelledby="members-title">
+            <div class="panel-head with-action"><div><h2 id="members-title">Workspace members</h2><p id="member-count"></p></div><button class="btn primary" id="invite-member" type="button" aria-haspopup="dialog" aria-controls="invite-dialog"><svg class="icon sm" aria-hidden="true"><use href="#i-plus"/></svg>Invite member</button></div>
+            <div class="table-wrap">
+              <table aria-label="Workspace members"><thead><tr><th scope="col">Member</th><th class="member-status" scope="col">Status</th><th scope="col">Role</th><th class="row-action" scope="col"><span aria-label="Actions"> </span></th></tr></thead><tbody id="member-list"></tbody></table>
+            </div>
+          </section>
+        </div>
+
+        <div class="section" id="billing" hidden>
+          <div class="billing-grid">
+            <section class="panel" aria-labelledby="plan-title">
+              <div class="panel-head with-action"><h2 id="plan-title">Current plan</h2><span class="badge good">Active</span></div>
+              <div class="panel-content"><h3>Relay Pro</h3><div class="plan-cost">$12 <span>/ seat per month</span></div><p class="small muted">Monthly billing in USD</p></div>
+            </section>
+            <section class="panel" aria-labelledby="payment-title">
+              <div class="panel-head"><h2 id="payment-title">Payment method</h2><p>Used for automatic workspace renewals.</p></div>
+              <div class="panel-content feature"><span class="payment-mark">VISA</span><div><h3>Visa ending in 4242</h3><p class="small muted">Expires September 2028</p></div></div>
+            </section>
+          </div>
+          <section class="panel" aria-labelledby="invoices-title">
+            <div class="panel-head"><h2 id="invoices-title">Invoices</h2><p>Download a receipt for a previous payment.</p></div>
+            <div class="table-wrap"><table aria-label="Invoices"><thead><tr><th scope="col">Date</th><th scope="col">Amount</th><th scope="col">Status</th><th scope="col" class="row-action">Receipt</th></tr></thead><tbody id="invoice-list"></tbody></table></div>
+          </section>
+        </div>
+
+        <div class="section" id="danger" hidden>
+          <section class="panel" aria-labelledby="transfer-title">
+            <div class="panel-head"><h2 id="transfer-title">Transfer ownership</h2><p>Give another active member control of the workspace and its billing.</p></div>
+            <div class="panel-content split"><p class="small muted" id="current-owner"></p><button class="btn" id="transfer-ownership" type="button" aria-haspopup="dialog" aria-controls="transfer-dialog"><svg class="icon sm" aria-hidden="true"><use href="#i-swap"/></svg>Transfer ownership</button></div>
+          </section>
+          <section class="panel danger-panel" aria-labelledby="delete-title">
+            <div class="panel-head feature"><span class="panel-icon"><svg class="icon" aria-hidden="true"><use href="#i-warning"/></svg></span><div><h2 id="delete-title">Delete workspace</h2><p>Permanently remove Studio North and its workspace data.</p></div></div>
+            <div class="panel-content"><button class="btn danger" id="delete-workspace" type="button" aria-haspopup="dialog" aria-controls="delete-dialog"><svg class="icon sm" aria-hidden="true"><use href="#i-trash"/></svg>Delete workspace</button></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="deleted" id="deleted-screen" hidden>
+    <div class="panel"><span class="panel-icon"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><h1 id="deleted-title" tabindex="-1">Workspace deleted</h1><p class="muted">Studio North has been removed from this browser.</p></div>
+  </div>
+
+  <div class="change-bar" id="change-bar" role="region" aria-label="Unsaved changes" hidden>
+    <div class="feature"><span class="panel-icon"><svg class="icon sm" aria-hidden="true"><use href="#i-warning"/></svg></span><strong>You have unsaved changes</strong></div>
+    <div class="actions"><button class="btn ghost" id="discard-changes" type="button">Discard</button><button class="btn primary" id="save-changes" type="button">Save changes</button></div>
+  </div>
+
+  <div class="toast" id="toast" hidden>
+    <span class="panel-icon"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>
+    <div class="toast-copy" role="status"><strong id="toast-title"></strong><p class="small muted" id="toast-text"></p></div>
+    <button class="icon-button" id="dismiss-toast" type="button" aria-label="Dismiss notification"><svg class="icon sm" aria-hidden="true"><use href="#i-close"/></svg></button>
+  </div>
+
+  <div class="popover" id="role-menu" role="menu" aria-label="Change member role" hidden></div>
+  <div class="popover timezone-popover" id="timezone-popover" role="dialog" aria-label="Choose a time zone" hidden>
+    <label for="timezone-search">Find a time zone</label><input type="search" id="timezone-search" placeholder="Search by city or time zone" autocomplete="off" aria-controls="timezone-options">
+    <div class="timezone-list" id="timezone-options" role="listbox" aria-label="Time zones"></div>
+    <p class="small muted" id="timezone-empty" role="status" hidden>No matching time zones.</p>
+  </div>
+
+  <dialog id="avatar-dialog" aria-labelledby="avatar-dialog-title">
+    <form id="avatar-form" novalidate>
+      <div class="dialog-head"><div><h2 id="avatar-dialog-title">Change avatar</h2><p>Upload a photo or choose a color for your initials.</p></div><button class="icon-button" type="button" data-close aria-label="Close avatar dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body flow">
+        <span class="avatar large avatar-preview" id="avatar-preview" aria-hidden="true"></span>
+        <div class="field"><label for="avatar-file">Upload photo</label><input id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="avatar-file-error"><p class="error" id="avatar-file-error" hidden></p></div>
+        <fieldset><legend>Use initials with a color</legend><div class="choices" id="avatar-colors"></div></fieldset>
+      </div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" id="apply-avatar" type="submit">Use avatar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="two-factor-dialog" aria-labelledby="two-factor-dialog-title">
+    <form id="two-factor-form" novalidate>
+      <div class="dialog-head"><div><h2 id="two-factor-dialog-title"></h2><p id="two-factor-description"></p></div><button class="icon-button" type="button" data-close aria-label="Close authentication dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body flow" id="two-factor-code-fields"><p class="small muted">Demo verification code <code class="demo-code" id="two-factor-demo-code"></code></p><div class="field"><label for="two-factor-code">Verification code</label><input id="two-factor-code" inputmode="numeric" maxlength="6" autocomplete="off" aria-describedby="two-factor-code-error"><p class="error" id="two-factor-code-error" hidden></p></div></div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" id="confirm-two-factor" type="submit"></button></div>
+    </form>
+  </dialog>
+
+  <dialog id="session-dialog" aria-labelledby="session-dialog-title">
+    <form id="session-form">
+      <div class="dialog-head"><div><h2 id="session-dialog-title">Sign out of session?</h2><p id="session-dialog-description"></p></div><button class="icon-button" type="button" data-close aria-label="Close sign-out dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close autofocus>Cancel</button><button class="btn danger-solid" id="confirm-signout" type="submit">Sign out</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="invite-dialog" aria-labelledby="invite-dialog-title">
+    <form id="invite-form" novalidate>
+      <div class="dialog-head"><div><h2 id="invite-dialog-title">Invite a member</h2><p>Add a pending invitation to Studio North.</p></div><button class="icon-button" type="button" data-close aria-label="Close invitation dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body flow">
+        <div class="field"><label for="invite-email">Email address</label><input type="email" id="invite-email" placeholder="name@example.com" maxlength="254" required autofocus aria-describedby="invite-email-error"><p class="error" id="invite-email-error" hidden></p></div>
+        <fieldset><legend>Workspace role</legend><div class="choices"><label class="choice"><input type="radio" name="invite-role" value="Admin">Admin</label><label class="choice"><input type="radio" name="invite-role" value="Member" checked>Member</label><label class="choice"><input type="radio" name="invite-role" value="Viewer">Viewer</label></div></fieldset>
+      </div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" id="send-invite" type="submit">Create invitation</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="remove-dialog" aria-labelledby="remove-dialog-title">
+    <form id="remove-form">
+      <div class="dialog-head"><div><h2 id="remove-dialog-title"></h2><p id="remove-dialog-description"></p></div><button class="icon-button" type="button" data-close aria-label="Close removal dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close autofocus>Cancel</button><button class="btn danger-solid" id="confirm-remove" type="submit"></button></div>
+    </form>
+  </dialog>
+
+  <dialog id="transfer-dialog" aria-labelledby="transfer-dialog-title">
+    <form id="transfer-form" novalidate>
+      <div class="dialog-head"><div><h2 id="transfer-dialog-title">Transfer ownership</h2><p>The new owner will manage the workspace and billing. Your role will become Admin.</p></div><button class="icon-button" type="button" data-close aria-label="Close transfer dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body flow">
+        <fieldset aria-describedby="new-owner-error"><legend>Choose a new owner</legend><div class="flow" id="transfer-options"></div><p class="error" id="new-owner-error" role="alert" hidden></p></fieldset>
+        <div class="field"><label class="choice"><input id="transfer-acknowledged" type="checkbox" aria-describedby="transfer-acknowledged-error">I understand the change to my access.</label><p class="error" id="transfer-acknowledged-error" hidden></p></div>
+      </div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close>Cancel</button><button class="btn danger-solid" id="confirm-transfer" type="submit">Transfer ownership</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="delete-dialog" aria-labelledby="delete-dialog-title">
+    <form id="delete-form" novalidate>
+      <div class="dialog-head"><div><h2 id="delete-dialog-title">Delete Studio North?</h2><p>This permanently removes the workspace, its members, and its settings from this browser.</p></div><button class="icon-button" type="button" data-close aria-label="Close deletion dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-body"><div class="field"><label for="delete-name">Type <strong>Studio North</strong> to confirm</label><input id="delete-name" autocomplete="off" spellcheck="false" required autofocus aria-describedby="delete-name-error"><p class="error" id="delete-name-error" hidden></p></div></div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close>Cancel</button><button class="btn danger-solid" id="confirm-delete" type="submit">Delete workspace</button></div>
+    </form>
+  </dialog>
+
+  <script>
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+  const workspace = 'Studio North';
+  const storageKey = 'relay-studio-north-settings-v1';
+  const sections = {
+    profile: ['Profile', 'Manage your personal information and how you appear to your team.', 'user'],
+    notifications: ['Notifications', 'Choose what Relay tells you about and where you receive it.', 'bell'],
+    security: ['Security', 'Protect your account and manage the devices that can access it.', 'shield'],
+    members: ['Members', 'Invite teammates and manage who has access to Studio North.', 'users'],
+    billing: ['Billing', 'View your subscription, payment method, and past invoices.', 'card'],
+    danger: ['Danger zone', 'Manage changes that affect ownership and access for everyone.', 'warning']
+  };
+  const channels = [
+    { id: 'email', name: 'Email', detail: 'Updates delivered to your inbox.', icon: 'mail', options: [
+      ['mentions', 'Mentions and replies', 'When someone mentions you or replies to your thread.', true],
+      ['messages', 'Direct messages', 'When a teammate sends you a direct message.', true],
+      ['digest', 'Weekly digest', 'A summary of the highlights from your workspace.', false],
+      ['product', 'Product updates', 'New features and tips for getting more out of Relay.', false]
+    ] },
+    { id: 'in-app', name: 'In-app', detail: 'Activity that appears in Relay.', icon: 'bell', options: [
+      ['mentions', 'Mentions and replies', 'Show new mentions and replies in your activity feed.', true],
+      ['messages', 'Direct messages', 'Show unread messages in your activity feed.', true],
+      ['projects', 'Project activity', 'Updates to projects that you follow.', true],
+      ['reactions', 'Reactions', 'When someone reacts to a message you wrote.', false]
+    ] },
+    { id: 'desktop', name: 'Desktop', detail: 'Preferences for desktop alerts when Relay is connected.', icon: 'screen', options: [
+      ['mentions', 'Mentions and replies', 'Show an alert for new mentions and replies.', true],
+      ['messages', 'Direct messages', 'Show an alert when a teammate messages you.', false],
+      ['quiet', 'Quiet hours', 'Mute alerts between 6 PM and 8 AM in your time zone.', true]
+    ] }
+  ];
+  const sessionDetails = [
+    { id: 'current', name: 'Edge on Windows', location: 'Chicago, US · Active now', icon: 'screen' },
+    { id: 'phone', name: 'Relay on iPhone', location: 'Chicago, US · 2 hours ago', icon: 'phone' },
+    { id: 'laptop', name: 'Chrome on macOS', location: 'Madison, US · Yesterday', icon: 'screen' }
+  ];
+  const invoices = [
+    { id: 'RN-1042', date: 'Nov 1, 2026', amount: '$48.00' },
+    { id: 'RN-0981', date: 'Oct 1, 2026', amount: '$48.00' },
+    { id: 'RN-0924', date: 'Sep 1, 2026', amount: '$48.00' }
+  ];
+  const roles = ['Admin', 'Member', 'Viewer'];
+  const tones = ['purple', 'blue', 'green', 'peach', 'rose'];
+  const zoneLabels = {
+    UTC: 'UTC (Coordinated Universal Time)',
+    'America/Chicago': 'Central Time (Chicago)',
+    'America/New_York': 'Eastern Time (New York)',
+    'America/Denver': 'Mountain Time (Denver)',
+    'America/Los_Angeles': 'Pacific Time (Los Angeles)'
+  };
+  const zones = [...new Set(['UTC', ...(Intl.supportedValuesOf?.('timeZone') ?? Object.keys(zoneLabels)),
+    'Europe/London', 'Europe/Paris', 'Asia/Kolkata', 'Asia/Tokyo', 'Australia/Sydney'])];
+  const defaults = {
+    profile: { name: 'Alex Morgan', email: 'alex@studionorth.design', timezone: 'America/Chicago', avatar: { tone: 'purple', photo: '' } },
+    notifications: Object.fromEntries(channels.flatMap(({ id, options }) =>
+      options.map(([key, , , enabled]) => [id + '-' + key, enabled]))),
+    members: [
+      { id: 'me', role: 'Owner' },
+      { id: 'maya', name: 'Maya Chen', email: 'maya@studionorth.design', role: 'Admin', tone: 'green' },
+      { id: 'jordan', name: 'Jordan Ellis', email: 'jordan@studionorth.design', role: 'Member', tone: 'blue' },
+      { id: 'sam', name: 'Sam Rivera', email: 'sam@studionorth.design', role: 'Viewer', tone: 'peach' }
+    ],
+    sessions: sessionDetails.map(({ id }) => id),
+    twoFactor: false
+  };
+
+  let canPersist = true;
+  let state = structuredClone(defaults);
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (stored) state = { ...state, ...JSON.parse(stored) };
+  } catch {
+    canPersist = false;
+  }
+
+  let profileDraft = structuredClone(state.profile);
+  let notificationDraft = { ...state.notifications };
+  let activeSection = 'profile';
+  let toastTimer;
+  let activePopover;
+  let avatarChoice;
+  let uploadAttempt = 0;
+  let challenge = '';
+  let selectedSession;
+  let selectedMember;
+
+  function icon(name, size = '') {
+    return '<svg class="icon ' + size + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>';
+  }
+
+  function make(tag, className, content) {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    if (content !== undefined) element.textContent = content;
+    return element;
+  }
+
+  function button(label, className, attributes = {}) {
+    const element = make('button', className, label);
+    element.type = 'button';
+    for (const [name, value] of Object.entries(attributes)) element.setAttribute(name, value);
+    return element;
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+      canPersist = true;
+    } catch {
+      canPersist = false;
+    }
+    updateDirty();
+  }
+
+  function toast(title, detail) {
+    clearTimeout(toastTimer);
+    $('toast').hidden = false;
+    $('toast-title').textContent = title;
+    $('toast-text').textContent = detail;
+    $('toast-text').hidden = !detail;
+    toastTimer = setTimeout(() => { $('toast').hidden = true; }, 5500);
+  }
+
+  function stateToast(title, detail = '') {
+    toast(title, canPersist ? detail : 'Changes apply until you close or reload this page.');
+  }
+
+  function initials(name) {
+    return name.trim().split(/\s+/).slice(0, 2).map((word) => Array.from(word)[0]).join('').toUpperCase().slice(0, 4) || '?';
+  }
+
+  function paintAvatar(element, name, avatar) {
+    element.dataset.tone = avatar.tone;
+    if (avatar.photo) {
+      const photo = make('img');
+      photo.alt = '';
+      photo.src = avatar.photo;
+      element.replaceChildren(photo);
+    } else {
+      element.textContent = initials(name);
+    }
+  }
+
+  function zoneName(zone) {
+    return zoneLabels[zone] ?? zone.replaceAll('_', ' ').replaceAll('/', ' / ');
+  }
+
+  function renderProfile() {
+    $('full-name').value = profileDraft.name;
+    $('email').value = profileDraft.email;
+    $('timezone-value').textContent = zoneName(profileDraft.timezone);
+    paintAvatar($('profile-avatar'), profileDraft.name, profileDraft.avatar);
+  }
+
+  function renderAccount() {
+    paintAvatar($('sidebar-avatar'), state.profile.name, state.profile.avatar);
+    $('sidebar-name').textContent = state.profile.name;
+    $('sidebar-role').textContent = isOwner() ? 'Workspace owner' : 'Workspace admin';
+  }
+
+  function renderNotifications() {
+    for (const channel of channels) {
+      const { id, name, detail, icon: channelIcon, options } = channel;
+      const panel = make('section', 'panel');
+      panel.setAttribute('aria-labelledby', id + '-channel');
+      const head = make('div', 'panel-head feature');
+      const mark = make('span', 'panel-icon');
+      mark.innerHTML = icon(channelIcon);
+      const copy = make('div');
+      const title = make('h2', '', name);
+      title.id = id + '-channel';
+      copy.append(title, make('p', '', detail));
+      head.append(mark, copy);
+      const list = make('div', 'row-list');
+      for (const [key, label, description] of options) {
+        const toggleKey = id + '-' + key;
+        const row = make('label', 'setting-row');
+        const copy = make('span');
+        const title = make('span', 'field-label', label);
+        title.id = toggleKey + '-title';
+        const hint = make('small', 'small muted', description);
+        hint.id = toggleKey + '-description';
+        copy.append(title, make('br'), hint);
+        const toggle = make('input', 'toggle');
+        toggle.type = 'checkbox';
+        toggle.id = toggleKey;
+        toggle.checked = notificationDraft[toggleKey];
+        toggle.setAttribute('role', 'switch');
+        toggle.setAttribute('aria-labelledby', title.id);
+        toggle.setAttribute('aria-describedby', hint.id);
+        toggle.addEventListener('change', () => {
+          notificationDraft[toggleKey] = toggle.checked;
+          updateDirty();
+        });
+        row.append(copy, toggle);
+        list.append(row);
+      }
+      panel.append(head, list);
+      $('notification-channels').append(panel);
+    }
+  }
+
+  function profileDirty() {
+    return JSON.stringify(profileDraft) !== JSON.stringify(state.profile);
+  }
+
+  function notificationsDirty() {
+    return Object.keys(notificationDraft).some((key) => notificationDraft[key] !== state.notifications[key]);
+  }
+
+  function updateDirty() {
+    const dirty = !state.deleted && (profileDirty() || notificationsDirty());
+    $('change-bar').hidden = !dirty;
+    $('save-status').dataset.dirty = dirty || !canPersist;
+    $('save-status-text').textContent = dirty ? 'Unsaved changes' : canPersist ? 'All changes saved' : 'Session only';
+  }
+
+  function showSection(section) {
+    closePopover();
+    activeSection = section;
+    for (const name of Object.keys(sections)) $(name).hidden = name !== section;
+    for (const item of document.querySelectorAll('.nav-item')) {
+      if (item.dataset.section === section) item.setAttribute('aria-current', 'page');
+      else item.removeAttribute('aria-current');
+    }
+    const [label, description, glyph] = sections[section];
+    $('page-title').textContent = $('breadcrumb').textContent = label;
+    $('page-description').textContent = description;
+    $('hero-icon').setAttribute('href', '#i-' + glyph);
+    document.title = label + ' settings · Relay';
+  }
+
+  function fieldError(input, message) {
+    const error = $(input.id + '-error');
+    input.setAttribute('aria-invalid', message ? 'true' : 'false');
+    error.textContent = message;
+    error.hidden = !message;
+    return !message;
+  }
+
+  function clearValidation(form) {
+    for (const input of form.querySelectorAll('[aria-invalid]')) fieldError(input, '');
+    for (const message of form.querySelectorAll('.error')) {
+      message.hidden = true;
+      message.textContent = '';
+    }
+  }
+
+  function emailError(input, duplicate = () => false) {
+    const email = input.value.trim();
+    if (!email) return 'Enter an email address.';
+    if (input.validity.typeMismatch || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Enter a valid email address.';
+    if (duplicate(email.toLowerCase())) return 'This email address is already in the workspace.';
+    return '';
+  }
+
+  function validateProfile() {
+    const name = $('full-name');
+    const email = $('email');
+    const validName = fieldError(name, name.value.trim() ? '' : 'Enter your full name.');
+    const validEmail = fieldError(email, emailError(email, (address) =>
+      state.members.some((member) => member.id !== 'me' && member.email.toLowerCase() === address)));
+    if (validName && validEmail) return true;
+    if (activeSection !== 'profile') showSection('profile');
+    (validName ? email : name).focus();
+    return false;
+  }
+
+  function saveDrafts(saveProfile, saveNotifications) {
+    if (saveProfile && !validateProfile()) return;
+    if (saveProfile) {
+      profileDraft.name = $('full-name').value.trim();
+      profileDraft.email = $('email').value.trim();
+      state.profile = structuredClone(profileDraft);
+      renderProfile();
+      renderAccount();
+      renderMembers();
+      renderDanger();
+    }
+    if (saveNotifications) state.notifications = { ...notificationDraft };
+    persist();
+    const title = saveProfile && saveNotifications ? 'Settings saved' : saveProfile ? 'Profile saved' : 'Preferences saved';
+    stateToast(title, 'Your changes are saved on this device.');
+  }
+
+  function registerDraftActions() {
+    for (const item of document.querySelectorAll('.nav-item')) {
+      item.addEventListener('click', () => showSection(item.dataset.section));
+    }
+    for (const [id, key] of [['full-name', 'name'], ['email', 'email']]) {
+      const input = $(id);
+      input.addEventListener('input', () => {
+        profileDraft[key] = input.value;
+        if (input.getAttribute('aria-invalid') === 'true') fieldError(input, '');
+        if (key === 'name') paintAvatar($('profile-avatar'), profileDraft.name, profileDraft.avatar);
+        updateDirty();
+      });
+    }
+    $('profile').addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveDrafts(true, false);
+    });
+    $('notifications').addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveDrafts(false, true);
+    });
+    $('save-changes').addEventListener('click', () => {
+      saveDrafts(profileDirty(), notificationsDirty());
+      if ($('change-bar').hidden) focusCurrentSection();
+    });
+    $('discard-changes').addEventListener('click', () => {
+      profileDraft = structuredClone(state.profile);
+      notificationDraft = { ...state.notifications };
+      for (const [id, value] of Object.entries(notificationDraft)) $(id).checked = value;
+      clearValidation($('profile'));
+      renderProfile();
+      updateDirty();
+      focusCurrentSection();
+    });
+  }
+
+  function focusCurrentSection() {
+    const preferred = state.deleted ? $('deleted-title') : activeSection === 'profile' ? $('save-profile') :
+      activeSection === 'notifications' ? $('save-notifications') : $('main');
+    preferred.focus({ preventScroll: true });
+  }
+
+  function openDialog(id, opener, focusId) {
+    closePopover();
+    opener.focus({ preventScroll: true });
+    const dialog = $(id);
+    dialog.showModal();
+    if (focusId) $(focusId).focus();
+  }
+
+  function initDialogs() {
+    for (const dialog of document.querySelectorAll('dialog')) {
+      for (const cancel of dialog.querySelectorAll('[data-close]')) {
+        cancel.addEventListener('click', () => dialog.close());
+      }
+    }
+  }
+
+  function initAvatar() {
+    function showPreview() {
+      paintAvatar($('avatar-preview'), profileDraft.name, avatarChoice);
+      for (const radio of $('avatar-colors').querySelectorAll('input')) {
+        radio.checked = !avatarChoice.photo && radio.value === avatarChoice.tone;
+      }
+    }
+
+    for (const tone of tones) {
+      const label = make('label', 'choice');
+      const radio = make('input');
+      radio.type = 'radio';
+      radio.name = 'avatar-color';
+      radio.value = tone;
+      label.append(radio, make('span', '', tone[0].toUpperCase() + tone.slice(1)));
+      $('avatar-colors').append(label);
+      radio.addEventListener('change', () => {
+        ++uploadAttempt;
+        $('apply-avatar').disabled = false;
+        $('avatar-file').value = '';
+        fieldError($('avatar-file'), '');
+        avatarChoice = { tone, photo: '' };
+        showPreview();
+      });
+    }
+    $('change-avatar').addEventListener('click', (event) => {
+      ++uploadAttempt;
+      avatarChoice = { ...profileDraft.avatar };
+      $('avatar-file').value = '';
+      $('apply-avatar').disabled = false;
+      clearValidation($('avatar-form'));
+      showPreview();
+      openDialog('avatar-dialog', event.currentTarget, 'avatar-file');
+    });
+    $('avatar-file').addEventListener('change', async (event) => {
+      const input = event.currentTarget;
+      const file = input.files[0];
+      const attempt = ++uploadAttempt;
+      fieldError(input, '');
+      $('apply-avatar').disabled = false;
+      if (!file) return;
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        fieldError(input, 'Choose a JPG, PNG, or WebP image.');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        fieldError(input, 'Choose a photo that is 2 MB or smaller.');
+        return;
+      }
+      $('apply-avatar').disabled = true;
+      const url = URL.createObjectURL(file);
+      try {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        if (attempt !== uploadAttempt || !$('avatar-dialog').open) return;
+        const canvas = document.createElement('canvas');
+        const side = Math.min(image.naturalWidth, image.naturalHeight);
+        canvas.width = canvas.height = Math.min(side, 256);
+        canvas.getContext('2d').drawImage(image, (image.naturalWidth - side) / 2, (image.naturalHeight - side) / 2,
+          side, side, 0, 0, canvas.width, canvas.height);
+        avatarChoice = { ...avatarChoice, photo: canvas.toDataURL('image/webp', .87) };
+        showPreview();
+      } catch {
+        if (attempt === uploadAttempt) fieldError(input, 'This photo could not be opened. Choose another file.');
+      } finally {
+        URL.revokeObjectURL(url);
+        if (attempt === uploadAttempt) $('apply-avatar').disabled = false;
+      }
+    });
+    $('avatar-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if ($('apply-avatar').disabled || $('avatar-file').getAttribute('aria-invalid') === 'true') return;
+      profileDraft.avatar = { ...avatarChoice };
+      renderProfile();
+      updateDirty();
+      $('avatar-dialog').close();
+    });
+  }
+
+  function placePopover() {
+    if (!activePopover) return;
+    const { element, trigger } = activePopover;
+    const rect = trigger.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) {
+      closePopover();
+      return;
+    }
+    const width = element.offsetWidth;
+    const height = element.offsetHeight;
+    const left = element.id === 'role-menu' ? rect.right - width : rect.left;
+    const top = rect.bottom + height + 16 <= window.innerHeight ? rect.bottom + 5 : rect.top - height - 5;
+    element.style.left = Math.max(8, Math.min(left, window.innerWidth - width - 8)) + 'px';
+    element.style.top = Math.max(8, Math.min(top, window.innerHeight - height - 8)) + 'px';
+  }
+
+  function openPopover(element, trigger) {
+    if (activePopover?.trigger === trigger) {
+      closePopover(true);
+      return false;
+    }
+    closePopover();
+    activePopover = { element, trigger };
+    trigger.setAttribute('aria-expanded', 'true');
+    element.hidden = false;
+    placePopover();
+    return true;
+  }
+
+  function closePopover(restoreFocus = false) {
+    if (!activePopover) return;
+    const { element, trigger } = activePopover;
+    activePopover = undefined;
+    element.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+    if (restoreFocus && trigger.isConnected) trigger.focus({ preventScroll: true });
+  }
+
+  function menuNavigation(event) {
+    const { key } = event;
+    if (!activePopover || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return;
+    if (event.target === $('timezone-search') && (key === 'Home' || key === 'End')) return;
+    const items = [...activePopover.element.querySelectorAll('.menu-item')];
+    if (!items.length) return;
+    event.preventDefault();
+    const index = items.indexOf(document.activeElement);
+    const next = key === 'Home' ? 0 : key === 'End' ? items.length - 1 :
+      key === 'ArrowDown' ? (index + 1) % items.length : (index <= 0 ? items.length - 1 : index - 1);
+    items[next].focus();
+  }
+
+  function initTimezones() {
+    const trigger = $('timezone-trigger');
+    const popover = $('timezone-popover');
+    const search = $('timezone-search');
+    const list = $('timezone-options');
+    function renderZones() {
+      const query = search.value.trim().toLowerCase();
+      const matching = zones.filter((zone) => (zone + ' ' + zoneName(zone)).toLowerCase().includes(query));
+      const selected = profileDraft.timezone;
+      if (!query && matching.includes(selected)) {
+        matching.splice(matching.indexOf(selected), 1);
+        matching.unshift(selected);
+      }
+      const options = matching.map((zone) => {
+        const item = button(zoneName(zone), 'menu-item', { role: 'option', 'aria-selected': zone === selected, tabindex: '-1' });
+        item.addEventListener('click', () => {
+          profileDraft.timezone = zone;
+          $('timezone-value').textContent = zoneName(zone);
+          updateDirty();
+          closePopover(true);
+        });
+        return item;
+      });
+      list.replaceChildren(...options);
+      list.scrollTop = 0;
+      $('timezone-empty').hidden = options.length > 0;
+      placePopover();
+    }
+    trigger.addEventListener('click', () => {
+      if (!openPopover(popover, trigger)) return;
+      search.value = '';
+      renderZones();
+      search.focus({ preventScroll: true });
+    });
+    search.addEventListener('input', renderZones);
+  }
+
+  function renderTwoFactor() {
+    $('two-factor-status').textContent = state.twoFactor ? 'On' : 'Off';
+    $('two-factor-status').className = 'badge ' + (state.twoFactor ? 'good' : 'neutral');
+    $('open-two-factor').textContent = state.twoFactor ? 'Turn off 2FA' : 'Set up 2FA';
+  }
+
+  function renderSessions() {
+    const rows = sessionDetails.filter(({ id }) => state.sessions.includes(id)).map((session) => {
+      const row = make('div', 'setting-row');
+      const detail = make('div', 'feature');
+      const mark = make('span', 'panel-icon');
+      mark.innerHTML = icon(session.icon);
+      const copy = make('div');
+      copy.append(make('h3', '', session.name), make('p', 'small muted', session.location));
+      if (session.id === 'current') copy.append(make('span', 'badge good', 'Current session'));
+      detail.append(mark, copy);
+      const action = button('Sign out', 'btn session-signout', {
+        'aria-label': 'Sign out of ' + session.name, 'aria-haspopup': 'dialog', 'aria-controls': 'session-dialog'
+      });
+      action.addEventListener('click', () => {
+        selectedSession = session;
+        $('session-dialog-description').textContent = 'End the ' + session.name + ' session in this preview.';
+        openDialog('session-dialog', action);
+      });
+      row.append(detail, action);
+      return row;
+    });
+    if (!rows.length) rows.push(make('p', 'setting-row muted', 'No active sessions.'));
+    $('sessions-list').replaceChildren(...rows);
+  }
+
+  function initSecurity() {
+    $('password-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const current = $('current-password');
+      const replacement = $('new-password');
+      const repeat = $('repeat-password');
+      const validCurrent = fieldError(current, current.value ? '' : 'Enter your current password.');
+      const newError = replacement.value.length < 12 ? 'Use at least 12 characters.' :
+        replacement.value === current.value ? 'Choose a different password.' : '';
+      const validReplacement = fieldError(replacement, newError);
+      const validRepeat = fieldError(repeat, !repeat.value ? 'Confirm your new password.' :
+        repeat.value !== replacement.value ? 'The passwords do not match.' : '');
+      if (!validCurrent || !validReplacement || !validRepeat) {
+        (validCurrent ? validReplacement ? repeat : replacement : current).focus();
+        return;
+      }
+      event.currentTarget.reset();
+      toast('Password form completed', 'Validation passed. This offline preview stores no passwords.');
+    });
+    $('open-two-factor').addEventListener('click', (event) => {
+      clearValidation($('two-factor-form'));
+      const on = state.twoFactor;
+      $('two-factor-dialog-title').textContent = on ? 'Turn off two-factor authentication?' : 'Set up two-factor authentication';
+      $('two-factor-description').textContent = on ? 'Disable the extra verification step in this preview.' :
+        'Enter the code below to try the verification step.';
+      $('two-factor-code-fields').hidden = on;
+      $('two-factor-code').value = '';
+      challenge = String(crypto.getRandomValues(new Uint32Array(1))[0] % 900000 + 100000);
+      $('two-factor-demo-code').textContent = challenge;
+      $('confirm-two-factor').textContent = on ? 'Turn off 2FA' : 'Verify and enable';
+      openDialog('two-factor-dialog', event.currentTarget, on ? undefined : 'two-factor-code');
+    });
+    $('two-factor-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const code = $('two-factor-code');
+      if (!state.twoFactor && !fieldError(code, code.value.trim() === challenge ? '' : 'Enter the six-digit demo code shown above.')) {
+        code.focus();
+        return;
+      }
+      state.twoFactor = !state.twoFactor;
+      challenge = '';
+      code.value = '';
+      persist();
+      renderTwoFactor();
+      $('two-factor-dialog').close();
+      stateToast(state.twoFactor ? 'Two-factor authentication enabled' : 'Two-factor authentication disabled', 'This preference applies to the offline preview.');
+    });
+    $('session-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!selectedSession) return;
+      state.sessions = state.sessions.filter((id) => id !== selectedSession.id);
+      persist();
+      $('session-dialog').close();
+      renderSessions();
+      ($('sessions-list').querySelector('.session-signout') ?? $('open-two-factor')).focus({ preventScroll: true });
+      stateToast('Session signed out', selectedSession.name);
+      selectedSession = undefined;
+    });
+  }
+
+  function isOwner() {
+    return state.members.some((member) => member.id === 'me' && member.role === 'Owner');
+  }
+
+  function displayMember(member) {
+    return member.id === 'me' ? { ...member, ...state.profile } : member;
+  }
+
+  function openRoleMenu(member, trigger, fromEnd = false) {
+    const menu = $('role-menu');
+    if (activePopover?.trigger === trigger) {
+      closePopover(true);
+      return;
+    }
+    const items = roles.map((role) => {
+      const choice = button(role, 'menu-item', { role: 'menuitemradio', 'aria-checked': role === member.role, tabindex: '-1' });
+      if (role === member.role) choice.insertAdjacentHTML('beforeend', icon('check', 'sm'));
+      choice.addEventListener('click', () => {
+        closePopover(true);
+        if (member.role === role) return;
+        member.role = role;
+        persist();
+        renderMembers();
+        $('role-' + member.id).focus({ preventScroll: true });
+        stateToast('Role updated', displayMember(member).name + ' is now ' + (role === 'Admin' ? 'an ' : 'a ') + role.toLowerCase() + '.');
+      });
+      return choice;
+    });
+    menu.replaceChildren(...items);
+    if (openPopover(menu, trigger)) {
+      const firstFocus = fromEnd ? items.at(-1) : items.find((item) => item.getAttribute('aria-checked') === 'true') ?? items[0];
+      firstFocus.focus({ preventScroll: true });
+    }
+  }
+
+  function renderMembers() {
+    const active = state.members.filter((member) => !member.pending).length;
+    const pending = state.members.length - active;
+    $('member-count').textContent = active + (active === 1 ? ' active member' : ' active members') + (pending ? ' · ' + pending + ' pending' : '');
+    const rows = state.members.map((member) => {
+      const person = displayMember(member);
+      const row = make('tr', 'member-row');
+      const identity = make('td');
+      const detail = make('div', 'feature');
+      const avatar = make('span', 'avatar');
+      avatar.setAttribute('aria-hidden', 'true');
+      paintAvatar(avatar, person.name, person.avatar ?? { tone: person.tone ?? 'rose' });
+      const labels = make('div', 'tile-copy');
+      labels.append(make('div', 'member-name', person.name + (member.id === 'me' ? ' (you)' : '')),
+        make('div', 'small muted member-email', person.email));
+      if (member.pending) labels.append(make('span', 'badge neutral member-pending-mobile', 'Invited'));
+      detail.append(avatar, labels);
+      identity.append(detail);
+      const status = make('td', 'member-status');
+      status.append(make('span', 'badge ' + (member.pending ? 'neutral' : 'good'), member.pending ? 'Invited' : 'Active'));
+      const role = make('td');
+      const action = make('td', 'row-action');
+      if (member.role === 'Owner' || member.id === 'me') {
+        role.append(make('span', 'badge', member.role));
+      } else {
+        const trigger = button(member.role, 'btn role-trigger', {
+          id: 'role-' + member.id, 'aria-label': 'Role for ' + person.name + ': ' + member.role,
+          'aria-haspopup': 'menu', 'aria-controls': 'role-menu', 'aria-expanded': 'false'
+        });
+        trigger.insertAdjacentHTML('beforeend', icon('down', 'sm'));
+        trigger.addEventListener('click', () => openRoleMenu(member, trigger));
+        trigger.addEventListener('keydown', (event) => {
+          if (['ArrowDown', 'ArrowUp'].includes(event.key)) {
+            event.preventDefault();
+            openRoleMenu(member, trigger, event.key === 'ArrowUp');
+          }
+        });
+        role.append(trigger);
+        const remove = button('', 'icon-button remove-member', {
+          'aria-label': (member.pending ? 'Revoke invitation for ' : 'Remove ') + person.name,
+          'aria-haspopup': 'dialog', 'aria-controls': 'remove-dialog'
+        });
+        remove.innerHTML = icon('trash', 'sm');
+        remove.addEventListener('click', () => {
+          selectedMember = member;
+          $('remove-dialog-title').textContent = member.pending ? 'Revoke invitation?' : 'Remove member?';
+          $('remove-dialog-description').textContent = member.pending ? 'Cancel the invitation for ' + person.email + '.' :
+            'Remove ' + person.name + ' and revoke their access to Studio North.';
+          $('confirm-remove').textContent = member.pending ? 'Revoke invitation' : 'Remove member';
+          openDialog('remove-dialog', remove);
+        });
+        action.append(remove);
+      }
+      row.append(identity, status, role, action);
+      return row;
+    });
+    $('member-list').replaceChildren(...rows);
+  }
+
+  function initMembers() {
+    $('invite-member').addEventListener('click', (event) => {
+      $('invite-form').reset();
+      clearValidation($('invite-form'));
+      openDialog('invite-dialog', event.currentTarget);
+    });
+    $('invite-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = $('invite-email');
+      const error = emailError(input, (address) =>
+        state.members.some((member) => displayMember(member).email.toLowerCase() === address));
+      if (!fieldError(input, error)) {
+        input.focus();
+        return;
+      }
+      const email = input.value.trim().toLowerCase();
+      const name = email.split('@')[0].split(/[._+-]/).filter(Boolean)
+        .map((part) => part[0].toUpperCase() + part.slice(1)).join(' ') || email;
+      const id = 'invite-' + [...crypto.getRandomValues(new Uint32Array(2))].map((part) => part.toString(36)).join('-');
+      const role = new FormData(event.currentTarget).get('invite-role');
+      state.members.push({ id, name, email, role, pending: true, tone: 'rose' });
+      persist();
+      $('invite-dialog').close();
+      renderMembers();
+      renderDanger();
+      stateToast('Invitation created', email + ' was added to your pending invitations.');
+    });
+    $('remove-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!selectedMember) return;
+      const member = selectedMember;
+      selectedMember = undefined;
+      state.members = state.members.filter(({ id }) => id !== member.id);
+      persist();
+      $('remove-dialog').close();
+      renderMembers();
+      renderDanger();
+      $('invite-member').focus({ preventScroll: true });
+      stateToast(member.pending ? 'Invitation revoked' : 'Member removed', member.email);
+    });
+  }
+
+  function renderInvoices() {
+    const rows = invoices.map((invoice) => {
+      const row = make('tr');
+      const date = make('td', '', invoice.date);
+      const amount = make('td', '', invoice.amount);
+      const status = make('td');
+      status.append(make('span', 'badge good', 'Paid'));
+      const action = make('td', 'row-action');
+      const download = make('a', 'icon-button');
+      download.innerHTML = icon('download', 'sm');
+      download.setAttribute('aria-label', 'Download receipt ' + invoice.id);
+      download.download = invoice.id + '.txt';
+      const receipt = ['Relay receipt · ' + invoice.id, workspace, invoice.date, '',
+        'Relay Pro · 4 seats', 'Total paid: ' + invoice.amount + ' USD', 'Visa ending in 4242', '', 'Sample receipt for the offline preview'].join('\n');
+      download.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(receipt);
+      action.append(download);
+      row.append(date, amount, status, action);
+      return row;
+    });
+    $('invoice-list').replaceChildren(...rows);
+  }
+
+  function transferCandidates() {
+    return state.members.filter((member) => member.id !== 'me' && !member.pending && member.role !== 'Owner');
+  }
+
+  function renderDanger() {
+    const owner = displayMember(state.members.find((member) => member.role === 'Owner'));
+    const allowed = isOwner();
+    const hasCandidate = transferCandidates().length > 0;
+    $('current-owner').textContent = allowed && !hasCandidate ? 'An active member is required.' : 'Current owner: ' + owner.name;
+    $('transfer-ownership').disabled = !allowed || !hasCandidate;
+    $('delete-workspace').disabled = !allowed;
+  }
+
+  function renderDeleted(focus = false) {
+    $('app').hidden = true;
+    document.querySelector('.skip').hidden = true;
+    $('change-bar').hidden = true;
+    $('deleted-screen').hidden = false;
+    document.title = 'Workspace deleted · Relay';
+    if (focus) $('deleted-title').focus();
+  }
+
+  function initDanger() {
+    $('transfer-ownership').addEventListener('click', (event) => {
+      clearValidation($('transfer-form'));
+      $('transfer-acknowledged').checked = false;
+      const choices = transferCandidates().map((member) => {
+        const label = make('label', 'choice');
+        const input = make('input');
+        input.type = 'radio';
+        input.name = 'new-owner';
+        input.value = member.id;
+        label.append(input, make('span', '', member.name + ' · ' + member.role));
+        return label;
+      });
+      $('transfer-options').replaceChildren(...choices);
+      openDialog('transfer-dialog', event.currentTarget);
+    });
+    $('transfer-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!isOwner()) return;
+      const id = new FormData(event.currentTarget).get('new-owner');
+      const member = transferCandidates().find((candidate) => candidate.id === id);
+      const error = $('new-owner-error');
+      error.textContent = member ? '' : 'Choose the member who will become the new owner.';
+      error.hidden = Boolean(member);
+      const acknowledgement = $('transfer-acknowledged');
+      const confirmed = fieldError(acknowledgement, acknowledgement.checked ? '' : 'Confirm that you understand the change.');
+      if (!member || !confirmed) {
+        (member ? acknowledgement : $('transfer-options').querySelector('input')).focus();
+        return;
+      }
+      state.members.find((candidate) => candidate.id === 'me').role = 'Admin';
+      member.role = 'Owner';
+      persist();
+      $('transfer-dialog').close();
+      renderAccount();
+      renderMembers();
+      renderDanger();
+      $('main').focus({ preventScroll: true });
+      stateToast('Ownership transferred', member.name + ' is now the workspace owner.');
+    });
+    $('delete-workspace').addEventListener('click', (event) => {
+      $('delete-form').reset();
+      clearValidation($('delete-form'));
+      openDialog('delete-dialog', event.currentTarget);
+    });
+    $('delete-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!isOwner()) return;
+      const input = $('delete-name');
+      if (!fieldError(input, input.value === workspace ? '' : 'Type Studio North exactly as shown.')) {
+        input.focus();
+        return;
+      }
+      state = { deleted: true };
+      persist();
+      $('delete-dialog').close();
+      renderDeleted(true);
+      stateToast('Workspace deleted', 'Studio North was removed.');
+    });
+  }
+
+  if (state.deleted) {
+    renderDeleted();
+  } else {
+    renderProfile();
+    renderAccount();
+    renderNotifications();
+    renderTwoFactor();
+    renderSessions();
+    renderMembers();
+    renderInvoices();
+    renderDanger();
+    updateDirty();
+    registerDraftActions();
+    initDialogs();
+    initAvatar();
+    initTimezones();
+    initSecurity();
+    initMembers();
+    initDanger();
+    $('dismiss-toast').addEventListener('click', () => {
+      clearTimeout(toastTimer);
+      $('toast').hidden = true;
+      focusCurrentSection();
+    });
+    document.addEventListener('pointerdown', (event) => {
+      if (activePopover && !activePopover.element.contains(event.target) && !activePopover.trigger.contains(event.target)) closePopover();
+    });
+    document.addEventListener('focusin', (event) => {
+      if (activePopover && !activePopover.element.contains(event.target) && !activePopover.trigger.contains(event.target)) closePopover();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && activePopover) {
+        event.preventDefault();
+        closePopover(true);
+        return;
+      }
+      menuNavigation(event);
+    });
+    window.addEventListener('resize', placePopover);
+    window.addEventListener('scroll', (event) => {
+      if (activePopover && !activePopover.element.contains(event.target)) placePopover();
+    }, true);
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--surface-canvas); color: var(--ink-primary); font: var(--text-body)/var(--leading-body) var(--font-ui); }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap-group) var(--gap-section); padding: var(--gap-group) var(--gap-section); background: var(--surface-base); border-bottom: 1px solid var(--edge-separator); position: sticky; top: 0; z-index: 10; }
+h1 { font-size: var(--text-heading); margin: 0; font-weight: var(--weight-strong); }
+h2 { font-size: var(--text-heading); margin: var(--gap-region) 0 var(--gap-group); font-weight: var(--weight-strong); }
+h3 { font-size: var(--text-body); margin: var(--gap-section) 0 var(--gap-related); font-weight: var(--weight-strong); }
+main { padding: var(--gap-section); max-width: 1400px; margin: 0 auto; }
+.pickers { display: flex; flex-wrap: wrap; gap: var(--gap-group); }
+label { color: var(--ink-secondary); display: inline-flex; align-items: center; gap: var(--gap-related); }
+select, button, input { font: inherit; color: var(--ink-primary); background: var(--surface-base); border: 1px solid var(--edge-control); border-radius: var(--radius-control); min-height: var(--control-height); padding: 0 var(--gap-group); }
+input[type="checkbox"] { min-height: 0; }
+select { max-width: 100%; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.tabs { display: flex; gap: var(--gap-control); margin-left: auto; flex-wrap: wrap; }
+button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.muted { color: var(--ink-secondary); }
+.meta { color: var(--ink-tertiary); font-size: var(--text-meta); }
+.note { background: var(--surface-base); border: 1px solid var(--edge-separator); border-radius: var(--radius-control); padding: var(--gap-group); margin: var(--gap-group) 0; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; background: var(--surface-base); border: 1px solid var(--edge-separator); }
+th, td { text-align: left; padding: 4px var(--gap-group); border-bottom: 1px solid var(--edge-separator); vertical-align: top; }
+th { background: var(--surface-sunken); font-weight: var(--weight-strong); color: var(--ink-secondary); white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.changed td { background: var(--selection); }
+.st { font-weight: var(--weight-strong); white-space: nowrap; }
+.st-caught { color: var(--state-success); }
+.st-silent { color: var(--state-error); }
+.st-norule { color: var(--state-waiting); }
+.st-other, .st-none { color: var(--ink-tertiary); }
+.arrow { color: var(--ink-tertiary); padding: 0 4px; }
+.filters { display: flex; flex-wrap: wrap; gap: var(--gap-group); margin: var(--gap-group) 0; align-items: center; }
+.row { display: flex; flex-wrap: wrap; gap: var(--gap-group); align-items: center; margin: var(--gap-related) 0; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-group); }
+.pair.single { grid-template-columns: 1fr; max-width: 700px; }
+.pair figure { margin: 0; min-width: 0; }
+.pair figcaption { font-weight: var(--weight-strong); margin-bottom: var(--gap-control); }
+.pair img { width: 100%; height: auto; display: block; border: 1px solid var(--edge-separator); background: var(--surface-base); }
+.pair.narrow img { max-width: 390px; }
+.pair .missing { border: 1px dashed var(--edge-control); padding: var(--gap-section); color: var(--ink-tertiary); }
+.surface { background: var(--surface-base); border: 1px solid var(--edge-separator); border-radius: var(--radius-container); padding: var(--gap-group); margin: var(--gap-group) 0; }
+.surface > h3 { margin-top: 0; }
+.tag { font-size: var(--text-meta); color: var(--ink-secondary); border: 1px solid var(--edge-separator); border-radius: var(--radius-control); padding: 0 6px; white-space: nowrap; }
+.tag.page-changed { color: var(--state-waiting); border-color: var(--state-waiting); }
+code { font-family: var(--font-code); font-size: 12px; }
+@media (max-width: 640px) {
+  main { padding: var(--gap-group); }
+  .tabs { margin-left: 0; }
+  .pair { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benchmark results</title>
+<link rel="stylesheet" href="../../demo/design/tokens.css">
+<link rel="stylesheet" href="viewer.css">
+</head>
+<body>
+<header class="bar">
+  <h1>Benchmark results</h1>
+  <div class="pickers">
+    <label>Before <select id="before"></select></label>
+    <label>After <select id="after"></select></label>
+  </div>
+  <nav class="tabs" id="nav">
+    <button data-view="overview" aria-pressed="true">Overview</button>
+    <button data-view="sites" aria-pressed="false">Generated sites</button>
+    <button data-view="planted" aria-pressed="false">Planted set</button>
+  </nav>
+</header>
+<main id="main"></main>
+<noscript>This viewer needs JavaScript.</noscript>
+<script src="data.js"></script>
+<script src="viewer.js"></script>
+</body>
+</html>

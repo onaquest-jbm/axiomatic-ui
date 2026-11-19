@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<title>Postmark — Inbox</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --paper:#fff; --rail:#f8f7f3; --canvas:#fbfaf8; --hover:#f5f3ee;
+  --text:#25261f; --muted:#686a60; --faint:#727369; --line:#e9e7e0; --edge:#e1dfd6;
+  --accent:#b04427; --accent-ink:#973819; --accent-fill:#af4226; --accent-hover:#97381f;
+  --wash:#f8ede4; --selection:#fbf3eb; --selection-line:#ead9cb;
+  --warm:#a57723; --shadow:0 14px 38px #2b211521, 0 2px 8px #2b21150c;
+  --work:#56519b; --work-bg:#eeebf9; --personal:#3c7158; --personal-bg:#e8f1e9;
+  --finance:#855818; --finance-bg:#f7eedb; --travel:#366e8a; --travel-bg:#e6f0f6;
+  font: 14px/1.45 "Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+@media (prefers-color-scheme:dark) {
+  :root {
+    --paper:#242520; --rail:#1e1f1a; --canvas:#20211c; --hover:#2c2d26;
+    --text:#f1eee5; --muted:#b3b4a7; --faint:#a6a79b; --line:#35362e; --edge:#414239;
+    --accent:#f09b7d; --accent-ink:#ffae92; --accent-fill:#b84c2e; --accent-hover:#a03e25;
+    --wash:#3d2c24; --selection:#322821; --selection-line:#50382c;
+    --warm:#eaca76; --shadow:0 14px 38px #0008, 0 2px 8px #0004;
+    --work:#d2cafa; --work-bg:#3d3754; --personal:#a4d4b9; --personal-bg:#2d4134;
+    --finance:#ebc88d; --finance-bg:#483b28; --travel:#abd6ee; --travel-bg:#2c404d;
+  }
+}
+*,*::before,*::after { box-sizing:border-box }
+[hidden] { display:none !important }
+body { margin:0; background:var(--paper); color:var(--text) }
+button,input,select,textarea { font:inherit; color:inherit }
+button { cursor:pointer; border:0; background:none; padding:0 }
+a { color:inherit }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
+button:disabled { cursor:default; opacity:.42 }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0 }
+.icon { width:19px; height:19px; flex:none; fill:none; stroke:currentColor; stroke-width:1.65; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle }
+.icon-button { display:inline-grid; flex:none; place-items:center; width:36px; height:36px; border-radius:8px; color:var(--muted) }
+.icon-button:hover,.icon-button[aria-expanded="true"] { background:var(--hover); color:var(--text) }
+.icon-button .icon { width:18px; height:18px }
+.app { display:grid; grid-template:68px minmax(0,1fr) / 224px minmax(350px, 440px) minmax(0,1fr); height:100vh; height:100dvh; overflow:hidden }
+.topbar { grid-area:1/1/2/4; display:grid; grid-template-columns:224px minmax(0,1fr) auto; align-items:center; border-bottom:1px solid var(--line); background:var(--paper); z-index:1 }
+.brand { display:flex; align-items:center; gap:10px; padding-left:23px; font-size:20px; font-weight:750; letter-spacing:-.8px; white-space:nowrap }
+.brand-mark { display:grid; place-items:center; width:34px; height:34px; color:#fff; background:var(--accent-fill); border-radius:10px }
+.brand-mark .icon { width:21px; height:21px; stroke-width:1.55 }
+.searchbar { display:flex; align-items:center; gap:10px; width:min(100% - 26px, 555px); height:41px; margin-left:24px; padding:0 5px 0 13px; background:var(--canvas); border:1px solid var(--line); border-radius:9px; color:var(--muted) }
+.searchbar:focus-within { border-color:var(--accent) }
+.searchbar input { flex:1; min-width:0; background:none; border:0; outline:none; color:var(--text); padding:0 }
+.searchbar input::placeholder { color:var(--faint) }
+.searchbar input::-webkit-search-cancel-button { display:none }
+.searchbar .icon-button { width:31px; height:30px }
+kbd { display:inline-grid; min-width:22px; height:22px; place-items:center; padding:0 5px; border:1px solid var(--edge); border-radius:5px; background:var(--paper); font:12px/1 system-ui,sans-serif; color:var(--muted); white-space:nowrap }
+.top-actions { display:flex; align-items:center; gap:10px; padding:0 22px 0 14px }
+.top-actions .icon-button { border:1px solid var(--line) }
+.avatar { display:grid; place-items:center; flex:none; width:36px; height:36px; border-radius:50%; font-size:12px; font-weight:750; letter-spacing:.01em; color:var(--avatar-ink,var(--accent-ink)); background:var(--avatar-bg,var(--wash)) }
+@media (prefers-color-scheme:dark) {
+  .avatar { color:var(--avatar-dark-ink,var(--accent-ink)); background:var(--avatar-dark-bg,var(--wash)) }
+}
+#folder-toggle,.mobile-only { display:none }
+.sidebar { grid-area:2/1/3/2; min-height:0; background:var(--rail); border-right:1px solid var(--line) }
+.sidebar-inner { display:flex; flex-direction:column; height:100%; min-height:0; padding:24px 14px 14px }
+.compose-open,.primary { display:inline-flex; justify-content:center; align-items:center; gap:9px; border-radius:8px; background:var(--accent-fill); color:#fff; font-weight:650 }
+.compose-open:hover,.primary:hover { background:var(--accent-hover) }
+.compose-open { align-self:stretch; margin:0 5px 25px; min-height:43px; box-shadow:0 2px 3px #40200c18 }
+.compose-open.mobile-only { display:none }
+.nav-scroll { flex:1; min-height:0; overflow:auto; scrollbar-width:thin }
+.section-label { margin:0 11px 8px; font-size:10px; font-weight:750; letter-spacing:.115em; color:var(--faint); text-transform:uppercase }
+.label-section { margin-top:27px }
+.nav-item { display:flex; width:100%; min-height:37px; align-items:center; gap:11px; padding:0 10px; margin:1px 0; text-align:left; border-radius:7px; color:var(--muted); font-size:13px; font-weight:550 }
+.nav-item:hover { background:var(--hover); color:var(--text) }
+.nav-item[aria-current="page"] { background:var(--wash); color:var(--accent-ink); font-weight:700 }
+.nav-item .icon { width:17px; height:17px }
+.nav-count { margin-left:auto; font-size:11px; font-weight:700; font-variant-numeric:tabular-nums }
+.label-dot { width:9px; height:9px; margin:0 4px; border-radius:50%; background:var(--label-color); flex:none }
+.label-work { --label-color:var(--work); --label-bg:var(--work-bg) }
+.label-personal { --label-color:var(--personal); --label-bg:var(--personal-bg) }
+.label-finance { --label-color:var(--finance); --label-bg:var(--finance-bg) }
+.label-travel { --label-color:var(--travel); --label-bg:var(--travel-bg) }
+.account { display:flex; align-items:center; gap:9px; padding:15px 5px 2px; margin-top:14px; border-top:1px solid var(--line); min-width:0 }
+.account .avatar { width:33px; height:33px }
+.account strong,.account small { display:block }
+.account strong { font-size:12px }
+.account small { font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis }
+.mailbox { grid-area:2/2/3/3; display:flex; flex-direction:column; min-height:0; min-width:0; background:var(--canvas); border-right:1px solid var(--line) }
+.mailbox-heading { padding:22px 20px 0; background:var(--paper) }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:8px }
+h1 { margin:0; font-size:27px; line-height:1.2; letter-spacing:-.85px; font-weight:750 }
+.mail-count { flex:none; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums }
+.view-bar { display:flex; margin-top:16px; gap:20px }
+.view-tab { min-height:36px; padding:0 2px 7px; border-bottom:2px solid transparent; color:var(--muted); font-size:12px; font-weight:650 }
+.view-tab:hover { color:var(--text) }
+.view-tab[aria-pressed="true"] { color:var(--accent-ink); border-bottom-color:var(--accent) }
+.view-tab .tab-count { margin-left:4px; font-size:11px }
+.messages { min-height:0; margin:0; padding:0; overflow:auto; list-style:none; border-top:1px solid var(--line); scrollbar-width:thin }
+.message-row { position:relative; isolation:isolate; display:grid; grid-template-columns:1fr 32px; min-height:84px; border-bottom:1px solid var(--line); background:var(--paper) }
+.message-row:hover,.message-row:focus-within { background:var(--hover) }
+.message-row.selected { background:var(--selection); border-bottom-color:var(--selection-line) }
+.message-row.selected::after { content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--accent); pointer-events:none }
+.message-main { display:grid; grid-template-columns:35px minmax(0,1fr); align-items:start; gap:10px; min-width:0; min-height:84px; text-align:left; padding:10px 0 10px 19px; border-radius:0 }
+.message-main:focus-visible { outline-offset:-3px; z-index:2 }
+.message-main .avatar { width:35px; height:35px; margin-top:2px }
+.row-copy { min-width:0; display:grid; gap:1px }
+.row-line { display:flex; align-items:center; gap:6px; min-width:0; min-height:18px }
+.row-sender,.row-subject,.row-snippet { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.row-sender { font-size:12px; font-weight:650 }
+.row-time { margin-left:auto; padding-left:4px; flex:none; color:var(--faint); font-size:10px; font-variant-numeric:tabular-nums }
+.row-subject { font-size:13px; font-weight:550; line-height:1.3 }
+.unread .row-sender,.unread .row-subject { font-weight:750 }
+.unread-dot { flex:none; width:6px; height:6px; border-radius:50%; background:var(--accent) }
+.row-snippet { min-width:0; flex:1; color:var(--muted); font-size:11.5px }
+.row-attachment { color:var(--muted); width:13px; height:13px; margin-left:auto }
+.chip { display:inline-flex; align-items:center; flex:none; padding:1px 6px; min-height:17px; border-radius:4px; font-size:10px; line-height:1.2; font-weight:650; color:var(--label-color); background:var(--label-bg); white-space:nowrap }
+.row-actions { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:0 5px 0 1px }
+.row-actions .icon-button { width:26px; height:27px; border-radius:5px }
+.row-actions .icon { width:15px; height:15px }
+.star-toggle[aria-pressed="true"] { color:var(--warm) }
+.star-toggle[aria-pressed="true"] .icon { fill:currentColor }
+.message-more { opacity:0 }
+.message-row:hover .message-more,.message-row:focus-within .message-more,.selected .message-more,.message-more[aria-expanded="true"] { opacity:1 }
+.empty-list { padding:34px 20px; color:var(--muted); text-align:center; font-size:13px }
+.reader { grid-area:2/3/3/4; display:flex; flex-direction:column; min-height:0; min-width:0; background:var(--paper) }
+.reader-tools { min-height:58px; flex:none; display:flex; align-items:center; gap:5px; border-bottom:1px solid var(--line); padding:0 18px }
+.tool-rule { width:1px; height:20px; margin:0 6px; background:var(--line) }
+.reader-position { margin-left:auto; padding:0 5px; font-size:11px; white-space:nowrap; color:var(--muted); font-variant-numeric:tabular-nums }
+.thread { flex:1; min-height:0; overflow:auto; scrollbar-width:thin; padding:27px clamp(24px,3vw,50px) 35px }
+.thread-inner { max-width:780px; margin-inline:auto }
+.thread-title { margin:0; font-size:clamp(23px,2.15vw,34px); font-weight:740; letter-spacing:-.035em; line-height:1.18; overflow-wrap:anywhere }
+.thread-labels { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px }
+.thread-labels:empty { display:none }
+.thread-labels .chip { font-size:11px; min-height:21px; padding-inline:8px }
+.sender-card { display:flex; gap:11px; align-items:center; margin-top:24px; min-width:0 }
+.sender-card .avatar { width:39px; height:39px; font-size:13px }
+.sender-info { flex:1; min-width:0 }
+.sender-info strong { display:block; font-size:13px; overflow-wrap:anywhere }
+.sender-info div { font-size:11.5px; color:var(--muted); overflow-wrap:anywhere }
+.thread-time { flex:none; font-size:11px; color:var(--muted) }
+.message-body { margin:22px 0; max-width:64ch; color:var(--text); font-size:14px; line-height:1.65; overflow-wrap:anywhere }
+.message-body p { margin:0 0 13px; white-space:pre-wrap }
+.message-body p:last-child { margin-bottom:0 }
+.attachment-section { margin:21px 0 23px }
+.attachment-caption { display:flex; align-items:center; gap:6px; margin:0 0 8px; color:var(--muted); font-size:11px; font-weight:650 }
+.attachment-caption .icon { width:14px; height:14px }
+.attachment-card { display:flex; width:min(100%, 312px); min-height:56px; align-items:center; gap:10px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--canvas); text-decoration:none }
+.attachment-card:hover { background:var(--hover); border-color:var(--edge) }
+.attachment-card + .attachment-card { margin-top:7px }
+.file-icon { display:grid; place-items:center; flex:none; width:34px; height:35px; border-radius:6px; background:var(--wash); color:var(--accent-ink) }
+.file-icon .icon { width:19px; height:19px }
+.file-info { display:grid; flex:1; min-width:0; font-size:12px; font-weight:650 }
+.file-info span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.file-info small { font-size:10px; font-weight:500; color:var(--muted) }
+.download-icon { margin-left:auto; color:var(--muted); width:15px; height:15px }
+.thread-previous { margin:0 0 18px; border:1px solid var(--line); border-radius:8px }
+.thread-toggle { display:flex; width:100%; align-items:center; gap:8px; padding:8px 10px; text-align:left; color:var(--muted); font-size:12px }
+.thread-toggle:hover { background:var(--hover); border-radius:8px }
+.thread-toggle .icon { width:15px; height:15px }
+.thread-toggle[aria-expanded="true"] .icon { transform:rotate(90deg) }
+.thread-toggle time { margin-left:auto; font-size:11px; white-space:nowrap }
+.prior-message { padding:0 12px 10px; margin:4px 0 0; font-size:13px; white-space:pre-wrap; overflow-wrap:anywhere }
+.response-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:17px }
+.secondary,.primary { display:inline-flex; align-items:center; justify-content:center; gap:7px; min-height:36px; padding:0 12px; border-radius:7px; font-size:12px; font-weight:650 }
+.secondary { border:1px solid var(--edge); color:var(--text); background:var(--paper) }
+.secondary:hover { background:var(--hover) }
+.secondary .icon,.primary .icon { width:16px; height:16px }
+.reader-empty { display:grid; align-content:center; justify-items:center; gap:6px; height:100%; color:var(--muted); text-align:center }
+.reader-empty .icon { width:32px; height:32px; margin-bottom:6px; color:var(--accent) }
+.reader-empty strong { color:var(--text); font-size:16px }
+.popup,dialog { position:fixed; background:var(--paper); color:var(--text); border:1px solid var(--edge); border-radius:11px; box-shadow:var(--shadow) }
+.popup { z-index:5; width:202px; max-width:calc(100vw - 16px); max-height:calc(100dvh - 16px); overflow:auto; padding:5px }
+.menu-action { display:flex; width:100%; min-height:36px; gap:10px; align-items:center; padding:0 9px; border-radius:6px; text-align:left; font-size:13px }
+.menu-action:hover,.menu-action:focus-visible { background:var(--hover) }
+.menu-action .icon { width:16px; height:16px; color:var(--muted) }
+.menu-action .next-icon { margin-left:auto; width:13px }
+.menu-action.danger,.menu-action.danger .icon { color:var(--accent-ink) }
+.menu-separator { margin:4px 3px; border:0; border-top:1px solid var(--line) }
+#advanced-search { width:344px; padding:15px }
+.popup-heading,.dialog-header { display:flex; align-items:center; justify-content:space-between; gap:6px }
+.popup-heading { margin:-3px -3px 8px 0 }
+.popup-heading h2,.dialog-header h2,.popup-title { margin:0; font-size:16px; letter-spacing:-.02em }
+.popup-title { padding:6px 9px; font-size:13px }
+.form-field { display:grid; gap:4px; margin:9px 0; color:var(--muted); font-size:12px; font-weight:600 }
+.form-field input,.form-field select { width:100%; min-width:0; min-height:36px; border:1px solid var(--edge); border-radius:6px; background:var(--canvas); padding:5px 8px; font-weight:400; color:var(--text) }
+.check-field { display:flex; gap:8px; align-items:center; font-size:13px; padding:5px 0 }
+input[type="checkbox"] { accent-color:var(--accent-fill); width:15px; height:15px; flex:none }
+.form-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px }
+dialog { max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); padding:0 }
+dialog::backdrop { background:#16161069 }
+.dialog-header { padding:10px 13px 10px 17px; border-bottom:1px solid var(--line); background:var(--canvas) }
+.dialog-header .icon-button { width:33px; height:33px }
+.dialog-body { padding:14px 17px 17px }
+#compose-window { inset:auto 22px 16px auto; width:515px; margin:0 }
+.compose-field { display:flex; align-items:center; min-height:41px; padding:0 17px; gap:9px; border-bottom:1px solid var(--line) }
+.compose-field span { min-width:47px; color:var(--muted); font-size:12px }
+.compose-field input { flex:1; min-width:0; padding:4px 2px; border:0; background:none }
+.compose-field input:focus,.compose-body:focus { outline:0 }
+.compose-field:focus-within,.compose-body:focus { box-shadow:inset 0 -2px var(--accent) }
+.compose-body { display:block; width:100%; height:clamp(110px,33dvh,310px); resize:vertical; min-height:95px; max-height:calc(100dvh - 200px); border:0; padding:12px 17px; background:var(--paper); line-height:1.55 }
+.compose-footer { display:flex; align-items:center; gap:10px; padding:10px 14px; border-top:1px solid var(--line) }
+.compose-footer .primary { padding-inline:14px }
+.compose-footer .icon-button { margin-left:auto }
+.draft-status { color:var(--muted); font-size:11px }
+#shortcuts-dialog,#snooze-picker,#label-picker { width:350px }
+.shortcut-list { margin:0 }
+.shortcut-list div { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--line) }
+.shortcut-list div:last-child { border-bottom:0 }
+.shortcut-list dd { margin:0; display:flex; align-items:center; gap:3px }
+.snooze-choice { justify-content:space-between }
+.snooze-choice small { margin-left:auto; color:var(--muted); white-space:nowrap }
+.snooze-custom { padding-top:7px; margin-top:9px; border-top:1px solid var(--line) }
+.label-choice { padding:5px 3px; border-radius:6px }
+.label-choice:hover { background:var(--hover) }
+#archive-toast { position:fixed; z-index:6; left:50%; bottom:18px; transform:translateX(-50%); display:flex; align-items:center; gap:10px; width:max-content; max-width:calc(100vw - 20px); min-height:47px; padding:4px 6px 4px 13px; border-radius:9px; background:var(--text); color:var(--paper); box-shadow:var(--shadow); font-size:13px }
+#archive-toast .icon { width:17px; height:17px }
+#archive-undo { margin-left:6px; min-height:33px; padding-inline:8px; font-size:13px; font-weight:750; text-decoration:underline; text-underline-offset:3px }
+#archive-toast .icon-button { color:inherit; width:32px; height:32px }
+#archive-toast .icon-button:hover { background:color-mix(in srgb,currentColor 15%,transparent) }
+@media (max-width:1100px) {
+  .app { grid-template-columns:188px minmax(308px,37%) minmax(0,1fr) }
+  .topbar { grid-template-columns:188px minmax(0,1fr) auto }
+  .brand { padding-left:19px }
+  .message-main { padding-left:14px }
+  .reader-tools { gap:3px; padding-inline:8px }
+  .reader-tools .icon-button { width:32px }
+  .tool-rule { margin:0 3px }
+}
+@media (max-width:940px) {
+  .reader-position { display:none }
+  .reader-tools #thread-prev { margin-left:auto }
+}
+@media (max-width:860px) {
+  .app { grid-template-columns:minmax(285px,40%) minmax(0,1fr); grid-template-rows:62px minmax(0,1fr) }
+  .topbar { grid-area:1/1/2/3; grid-template-columns:auto minmax(0,1fr) auto; padding-left:12px }
+  .sidebar,.brand .brand-mark { display:none }
+  .mobile-brand { display:flex; align-items:center; gap:6px }
+  #folder-toggle { display:inline-grid }
+  .brand { padding:0; font-size:18px }
+  .searchbar { width:calc(100% - 15px); margin-left:15px }
+  .mailbox { grid-area:2/1/3/2 }
+  .reader { grid-area:2/2/3/3 }
+  #folder-drawer { inset:0 auto 0 0; margin:0; width:248px; height:100dvh; max-height:none; border:0; border-right:1px solid var(--line); border-radius:0; background:var(--rail) }
+  #folder-drawer .sidebar-inner { height:calc(100% - 54px); padding-top:14px }
+}
+@media (max-width:620px) {
+  .app { grid-template-columns:minmax(0,1fr); grid-template-rows:56px minmax(0,1fr) }
+  .topbar { grid-area:1/1/2/2; padding-left:7px }
+  .mobile-brand { gap:1px }
+  .brand { font-size:16px; letter-spacing:-.65px }
+  .searchbar { width:calc(100% - 9px); height:36px; gap:6px; margin-left:9px; padding-left:7px; font-size:13px }
+  .searchbar > span .icon { width:15px; height:15px }
+  .searchbar input,.compose-field input,.compose-body,.form-field input,.form-field select { font-size:16px }
+  .searchbar kbd,.top-actions .avatar { display:none }
+  .top-actions { padding:0 8px 0 6px }
+  .top-actions .icon-button { width:34px; height:34px }
+  .mailbox,.reader { grid-area:2/1/3/2; border-right:0 }
+  .reader,[data-mobile-reading="true"] .mailbox { display:none }
+  [data-mobile-reading="true"] .reader { display:flex }
+  .mobile-only { display:inline-grid }
+  .compose-open.mobile-only { display:inline-grid; width:36px; min-height:33px; margin:0; flex:none }
+  .mobile-compose .icon { width:17px; height:17px }
+  .mailbox-heading { padding:17px 14px 0 }
+  .mail-count { margin-left:auto }
+  .view-bar { margin-top:9px }
+  .message-row { grid-template-columns:minmax(0,1fr) 39px }
+  .message-main { padding-left:12px }
+  .message-more { opacity:1 }
+  .row-actions { padding-right:5px }
+  .row-actions .icon-button { width:33px; height:34px }
+  .reader-tools { min-height:51px; gap:2px; padding:0 6px }
+  .reader-tools .icon-button { width:33px; height:34px }
+  .reader-position { display:none }
+  .reader-tools #thread-prev { margin-left:auto }
+  .tool-rule { margin:0 3px }
+  .thread { padding:20px 16px 28px }
+  .thread-title { font-size:25px }
+  .sender-card { margin-top:20px }
+  #compose-window { inset:auto 7px 7px; width:auto; max-width:none }
+}
+@media (max-width:350px) {
+  .mobile-brand .brand { display:none }
+  .reader-tools .icon-button { width:29px }
+  .row-line .chip { display:none }
+}
+@media (pointer:coarse) { .message-more { opacity:1 } }
+</style>
+</head>
+<body>
+<div class="app" id="app" data-mobile-reading="false">
+  <header class="topbar">
+    <div class="mobile-brand">
+      <button id="folder-toggle" class="icon-button" type="button" aria-label="Open folders" aria-controls="folder-drawer" aria-haspopup="dialog" data-icon="menu"></button>
+      <div class="brand"><span class="brand-mark" data-icon="envelope"></span>Postmark</div>
+    </div>
+    <form id="search-form" class="searchbar" role="search">
+      <span data-icon="search"></span>
+      <label class="sr-only" for="search-input">Search mail</label>
+      <input id="search-input" type="search" placeholder="Search mail" autocomplete="off">
+      <kbd aria-hidden="true" id="search-key">/</kbd>
+      <button id="search-clear" class="icon-button" type="button" aria-label="Clear search" data-icon="close" hidden></button>
+      <button id="advanced-toggle" class="icon-button" type="button" aria-label="Advanced search" aria-controls="advanced-search" aria-expanded="false" data-icon="sliders"></button>
+    </form>
+    <div class="top-actions">
+      <button id="shortcuts-toggle" class="icon-button" type="button" aria-label="Keyboard shortcuts (?)" aria-controls="shortcuts-dialog" aria-haspopup="dialog" data-icon="help"></button>
+      <span class="avatar" aria-label="Alex Morgan">AM</span>
+    </div>
+  </header>
+
+  <aside class="sidebar" aria-label="Mailbox navigation"><div class="sidebar-inner"></div></aside>
+
+  <section class="mailbox" aria-labelledby="mailbox-title">
+    <div class="mailbox-heading">
+      <div class="title-row">
+        <h1 id="mailbox-title">Inbox</h1>
+        <span class="mail-count" id="mail-count"></span>
+        <button class="compose-open mobile-compose mobile-only" type="button" aria-label="Compose" aria-controls="compose-window" aria-haspopup="dialog" data-icon="edit"></button>
+      </div>
+      <div class="view-bar" role="group" aria-label="Filter messages">
+        <button class="view-tab" data-view="all" type="button" aria-pressed="true">All mail</button>
+        <button class="view-tab" data-view="unread" type="button" aria-pressed="false">Unread <span class="tab-count" id="unread-count"></span></button>
+        <button class="view-tab" data-view="starred" type="button" aria-pressed="false">Starred</button>
+      </div>
+    </div>
+    <ul class="messages" id="message-list" aria-label="Messages"></ul>
+  </section>
+
+  <section class="reader" id="reading-pane" aria-label="Reading pane">
+    <div class="reader-tools" id="reader-tools">
+      <button id="back-to-list" class="icon-button mobile-only" type="button" aria-label="Back to message list" data-icon="back"></button>
+      <button id="reader-archive" class="icon-button" type="button" aria-label="Archive message" data-icon="archive"></button>
+      <button id="reader-delete" class="icon-button" type="button" aria-label="Move message to Trash" data-icon="trash"></button>
+      <button id="reader-unread" class="icon-button" type="button" aria-label="Mark as unread" data-icon="mail"></button>
+      <span class="tool-rule" aria-hidden="true"></span>
+      <button id="reader-snooze" class="icon-button" type="button" aria-label="Snooze message" aria-haspopup="dialog" aria-controls="snooze-picker" data-icon="clock"></button>
+      <button id="reader-label" class="icon-button" type="button" aria-label="Label message" aria-haspopup="dialog" aria-controls="label-picker" data-icon="tag"></button>
+      <button id="reader-more" class="icon-button" type="button" aria-label="More message actions" aria-haspopup="menu" aria-controls="message-menu" aria-expanded="false" data-icon="more"></button>
+      <span class="reader-position" id="reader-position"></span>
+      <button id="thread-prev" class="icon-button" type="button" aria-label="Previous message" data-icon="left"></button>
+      <button id="thread-next" class="icon-button" type="button" aria-label="Next message" data-icon="right"></button>
+    </div>
+    <div class="thread" id="thread"></div>
+  </section>
+</div>
+
+<div class="popup" id="advanced-search" role="region" aria-labelledby="advanced-title" hidden>
+  <div class="popup-heading">
+    <h2 id="advanced-title">Advanced search</h2>
+    <button class="icon-button popup-close" type="button" aria-label="Close advanced search" data-icon="close"></button>
+  </div>
+  <form id="advanced-form">
+    <label class="form-field">From <input name="from" type="text" placeholder="Name or email address"></label>
+    <label class="form-field">Subject <input name="subject" type="text"></label>
+    <label class="form-field">Contains the words <input name="words" type="text"></label>
+    <label class="form-field">Search in <select id="search-folder" name="folder"></select></label>
+    <label class="check-field"><input name="attachments" type="checkbox"> Has an attachment</label>
+    <div class="form-actions">
+      <button id="advanced-reset" class="secondary" type="button">Reset</button>
+      <button class="primary" type="submit">Search</button>
+    </div>
+  </form>
+</div>
+
+<div class="popup" id="message-menu" role="menu" aria-label="Message actions" hidden>
+  <button class="menu-action" role="menuitem" data-action="unread" type="button"><span data-icon="mail"></span><span id="menu-read-text">Mark as unread</span></button>
+  <button class="menu-action" role="menuitem" data-action="snooze" type="button" aria-haspopup="dialog" aria-controls="snooze-picker"><span data-icon="clock"></span>Snooze</button>
+  <button class="menu-action" role="menuitem" data-action="move" type="button" aria-haspopup="menu" aria-controls="move-menu" aria-expanded="false"><span data-icon="folder"></span>Move to <span class="next-icon" data-icon="right"></span></button>
+  <button class="menu-action" role="menuitem" data-action="label" type="button" aria-haspopup="dialog" aria-controls="label-picker"><span data-icon="tag"></span>Label as</button>
+  <hr class="menu-separator" role="separator">
+  <button class="menu-action" role="menuitem" data-action="archive" type="button"><span data-icon="archive"></span>Archive</button>
+  <button class="menu-action danger" role="menuitem" data-action="delete" type="button"><span data-icon="trash"></span>Delete</button>
+</div>
+<div class="popup" id="move-menu" role="menu" aria-label="Move to folder" hidden>
+  <h2 class="popup-title" role="presentation">Move to</h2>
+  <div id="move-options" role="presentation"></div>
+</div>
+
+<dialog id="folder-drawer" aria-labelledby="drawer-title">
+  <div class="dialog-header"><h2 id="drawer-title">Folders</h2><button class="icon-button dialog-close" type="button" aria-label="Close folders" data-icon="close"></button></div>
+  <div class="sidebar-inner"></div>
+</dialog>
+
+<dialog id="compose-window" aria-labelledby="compose-title">
+  <div class="dialog-header"><h2 id="compose-title">New message</h2><button class="icon-button dialog-close" type="button" aria-label="Close and save draft" data-icon="close"></button></div>
+  <form id="compose-form">
+    <label class="compose-field"><span>To</span><input id="compose-to" name="to" type="email" multiple required autocomplete="off"></label>
+    <label class="compose-field"><span>Subject</span><input name="subject" type="text" autocomplete="off"></label>
+    <label class="sr-only" for="compose-body">Message</label>
+    <textarea class="compose-body" id="compose-body" name="body" placeholder="Write your message…"></textarea>
+    <div class="compose-footer">
+      <button class="primary" type="submit"><span data-icon="send"></span>Send</button>
+      <span class="draft-status" id="draft-status"></span>
+      <button id="discard-draft" class="icon-button" type="button" aria-label="Discard draft" data-icon="trash"></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="shortcuts-dialog" aria-labelledby="shortcuts-title">
+  <div class="dialog-header"><h2 id="shortcuts-title">Keyboard shortcuts</h2><button class="icon-button dialog-close" type="button" aria-label="Close keyboard shortcuts" data-icon="close"></button></div>
+  <div class="dialog-body">
+    <dl class="shortcut-list">
+      <div><dt>Search mail</dt><dd><kbd>/</kbd></dd></div>
+      <div><dt>Compose</dt><dd><kbd>C</kbd></dd></div>
+      <div><dt>Next message</dt><dd><kbd>J</kbd></dd></div>
+      <div><dt>Previous message</dt><dd><kbd>K</kbd></dd></div>
+      <div><dt>Reply to selected message</dt><dd><kbd>R</kbd></dd></div>
+      <div><dt>Archive selected message</dt><dd><kbd>E</kbd></dd></div>
+      <div><dt>Open shortcuts</dt><dd><kbd>?</kbd></dd></div>
+      <div><dt>Close or go back</dt><dd><kbd>Esc</kbd></dd></div>
+    </dl>
+  </div>
+</dialog>
+
+<dialog id="snooze-picker" aria-labelledby="snooze-title">
+  <div class="dialog-header"><h2 id="snooze-title">Snooze until</h2><button class="icon-button dialog-close" type="button" aria-label="Close snooze picker" data-icon="close"></button></div>
+  <div class="dialog-body">
+    <div id="snooze-options"></div>
+    <form id="snooze-form" class="snooze-custom">
+      <label class="form-field">Pick a date and time <input id="snooze-date" type="datetime-local" required></label>
+      <div class="form-actions"><button class="primary" type="submit">Snooze</button></div>
+    </form>
+  </div>
+</dialog>
+
+<dialog id="label-picker" aria-labelledby="label-title">
+  <div class="dialog-header"><h2 id="label-title">Label message</h2><button class="icon-button dialog-close" type="button" aria-label="Close label picker" data-icon="close"></button></div>
+  <form class="dialog-body" id="label-form">
+    <div id="label-options"></div>
+    <div class="form-actions">
+      <button class="secondary dialog-close" type="button">Cancel</button>
+      <button class="primary" type="submit">Apply labels</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="archive-toast" role="group" aria-label="Archive notification" hidden>
+  <span data-icon="check"></span><span>Message archived</span>
+  <button id="archive-undo" type="button">Undo</button>
+  <button id="archive-dismiss" class="icon-button" type="button" aria-label="Dismiss notification" data-icon="close"></button>
+</div>
+<div id="announcement" class="sr-only" role="status" aria-atomic="true"></div>
+
+<script>
+"use strict";
+const icons = {
+  envelope:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/>',
+  openmail:'<path d="M3 10 12 4l9 6v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m3 10 9 6 9-6"/>',
+  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+  search:'<circle cx="10.8" cy="10.8" r="6.3"/><path d="m16 16 4 4"/>',
+  sliders:'<path d="M4 6h7m4 0h5M4 12h3m4 0h9M4 18h11m4 0h1"/><circle cx="13" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1-1.5 2m0 3h.01"/>',
+  edit:'<path d="M12 20H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h8m1 12-4 1 1-4 7-7 3 3zM17 8l3 3"/>',
+  inbox:'<path d="M4 5h16l2 9v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-4z"/><path d="M2 14h6l1.5 2.5h5L16 14h6"/>',
+  star:'<path d="m12 3 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3L12 17.5l-5.6 2.9 1.1-6.3-4.6-4.5 6.3-.9z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  send:'<path d="m21 3-6.9 18-3.8-7.3L3 10zM10.3 13.7 21 3"/>',
+  draft:'<path d="M6 3h8l4 4v13H6zM14 3v5h4M9 12h6m-6 4h5"/>',
+  archive:'<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8m-9 4h4"/>',
+  trash:'<path d="M4 6h16M9 6V4h6v2M6 6l1 14h10l1-14m-8 4v6m4-6v6"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',
+  tag:'<path d="M3 4h8l9 9a1.4 1.4 0 0 1 0 2l-5 5a1.4 1.4 0 0 1-2 0l-9-9z"/><circle cx="8" cy="8" r="1"/>',
+  more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+  left:'<path d="m14 6-6 6 6 6"/>',
+  right:'<path d="m10 6 6 6-6 6"/>',
+  back:'<path d="m10 6-6 6 6 6M4 12h16"/>',
+  attach:'<path d="m8 13 6.6-6.6a2.3 2.3 0 0 1 3.3 3.3l-8.3 8.3a3.5 3.5 0 0 1-5-5l8.7-8.7a4.5 4.5 0 0 1 6.4 6.4l-8 8"/>',
+  download:'<path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/>',
+  file:'<path d="M6 3h8l4 4v14H6zm8 0v5h4m-9 4h6m-6 4h6"/>',
+  reply:'<path d="m10 6-6 5 6 5v-4h4c4 0 6 2 6 5v-2a7 7 0 0 0-7-7h-3z"/>',
+  forward:'<path d="m14 6 6 5-6 5v-4h-4c-4 0-6 2-6 5v-2a7 7 0 0 1 7-7h3z"/>',
+  close:'<path d="m6 6 12 12M18 6 6 18"/>',
+  check:'<path d="m5 12 4 4L19 6"/>',
+  calendar:'<rect x="4" y="6" width="16" height="14" rx="2"/><path d="M8 4v4m8-4v4M4 10h16"/>',
+};
+function icon(name) {
+  return '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+icons[name]+'</svg>';
+}
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+for (const element of $$('[data-icon]')) element.innerHTML = icon(element.dataset.icon);
+
+const folders = [
+  ['inbox','Inbox','inbox'], ['starred','Starred','star'], ['snoozed','Snoozed','clock'],
+  ['sent','Sent','send'], ['drafts','Drafts','draft'], ['archive','Archive','archive'], ['trash','Trash','trash'],
+];
+const labels = {work:'Work', personal:'Personal', finance:'Finance', travel:'Travel'};
+const avatarColors = [
+  ['#e9dff4','#62478a','#443752','#e5cef6'], ['#dfece3','#356750','#304738','#b9ddc5'],
+  ['#f3e4d7','#905330','#503729','#f5cfae'], ['#e0e9f3','#3d6585','#35414e','#c2dbf3'],
+  ['#f4dfe5','#935269','#50323d','#f6c6d6'], ['#efead5','#75602c','#453e2b','#eddb9e'],
+];
+
+const seeds = [
+  {
+    name:'Maya Chen', email:'maya@fieldwork.example', subject:'November issue proofs',
+    snippet:'The final proofs are ready for a last look before we send them to print.',
+    time:'10:42 AM', labels:['work'], starred:true,
+    body:[
+      'Hi Alex,',
+      'The final proofs are ready for a last look before we send them to print. I swapped in the new cover photo and tightened up the captions in the feature spread.',
+      'Could you give the contributor credits on pages 12–15 one more pass by Thursday afternoon? I’ve attached the checklist we’ll use for the final handoff.',
+      'Thanks so much,\nMaya',
+    ],
+    files:[{name:'november-proof-checklist.txt',type:'Text file',content:'November issue — final proof checklist\n\n[ ] Confirm the updated cover image.\n[ ] Match captions against the feature spread.\n[ ] Check contributor credits on pages 12–15.\n[ ] Confirm print handoff before Friday.\n'}],
+    prior:{name:'Alex Morgan',time:'Yesterday',body:'Hi Maya,\n\nI’ve reviewed the first set of proofs. The new cover option looks great with the small masthead. Could you send the revised spread and credits when they’re ready?\n\nAlex'},
+  },
+  {name:'Jonah Ellis',email:'jonah@studio.example',subject:'Re: Studio walkthrough',snippet:'Friday at 11 works on my end. I’ll meet you by the loading entrance.',time:'9:58 AM',unread:true,labels:['work'],body:['Hey Alex,','Friday at 11 works on my end. I’ll meet you by the loading entrance on Wabash. Bring the small lens if you have it.','See you there,\nJonah']},
+  {name:'Poppy Coffee',email:'team@poppycoffee.example',subject:'Your subscription ships tomorrow',snippet:'One bag of La Esperanza, washed and roasted on Monday, is headed your way.',time:'9:15 AM',unread:true,body:['Hi Alex,','One bag of La Esperanza, washed and roasted on Monday, is headed your way. We’ll email your tracking number when it leaves our roastery.','The Poppy team']},
+  {name:'Isabel Moreno',email:'isabel@post.example',subject:'Dinner on Saturday?',snippet:'I got a table at Lula for 7:30. Let me know if you can make it!',time:'8:34 AM',unread:true,starred:true,labels:['personal'],body:['Alex!','I got a table at Lula for 7:30. Let me know if you can make it! Nora is visiting this weekend and will come too.','Isabel']},
+  {name:'Northline Rail',email:'tickets@northline.example',subject:'Tickets for Chicago → Milwaukee',snippet:'Your November 28 reservation is confirmed. Booking reference NL4W7K.',time:'Yesterday',labels:['travel'],body:['Your November 28 reservation is confirmed. Booking reference NL4W7K.','Your train leaves Chicago Union Station at 9:05 AM and arrives in Milwaukee at 10:34 AM. Please arrive 20 minutes before departure.'],files:[{name:'northline-booking-NL4W7K.txt',type:'Text file',content:'Northline Rail — Booking NL4W7K\nNovember 28, Chicago Union Station 9:05 AM → Milwaukee 10:34 AM\nPassenger: Alex Morgan\n'}]},
+  {name:'Lena Brooks',email:'lena@fieldwork.example',subject:'Vendor invoice for October',snippet:'Here’s the updated invoice with the deposit applied to the final total.',time:'Yesterday',unread:true,labels:['finance'],body:['Hi Alex,','Here’s the updated invoice with the deposit applied to the final total. Please let me know if your bookkeeper needs a different reference.','Thanks,\nLena'],files:[{name:'october-vendor-invoice.csv',type:'CSV file',content:'Description,Amount USD\nPhotography services,850\nDeposit,-250\nBalance due,600\n'}]},
+  {name:'Chicago Public Library',email:'notices@chipublib.example',subject:'A book you requested is ready',snippet:'The Serviceberry is available for pickup at your branch until November 24.',time:'Yesterday',labels:['personal'],body:['Alex Morgan,','The Serviceberry is available for pickup at your branch until November 24. Please bring your library card or use the barcode in the library app.']},
+  {name:'Drew Patel',email:'drew@fieldwork.example',subject:'Updated homepage copy',snippet:'I added the shorter headline options to the review notes.',time:'Yesterday',labels:['work'],body:['I added the shorter headline options to the review notes. My favorite is the second one. It keeps the line break on smaller screens.','Could you look before we review it together on Thursday?\nDrew']},
+  {name:'Good Measure',email:'news@goodmeasure.example',subject:'A note from the print shop',snippet:'Our winter hours start next week, and the paper sample books have been restocked.',time:'Tuesday',unread:true,body:['Our winter hours start next week, and the paper sample books have been restocked. We’ll be open Tuesday through Saturday, 10 to 5.','Drop in any time if you’d like to see paper samples before placing an order.']},
+  {name:'Nora Wilson',email:'nora@post.example',subject:'A few photos from the lake',snippet:'I finally sorted through the shots from Sunday. The light was so good.',time:'Tuesday',labels:['personal'],starred:true,body:['I finally sorted through the shots from Sunday. The light was so good.','If you remember the name of that little beach by the turnoff, send it over so I can add it to my notes.\nNora']},
+  {name:'Elliot Reed',email:'elliot@studio.example',subject:'Workshop room booked',snippet:'We have the small workshop room reserved from 1–4 PM on the 26th.',time:'Tuesday',labels:['work'],body:['Good news, we have the small workshop room reserved from 1–4 PM on the 26th.','There’s a projector, but please bring an adapter for your laptop. I’ll pick up snacks on the way.\nElliot']},
+  {name:'Juniper Market',email:'orders@junipermarket.example',subject:'Receipt for order #J-8457',snippet:'Thanks for shopping with us. Here’s a copy of your order summary.',time:'Monday',labels:['finance'],body:['Thanks for shopping with us. Your order #J-8457 is complete.','Order summary\nStoneware mug: $24.00\nLinen tea towel: $12.00\nTotal paid: $36.00']},
+  {name:'Samira Okafor',email:'samira@fieldwork.example',subject:'Notes from the planning call',snippet:'I pulled the decisions and next steps into one short document.',time:'Monday',unread:true,labels:['work'],body:['Hi Alex,','I pulled the decisions and next steps into one short document. The two deadlines to watch are the contributor sign-off and the print deposit.','Samira'],files:[{name:'planning-call-notes.txt',type:'Text file',content:'Planning call\nContributor sign-off — Thursday 3 PM\nPrint deposit — Friday noon\nOwner: Alex Morgan\n'}]},
+  {name:'Lake House Inn',email:'stay@lakehouse.example',subject:'A few details for your stay',snippet:'Check-in starts at 3 PM. Let us know if you expect to arrive later than 8.',time:'Monday',labels:['travel'],body:['We’re looking forward to your stay next week. Check-in starts at 3 PM. Let us know if you expect to arrive later than 8.','The front desk can also recommend a few nearby spots for dinner.']},
+  {name:'Owen Park',email:'owen@post.example',subject:'Your running route',snippet:'Try the path on the east side of the river. It’s quieter in the mornings.',time:'Nov 14',labels:['personal'],body:['Try the path on the east side of the river. It’s quieter in the mornings, and the water fountain by the park entrance is still running.','I usually turn around at the second pedestrian bridge.\nOwen']},
+  {name:'Common Ground',email:'events@commonground.example',subject:'Your seat for the November talk',snippet:'You’re on the list for Thursday’s conversation on neighborhood archives.',time:'Nov 13',body:['You’re on the list for Thursday’s conversation on neighborhood archives. Doors open at 6 PM, with the program at 6:30 PM.','Please use the entrance on the courtyard side.']},
+  {name:'Tessa Miles',email:'tessa@fieldwork.example',subject:'Photo selects for the web',snippet:'I narrowed it down to six frames, including a few with room for type.',time:'Nov 12',labels:['work'],body:['I narrowed it down to six frames, including a few with room for type. Frames 2 and 5 should crop nicely for both the homepage and newsletter.','Let me know which ones you want me to retouch.\nTessa']},
+  {name:'Maple Mutual',email:'statements@maplemutual.example',subject:'Your monthly statement is ready',snippet:'Your October statement is available in your account documents.',time:'Nov 11',labels:['finance'],body:['Your October statement is available in your account documents. The statement covers transactions from October 1 through October 31.','Thank you for being a Maple Mutual member.']},
+  {name:'Grace Kim',email:'grace@post.example',subject:'The recipe I promised',snippet:'Here’s the pear cake recipe. A little cardamom makes it even better.',time:'Nov 10',labels:['personal'],starred:true,body:['Here’s the pear cake recipe. A little cardamom makes it even better.','Use ripe but firm pears, and let it cool in the pan for at least 15 minutes before slicing. I can bring a copy on Saturday if you want it.\nGrace']},
+  {name:'Caleb Hart',email:'caleb@studio.example',subject:'Lighting kit returned',snippet:'Everything is back in the equipment room, including the spare battery.',time:'Nov 9',labels:['work'],body:['Everything is back in the equipment room, including the spare battery. The kit is on the middle shelf under the travel cases.','Thanks for the loan!\nCaleb']},
+  {name:'Maya Chen',email:'maya@fieldwork.example',subject:'September contributor list',snippet:'Here’s the final directory for your records.',time:'Nov 7',folder:'archive',labels:['work'],body:['Here’s the final directory for your records. Everyone approved their credits in Friday’s review.\nMaya']},
+  {name:'Alex Morgan',email:'alex@postmark.example',to:'drew@fieldwork.example',subject:'Re: Homepage review',snippet:'I left a few comments on the version you shared.',time:'Nov 6',folder:'sent',labels:['work'],body:['Hi Drew,','I left a few comments on the version you shared. The footer is ready as soon as we pick a contact address.\nAlex']},
+];
+
+const storageKey = 'postmark-mailbox-v1';
+let saved = {};
+try { saved = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch {}
+let messages = Array.isArray(saved.messages) ? saved.messages : seeds.map((seed, index) => ({
+  id:'mail-'+(index+1), folder:'inbox', labels:[], files:[], unread:false, starred:false, color:index % avatarColors.length, ...seed,
+}));
+const drafts = new Map(Array.isArray(saved.drafts) ? saved.drafts : []);
+const state = { folder:'inbox', view:'all', query:'', filters:null, selected:'mail-1', mobileReading:false };
+const app = $('#app');
+const list = $('#message-list');
+const thread = $('#thread');
+const searchInput = $('#search-input');
+const advancedForm = $('#advanced-form');
+const composeForm = $('#compose-form');
+const composeWindow = $('#compose-window');
+const drawer = $('#folder-drawer');
+const mobile = matchMedia('(max-width:620px)');
+const narrow = matchMedia('(max-width:860px)');
+const timeFormat = new Intl.DateTimeFormat(undefined, {hour:'numeric',minute:'2-digit'});
+const dateFormat = new Intl.DateTimeFormat(undefined, {weekday:'short',month:'short',day:'numeric'});
+let storageAvailable = true;
+let activeDraft = null;
+let visibleMessages = [];
+let readerKey = '';
+let pickerMessageId = null;
+let contextMessageId = null;
+let popup = null;
+let childPopup = null;
+let undoArchive = null;
+let toastTimer;
+let liveTimer;
+
+function persist() {
+  try {
+    localStorage.setItem(storageKey, JSON.stringify({messages, drafts:[...drafts]}));
+  } catch {
+    storageAvailable = false;
+  }
+}
+function announce(text) {
+  clearTimeout(liveTimer);
+  $('#announcement').textContent = '';
+  liveTimer = setTimeout(() => { $('#announcement').textContent = text; }, 30);
+}
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;',
+  })[char]);
+}
+function avatar(name, color) {
+  const [background, ink, darkBackground, darkInk] = avatarColors[color] || avatarColors[0];
+  const initials = name.trim().split(/\s+/).slice(0, 2).map(word => word[0]).join('').toUpperCase();
+  return '<span class="avatar" aria-hidden="true" style="--avatar-bg:'+background+';--avatar-ink:'+ink+';--avatar-dark-bg:'+darkBackground+';--avatar-dark-ink:'+darkInk+'">'+escapeHTML(initials || 'AM')+'</span>';
+}
+function chip(id) {
+  return labels[id] ? '<span class="chip label-'+id+'">'+labels[id]+'</span>' : '';
+}
+function byId(id) {
+  return messages.find(message => message.id === id);
+}
+function inFolder(message, folder) {
+  if (folder === 'everywhere') return true;
+  if (folder === 'starred') return message.starred && message.folder !== 'trash';
+  if (folder.startsWith('label:')) return message.folder !== 'trash' && message.labels.includes(folder.slice(6));
+  return message.folder === folder;
+}
+function draftRows() {
+  return [...drafts].reverse().map(([key, draft]) => ({
+    id:key, draft:true, folder:'drafts', labels:[], files:[], color:2, unread:false, starred:false,
+    name:draft.to || 'Draft', to:draft.to, email:'alex@postmark.example', time:'Draft',
+    subject:draft.subject || '(No subject)', snippet:draft.body.trim() || 'Continue writing',
+    body:[draft.body],
+  }));
+}
+function isSearching() {
+  return Boolean(state.query || state.filters);
+}
+function matchingMessages() {
+  const source = [...draftRows(), ...messages];
+  if (!isSearching()) return source.filter(message => inFolder(message, state.folder));
+  const {from='', subject='', words='', folder='everywhere', attachments=false} = state.filters || {};
+  const includes = (text, query) => text.toLowerCase().includes(query.toLowerCase());
+  return source.filter(message => {
+    if (!inFolder(message, folder)) return false;
+    if (folder === 'everywhere' && message.folder === 'trash') return false;
+    const haystack = [message.name, message.email, message.to, message.subject, message.snippet, ...message.body, ...message.labels.map(id => labels[id]), ...message.files.map(file => file.name)].filter(Boolean).join(' ');
+    return includes(haystack, state.query) && includes(message.name+' '+message.email, from)
+      && includes(message.subject, subject) && includes(haystack, words)
+      && (!attachments || message.files.length > 0);
+  });
+}
+function fillSidebar() {
+  for (const sidebar of $$('.sidebar-inner')) {
+    sidebar.innerHTML =
+      '<button class="compose-open" type="button" aria-haspopup="dialog" aria-controls="compose-window">'+icon('edit')+'Compose</button>'+
+      '<nav class="nav-scroll" aria-label="Folders and labels">'+
+      '<p class="section-label">Mailbox</p>'+
+      folders.map(([id, label, glyph]) => navItem(id, label, icon(glyph))).join('')+
+      '<p class="section-label label-section">Labels</p>'+
+      Object.entries(labels).map(([id, label]) => navItem('label:'+id, label, '<span class="label-dot label-'+id+'"></span>')).join('')+
+      '</nav><div class="account"><span class="avatar" aria-hidden="true">AM</span><div><strong>Alex Morgan</strong><small>alex@postmark.example</small></div></div>';
+  }
+}
+function navItem(id, label, glyph) {
+  return '<button class="nav-item" type="button" data-folder="'+id+'">'+glyph+label+'<span class="nav-count" hidden></span></button>';
+}
+function renderSidebar() {
+  for (const button of $$('.nav-item')) {
+    const id = button.dataset.folder;
+    const count = id === 'drafts' ? drafts.size : messages.filter(message => message.unread && inFolder(message, id)).length;
+    const countText = $('.nav-count', button);
+    countText.textContent = count;
+    countText.hidden = count === 0;
+    countText.setAttribute('aria-label', count+(id === 'drafts' ? ' drafts' : ' unread'));
+    if (id === state.folder && !isSearching()) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  }
+}
+function renderSearch() {
+  const active = isSearching();
+  $('#search-clear').hidden = !active;
+  $('#search-key').hidden = active;
+  $('#advanced-toggle').setAttribute('aria-label', state.filters ? 'Advanced search (filters applied)' : 'Advanced search');
+}
+function render({resetList=false, retainSelection=false} = {}) {
+  const all = matchingMessages();
+  const unread = all.filter(message => message.unread).length;
+  visibleMessages = all.filter(message => state.view === 'all' || (state.view === 'unread' ? message.unread : message.starred));
+  if (retainSelection && !byId(state.selected)) retainSelection = false;
+  if (!retainSelection && !state.mobileReading && !visibleMessages.some(message => !message.draft && message.id === state.selected)) {
+    state.selected = visibleMessages.find(message => !message.draft)?.id || null;
+  }
+  if (!byId(state.selected)) state.mobileReading = false;
+  app.dataset.mobileReading = state.mobileReading;
+  const title = isSearching() ? 'Search results' : folders.find(([id]) => id === state.folder)?.[1] || labels[state.folder.slice(6)];
+  $('#mailbox-title').textContent = title;
+  document.title = 'Postmark — '+title;
+  $('#mail-count').textContent = visibleMessages.length+' '+(visibleMessages.length === 1 ? 'message' : 'messages');
+  $('#unread-count').textContent = unread || '';
+  for (const tab of $$('.view-tab')) tab.setAttribute('aria-pressed', tab.dataset.view === state.view);
+  renderSidebar();
+  renderSearch();
+  const active = document.activeElement;
+  const focusedRow = active.closest('.message-row');
+  const listScroll = list.scrollTop;
+  list.innerHTML = visibleMessages.length
+    ? visibleMessages.map(renderRow).join('')
+    : '<li class="empty-list">'+(isSearching() ? 'No messages match your search.' : 'No messages to show.')+'</li>';
+  list.scrollTop = resetList ? 0 : listScroll;
+  if (focusedRow && !(mobile.matches && state.mobileReading)) {
+    const control = ['message-main','star-toggle','message-more'].find(className => active.classList.contains(className));
+    focusRow(focusedRow.dataset.id, '.'+control, true);
+  }
+  renderReader();
+}
+function renderRow(message) {
+  const selected = message.id === state.selected && !message.draft;
+  const unreadDot = message.unread ? '<span class="unread-dot"></span>' : '';
+  const name = message.folder === 'sent' ? 'To: '+message.to : message.name;
+  return '<li class="message-row'+(selected ? ' selected' : '')+(message.unread ? ' unread' : '')+'" data-id="'+escapeHTML(message.id)+'"'+(message.draft ? ' data-draft' : '')+'>'+
+    '<button type="button" class="message-main"'+(selected ? ' aria-current="true"' : '')+' aria-label="'+
+    escapeHTML([name, message.subject, message.time, message.unread && 'unread', message.files.length && 'has attachments'].filter(Boolean).join(', '))+'">'+
+    avatar(name, message.color)+'<span class="row-copy">'+
+    '<span class="row-line"><span class="row-sender">'+escapeHTML(name)+'</span>'+unreadDot+
+    '<span class="row-time">'+escapeHTML(message.time)+'</span></span>'+
+    '<span class="row-line"><span class="row-subject">'+escapeHTML(message.subject)+'</span>'+
+    (message.files.length ? icon('attach').replace('class="icon"', 'class="icon row-attachment"') : '')+
+    '</span><span class="row-line"><span class="row-snippet">'+escapeHTML(message.snippet)+'</span>'+
+    message.labels.slice(0, 2).map(chip).join('')+'</span></span></button>'+
+    (message.draft ? '' : '<div class="row-actions">'+
+      '<button class="icon-button star-toggle" type="button" aria-label="Star message" aria-pressed="'+message.starred+'">'+icon('star')+'</button>'+
+      '<button class="icon-button message-more" type="button" aria-label="More actions for '+escapeHTML(message.subject)+'" aria-haspopup="menu" aria-controls="message-menu" aria-expanded="false">'+icon('more')+'</button></div>')+
+    '</li>';
+}
+function renderReader() {
+  const message = byId(state.selected);
+  const candidates = visibleMessages.filter(item => !item.draft);
+  const index = candidates.findIndex(item => item.id === state.selected);
+  $('#reader-position').textContent = index < 0 ? '' : (index+1)+' of '+candidates.length;
+  $('#thread-prev').disabled = index <= 0;
+  $('#thread-next').disabled = index >= candidates.length-1;
+  $('#reader-tools').hidden = !message;
+  if (!message) {
+    readerKey = '';
+    thread.innerHTML = '<div class="reader-empty">'+icon('envelope')+'<strong>Select a message</strong><span>Opened conversations appear here.</span></div>';
+    return;
+  }
+  $('#reader-archive').disabled = message.folder === 'archive';
+  $('#reader-delete').disabled = message.folder === 'trash';
+  $('#reader-unread').setAttribute('aria-label', message.unread ? 'Mark as read' : 'Mark as unread');
+  $('#reader-unread').innerHTML = icon(message.unread ? 'openmail' : 'mail');
+  const key = JSON.stringify(message);
+  if (key === readerKey) return;
+  const sameThread = $('.thread-inner', thread)?.dataset.id === message.id;
+  const scroll = sameThread ? thread.scrollTop : 0;
+  const priorExpanded = sameThread && $('.thread-toggle', thread)?.getAttribute('aria-expanded') === 'true';
+  readerKey = key;
+  const recipient = message.to || 'me';
+  thread.innerHTML = '<article class="thread-inner" data-id="'+escapeHTML(message.id)+'">'+
+    '<h2 class="thread-title" id="thread-subject" tabindex="-1">'+escapeHTML(message.subject)+'</h2>'+
+    '<div class="thread-labels">'+message.labels.map(chip).join('')+'</div>'+
+    '<div class="sender-card">'+avatar(message.name, message.color)+
+    '<div class="sender-info"><strong>'+escapeHTML(message.name)+'</strong><div>'+escapeHTML(message.email)+' · to '+escapeHTML(recipient)+'</div></div>'+
+    '<time class="thread-time">'+escapeHTML(message.time)+'</time></div>'+
+    '<div class="message-body">'+message.body.map(paragraph => '<p>'+escapeHTML(paragraph)+'</p>').join('')+'</div>'+
+    (message.files.length ? renderAttachments(message.files) : '')+
+    (message.prior ? '<div class="thread-previous"><button type="button" class="thread-toggle" aria-expanded="'+Boolean(priorExpanded)+'" aria-controls="prior-message">'+icon('right')+
+      '<strong>'+escapeHTML(message.prior.name)+'</strong><span>Previous message</span><time>'+escapeHTML(message.prior.time)+'</time></button>'+
+      '<p class="prior-message" id="prior-message"'+(priorExpanded ? '' : ' hidden')+'>'+escapeHTML(message.prior.body)+'</p></div>' : '')+
+    '<div class="response-actions"><button type="button" class="secondary reply-button" aria-haspopup="dialog" aria-controls="compose-window">'+icon('reply')+'Reply</button>'+
+    '<button type="button" class="secondary forward-button" aria-haspopup="dialog" aria-controls="compose-window">'+icon('forward')+'Forward</button></div></article>';
+  thread.scrollTop = scroll;
+}
+function renderAttachments(files) {
+  return '<section class="attachment-section" aria-label="Attachments"><p class="attachment-caption">'+icon('attach')+
+    files.length+' '+(files.length === 1 ? 'attachment' : 'attachments')+'</p>'+
+    files.map(file => '<a class="attachment-card" href="data:text/plain;charset=utf-8,'+encodeURIComponent(file.content).replace(/'/g, '%27')+
+      '" download="'+escapeHTML(file.name)+'" aria-label="Download '+escapeHTML(file.name)+'">'+
+      '<span class="file-icon">'+icon('file')+'</span><span class="file-info"><span>'+escapeHTML(file.name)+'</span><small>'+escapeHTML(file.type)+
+      '</small></span>'+icon('download').replace('class="icon"', 'class="icon download-icon"')+'</a>').join('')+'</section>';
+}
+function messageRow(id) {
+  return $$('.message-row', list).find(row => row.dataset.id === id);
+}
+function focusRow(id, selector = '.message-main', preventScroll = false) {
+  const row = messageRow(id);
+  const target = row && $(selector, row);
+  (target || $('.message-main', list) || $('.view-tab[aria-pressed="true"]'))?.focus({preventScroll});
+}
+function openMessage(message, options = {}) {
+  if (!message) return;
+  state.selected = message.id;
+  state.mobileReading = mobile.matches;
+  if (message.unread) {
+    message.unread = false;
+    persist();
+  }
+  render({retainSelection:true});
+  if (mobile.matches) $('#thread-subject')?.focus();
+  else if (options.focusList) focusRow(message.id);
+  else messageRow(message.id)?.scrollIntoView({block:'nearest'});
+}
+function stepMessage(direction) {
+  const candidates = visibleMessages.filter(message => !message.draft);
+  const index = candidates.findIndex(item => item.id === state.selected);
+  openMessage(candidates[index === -1 ? 0 : index+direction], {focusList:!mobile.matches && list.contains(document.activeElement)});
+}
+function backToList() {
+  const selection = state.selected;
+  state.mobileReading = false;
+  render();
+  focusRow(selection);
+}
+function switchFolder(folder) {
+  closePopup();
+  if (drawer.open) drawer.close();
+  Object.assign(state, {folder, view:'all', query:'', filters:null, selected:null, mobileReading:false});
+  searchInput.value = '';
+  advancedForm.reset();
+  render({resetList:true});
+}
+function setSearch(query, filters) {
+  Object.assign(state, {view:'all', query, filters, selected:null, mobileReading:false});
+  render({resetList:true});
+}
+function refreshAfterMoving(message) {
+  if (state.selected === message.id) {
+    state.selected = null;
+    state.mobileReading = false;
+  }
+  persist();
+  render();
+}
+function moveMessage(message, folder) {
+  if (!message || message.folder === folder) return;
+  if (folder === 'archive') {
+    archiveMessage(message);
+    return;
+  }
+  message.folder = folder;
+  delete message.snoozeUntil;
+  refreshAfterMoving(message);
+  announce('Message moved to '+folders.find(([id]) => id === folder)[1]+'.');
+}
+function archiveMessage(message) {
+  if (!message || message.folder === 'archive') return;
+  undoArchive = {id:message.id, folder:message.folder, snoozeUntil:message.snoozeUntil};
+  message.folder = 'archive';
+  delete message.snoozeUntil;
+  refreshAfterMoving(message);
+  $('#archive-toast').hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 10000);
+  announce('Message archived. Undo is available.');
+}
+function hideToast() {
+  $('#archive-toast').hidden = true;
+  undoArchive = null;
+  clearTimeout(toastTimer);
+}
+function restoreArchive() {
+  if (!undoArchive) return;
+  const {id, folder, snoozeUntil} = undoArchive;
+  const message = byId(id);
+  hideToast();
+  if (message?.folder === 'archive') {
+    message.folder = folder;
+    if (snoozeUntil) message.snoozeUntil = snoozeUntil;
+    persist();
+    render();
+    if (!state.mobileReading) focusRow(id);
+    announce('Message restored.');
+  }
+}
+function markUnread(message) {
+  if (!message) return;
+  message.unread = !message.unread;
+  persist();
+  render({retainSelection:true});
+  announce(message.unread ? 'Marked as unread.' : 'Marked as read.');
+}
+
+function positionPopup(entry) {
+  const {element, anchor, point, submenu} = entry;
+  if (!point && (!anchor?.isConnected || !anchor.getClientRects().length)) return;
+  const margin = 8;
+  const rect = point ? {left:point.x,right:point.x,top:point.y,bottom:point.y} : anchor.getBoundingClientRect();
+  const width = element.offsetWidth;
+  const height = element.offsetHeight;
+  let left = point ? rect.left : rect.right-width;
+  let top = rect.bottom+(point ? 0 : 5);
+  if (submenu) {
+    left = rect.right+6+width <= innerWidth-margin ? rect.right+6 : rect.left-width-6;
+    top = rect.top;
+  } else if (top+height > innerHeight-margin) {
+    top = rect.top-height-5;
+  }
+  element.style.left = Math.max(margin, Math.min(left, innerWidth-width-margin))+'px';
+  element.style.top = Math.max(margin, Math.min(top, innerHeight-height-margin))+'px';
+}
+function closeChild(restore = false) {
+  if (!childPopup) return;
+  const {anchor, element} = childPopup;
+  element.hidden = true;
+  anchor.setAttribute('aria-expanded', 'false');
+  childPopup = null;
+  if (restore) anchor.focus();
+}
+function closePopup(restore = false) {
+  closeChild();
+  if (!popup) return;
+  const {anchor, element} = popup;
+  element.hidden = true;
+  anchor?.setAttribute('aria-expanded', 'false');
+  popup = null;
+  if (restore) anchor?.focus();
+}
+function showPopup(element, anchor, point = null) {
+  closePopup();
+  popup = {element, anchor, point};
+  element.hidden = false;
+  anchor?.setAttribute('aria-expanded', 'true');
+  positionPopup(popup);
+  (element.matches('[role="menu"]') ? $('[role="menuitem"]:not([disabled])', element) : $('input', element))?.focus({preventScroll:true});
+}
+function openMessageMenu(message, anchor, point) {
+  if (!message) return;
+  if (!point && popup?.element.id === 'message-menu' && popup.anchor === anchor) {
+    closePopup(true);
+    return;
+  }
+  contextMessageId = message.id;
+  $('#menu-read-text').textContent = message.unread ? 'Mark as read' : 'Mark as unread';
+  $('[data-action="unread"] > span').innerHTML = icon(message.unread ? 'openmail' : 'mail');
+  $('[data-action="archive"]').disabled = message.folder === 'archive';
+  $('[data-action="delete"]').disabled = message.folder === 'trash';
+  showPopup($('#message-menu'), anchor, point);
+}
+function openMoveMenu(message, anchor) {
+  if (!message) return;
+  if (childPopup) {
+    closeChild(true);
+    return;
+  }
+  $('#move-options').innerHTML = folders.filter(([id]) => ['inbox','archive','trash'].includes(id)).map(([id, name, glyph]) =>
+    '<button type="button" class="menu-action" role="menuitem" data-move="'+id+'"'+(message.folder === id ? ' disabled' : '')+'>'+icon(glyph)+name+'</button>'
+  ).join('');
+  const element = $('#move-menu');
+  childPopup = {element, anchor, submenu:true};
+  anchor.setAttribute('aria-expanded', 'true');
+  element.hidden = false;
+  positionPopup(childPopup);
+  $('[role="menuitem"]:not([disabled])', element)?.focus({preventScroll:true});
+}
+function handleMenuKeys(event, menu) {
+  const items = $$('[role="menuitem"]:not([disabled])', menu);
+  const index = items.indexOf(document.activeElement);
+  switch (event.key) {
+    case 'ArrowDown': items[(index+1) % items.length]?.focus(); break;
+    case 'ArrowUp': items[(index-1+items.length) % items.length]?.focus(); break;
+    case 'Home': items[0]?.focus(); break;
+    case 'End': items.at(-1)?.focus(); break;
+    case 'ArrowRight':
+      if (document.activeElement.dataset.action === 'move') openMoveMenu(byId(contextMessageId), document.activeElement);
+      else return;
+      break;
+    case 'ArrowLeft':
+      if (menu.id === 'move-menu') closeChild(true);
+      else return;
+      break;
+    case 'Tab': closePopup(true); return;
+    default: return;
+  }
+  event.preventDefault();
+}
+
+function showDialog(dialog) {
+  if (dialog.open) return;
+  closePopup(true);
+  dialog.showModal();
+}
+function readComposeForm() {
+  return {
+    to:composeForm.elements.to.value.trim(), subject:composeForm.elements.subject.value,
+    body:composeForm.elements.body.value,
+  };
+}
+function saveDraft() {
+  if (!activeDraft) return;
+  const {key, initial} = activeDraft;
+  const values = readComposeForm();
+  const changed = Object.keys(initial).some(field => initial[field] !== values[field]);
+  if (changed && Object.values(values).some(value => value.trim())) {
+    drafts.set(key, {...values, mode:activeDraft.mode, messageId:activeDraft.messageId, initial});
+  } else {
+    drafts.delete(key);
+  }
+  persist();
+  renderSidebar();
+  $('#draft-status').textContent = drafts.has(key) ? (storageAvailable ? 'Saved on this device' : 'Saved for this session') : '';
+}
+function openCompose(mode = 'new', message, draftKey) {
+  if (composeWindow.open) return;
+  const key = draftKey || (message ? mode+':'+message.id : 'new');
+  const existing = drafts.get(key);
+  if (existing) {
+    mode = existing.mode;
+    message = byId(existing.messageId);
+  }
+  const initial = {to:'', subject:'', body:''};
+  if (message && mode === 'reply') {
+    initial.to = message.folder === 'sent' ? message.to : message.email;
+    initial.subject = /^re:/i.test(message.subject) ? message.subject : 'Re: '+message.subject;
+  } else if (message && mode === 'forward') {
+    initial.subject = /^fwd:/i.test(message.subject) ? message.subject : 'Fwd: '+message.subject;
+    initial.body = '\n\n---------- Forwarded message ----------\nFrom: '+message.name+' <'+message.email+'>\nSubject: '+message.subject+'\n\n'+message.body.join('\n\n');
+  }
+  const values = existing || initial;
+  activeDraft = {key, mode, messageId:message?.id, initial:existing?.initial || initial};
+  for (const name of Object.keys(initial)) composeForm.elements[name].value = values[name];
+  $('#compose-title').textContent = mode === 'reply' ? 'Reply' : mode === 'forward' ? 'Forward message' : 'New message';
+  $('#draft-status').textContent = existing ? 'Draft' : '';
+  if (drawer.open) drawer.close();
+  showDialog(composeWindow);
+  const field = values.to ? composeForm.elements.body : composeForm.elements.to;
+  field.focus();
+  if (mode === 'forward') composeForm.elements.body.setSelectionRange(0, 0);
+}
+function sendMessage(event) {
+  event.preventDefault();
+  if (!activeDraft) return;
+  const values = readComposeForm();
+  const source = byId(activeDraft.messageId);
+  messages.unshift({
+    id:'sent-'+Date.now()+'-'+Math.random().toString(36).slice(2, 8),
+    name:'Alex Morgan', email:'alex@postmark.example', folder:'sent', color:2, files:[],
+    starred:false, unread:false, labels:[], time:timeFormat.format(new Date()), to:values.to,
+    subject:values.subject.trim() || '(No subject)', snippet:values.body.trim().replace(/\s+/g, ' ') || '(No message body)',
+    body:values.body.split(/\n\n+/), prior:activeDraft.mode === 'reply' && source ? {
+      name:source.name, time:source.time, body:source.body.join('\n\n'),
+    } : undefined,
+  });
+  drafts.delete(activeDraft.key);
+  activeDraft = null;
+  persist();
+  composeWindow.close();
+  render();
+  announce('Message saved to Sent.');
+}
+
+function localDateTime(date) {
+  const pad = value => String(value).padStart(2, '0');
+  return date.getFullYear()+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate())+'T'+pad(date.getHours())+':'+pad(date.getMinutes());
+}
+function openSnooze(message) {
+  if (!message) return;
+  pickerMessageId = message.id;
+  const now = new Date();
+  const later = new Date(now.getTime()+3*60*60*1000);
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 9);
+  const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate()+7, 9);
+  const options = [['In three hours', later, 'clock'], ['Tomorrow', tomorrow, 'calendar'], ['In one week', nextWeek, 'calendar']];
+  $('#snooze-options').innerHTML = options.map(([name, date, glyph]) =>
+    '<button class="menu-action snooze-choice" data-snooze="'+date.getTime()+'" type="button">'+icon(glyph)+name+
+    '<small>'+escapeHTML(dateFormat.format(date)+' · '+timeFormat.format(date))+'</small></button>'
+  ).join('')+(message.folder === 'snoozed' ? '<button class="menu-action" type="button" data-snooze="0">'+icon('inbox')+'Return to Inbox</button>' : '');
+  const field = $('#snooze-date');
+  field.min = localDateTime(new Date(now.getTime()+60000));
+  field.value = localDateTime(message.snoozeUntil ? new Date(message.snoozeUntil) : tomorrow);
+  field.setCustomValidity('');
+  showDialog($('#snooze-picker'));
+}
+function snoozeMessage(timestamp) {
+  const message = byId(pickerMessageId);
+  if (!message) return;
+  $('#snooze-picker').close();
+  if (!timestamp) {
+    moveMessage(message, 'inbox');
+    return;
+  }
+  message.folder = 'snoozed';
+  message.snoozeUntil = timestamp;
+  refreshAfterMoving(message);
+  if (!state.mobileReading && mobile.matches) focusRow(message.id);
+  announce('Message snoozed until '+dateFormat.format(timestamp)+' at '+timeFormat.format(timestamp)+'.');
+}
+function wakeMessages() {
+  const now = Date.now();
+  const due = messages.filter(message => message.folder === 'snoozed' && message.snoozeUntil <= now);
+  if (!due.length) return;
+  for (const message of due) {
+    message.folder = 'inbox';
+    delete message.snoozeUntil;
+  }
+  closePopup();
+  persist();
+  render({retainSelection:true});
+}
+function openLabelPicker(message) {
+  if (!message) return;
+  pickerMessageId = message.id;
+  $('#label-options').innerHTML = Object.entries(labels).map(([id, label]) =>
+    '<label class="check-field label-choice"><input type="checkbox" name="labels" value="'+id+'"'+(message.labels.includes(id) ? ' checked' : '')+
+    '><span class="label-dot label-'+id+'"></span>'+label+'</label>'
+  ).join('');
+  showDialog($('#label-picker'));
+}
+
+fillSidebar();
+$('#search-folder').innerHTML = [['everywhere','All mail'], ...folders, ...Object.entries(labels).map(([id, name]) => ['label:'+id,name])]
+  .map(([id, name]) => '<option value="'+id+'">'+name+'</option>').join('');
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('button');
+  if (!button) return;
+  if (button.matches('.dialog-close')) { button.closest('dialog').close(); return; }
+  if (button.matches('.popup-close')) { closePopup(true); return; }
+  if (button.matches('.nav-item')) { switchFolder(button.dataset.folder); return; }
+  if (button.matches('.view-tab')) {
+    state.view = button.dataset.view;
+    render({resetList:true});
+    return;
+  }
+  if (button.matches('.compose-open')) { openCompose(); return; }
+  if (button.matches('.reply-button, .forward-button')) {
+    openCompose(button.matches('.reply-button') ? 'reply' : 'forward', byId(state.selected));
+    return;
+  }
+  if (button.matches('.thread-toggle')) {
+    const open = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', !open);
+    $('#prior-message').hidden = open;
+    return;
+  }
+
+  const row = button.closest('.message-row');
+  if (row) {
+    const {id} = row.dataset;
+    const message = byId(id);
+    if (button.matches('.message-main')) {
+      if (row.hasAttribute('data-draft')) openCompose('new', null, id);
+      else openMessage(message, {focusList:true});
+    } else if (button.matches('.star-toggle') && message) {
+      message.starred = !message.starred;
+      persist();
+      render({retainSelection:true});
+      focusRow(id, '.star-toggle');
+      announce(message.starred ? 'Message starred.' : 'Star removed.');
+    } else if (button.matches('.message-more')) {
+      openMessageMenu(message, button);
+    }
+    return;
+  }
+
+  if (button.matches('[data-action]')) {
+    const message = byId(contextMessageId);
+    if (!message) return;
+    const {action} = button.dataset;
+    if (action === 'move') { openMoveMenu(message, button); return; }
+    if (action === 'snooze') { openSnooze(message); return; }
+    if (action === 'label') { openLabelPicker(message); return; }
+    const fromRow = popup?.anchor?.matches('.message-more');
+    closePopup(true);
+    if (action === 'unread') markUnread(message);
+    if (action === 'archive') archiveMessage(message);
+    if (action === 'delete') moveMessage(message, 'trash');
+    if (fromRow || (mobile.matches && !state.mobileReading)) focusRow(message.id, fromRow ? '.message-more' : '.message-main');
+    return;
+  }
+  if (button.matches('[data-move]')) {
+    const message = byId(contextMessageId);
+    const fromRow = popup?.anchor?.matches('.message-more');
+    closePopup(true);
+    moveMessage(message, button.dataset.move);
+    if (message && (fromRow || (mobile.matches && !state.mobileReading))) focusRow(message.id, fromRow ? '.message-more' : '.message-main');
+    return;
+  }
+  if (button.matches('[data-snooze]')) { snoozeMessage(Number(button.dataset.snooze)); return; }
+
+  const message = byId(state.selected);
+  switch (button.id) {
+    case 'folder-toggle': showDialog(drawer); break;
+    case 'shortcuts-toggle': showDialog($('#shortcuts-dialog')); break;
+    case 'advanced-toggle':
+      if (popup?.element.id === 'advanced-search') closePopup(true);
+      else showPopup($('#advanced-search'), button);
+      break;
+    case 'search-clear':
+      advancedForm.reset();
+      searchInput.value = '';
+      setSearch('', null);
+      searchInput.focus();
+      break;
+    case 'advanced-reset':
+      advancedForm.reset();
+      $('input', advancedForm).focus();
+      break;
+    case 'back-to-list': backToList(); break;
+    case 'thread-prev': stepMessage(-1); break;
+    case 'thread-next': stepMessage(1); break;
+    case 'reader-more': openMessageMenu(message, button); break;
+    case 'reader-unread': markUnread(message); break;
+    case 'reader-label': openLabelPicker(message); break;
+    case 'reader-snooze': openSnooze(message); break;
+    case 'reader-delete':
+      moveMessage(message, 'trash');
+      if (mobile.matches && !state.mobileReading) focusRow(message?.id);
+      break;
+    case 'reader-archive':
+      archiveMessage(message);
+      if (mobile.matches && !state.mobileReading) focusRow(message?.id);
+      break;
+    case 'archive-undo': restoreArchive(); break;
+    case 'archive-dismiss': hideToast(); break;
+    case 'discard-draft':
+      if (activeDraft) drafts.delete(activeDraft.key);
+      activeDraft = null;
+      persist();
+      composeWindow.close();
+      render();
+      announce('Draft discarded.');
+      break;
+  }
+});
+list.addEventListener('contextmenu', event => {
+  const row = event.target.closest('.message-row');
+  if (!row || row.hasAttribute('data-draft')) return;
+  event.preventDefault();
+  openMessageMenu(byId(row.dataset.id), $('.message-more', row), {x:event.clientX,y:event.clientY});
+});
+document.addEventListener('pointerdown', event => {
+  if (popup && !popup.element.contains(event.target) && !popup.anchor?.contains(event.target)
+    && !childPopup?.element.contains(event.target)) closePopup();
+});
+document.addEventListener('keydown', event => {
+  if (event.defaultPrevented || $('dialog[open]')) return;
+  if (event.key === 'Escape') {
+    if (childPopup) closeChild(true);
+    else if (popup) closePopup(true);
+    else if (state.mobileReading && mobile.matches) backToList();
+    else return;
+    event.preventDefault();
+    return;
+  }
+  const menu = event.target.closest('[role="menu"]');
+  if (menu) { handleMenuKeys(event, menu); return; }
+  if (event.key === 'ArrowDown' && event.target.matches('[aria-haspopup="menu"]') && !popup) {
+    event.preventDefault();
+    event.target.click();
+    return;
+  }
+  if (event.metaKey || event.ctrlKey || event.altKey || event.target.closest('input, textarea, select, [contenteditable]') || popup) return;
+  switch (event.key.toLowerCase()) {
+    case '?': showDialog($('#shortcuts-dialog')); break;
+    case '/': searchInput.focus(); break;
+    case 'c': openCompose(); break;
+    case 'j': stepMessage(1); break;
+    case 'k': stepMessage(-1); break;
+    case 'r': if (byId(state.selected)) openCompose('reply', byId(state.selected)); break;
+    case 'e': {
+      const message = byId(state.selected);
+      archiveMessage(message);
+      if (!state.mobileReading && mobile.matches) focusRow(message?.id);
+      break;
+    }
+    default: return;
+  }
+  event.preventDefault();
+});
+document.addEventListener('focusin', event => {
+  if (popup && !popup.element.contains(event.target) && !popup.anchor?.contains(event.target)
+    && !childPopup?.element.contains(event.target)) closePopup();
+});
+window.addEventListener('resize', () => {
+  if (popup) positionPopup(popup);
+  if (childPopup) positionPopup(childPopup);
+});
+list.addEventListener('scroll', () => {
+  if (popup?.anchor?.matches('.message-more')) {
+    const row = popup.anchor.closest('.message-row');
+    const rect = row.getBoundingClientRect();
+    const bounds = list.getBoundingClientRect();
+    if (rect.bottom <= bounds.top || rect.top >= bounds.bottom || popup.point) closePopup();
+    else {
+      positionPopup(popup);
+      if (childPopup) positionPopup(childPopup);
+    }
+  }
+}, {passive:true});
+narrow.addEventListener('change', () => { if (!narrow.matches && drawer.open) drawer.close(); });
+mobile.addEventListener('change', () => {
+  if (!mobile.matches) {
+    state.mobileReading = false;
+    closePopup();
+    render({retainSelection:true});
+  }
+});
+searchInput.addEventListener('input', () => setSearch(searchInput.value.trim(), state.filters));
+$('#search-form').addEventListener('submit', event => {
+  event.preventDefault();
+  setSearch(searchInput.value.trim(), state.filters);
+  if (visibleMessages.length) focusRow(visibleMessages[0].id);
+});
+advancedForm.addEventListener('submit', event => {
+  event.preventDefault();
+  const data = new FormData(advancedForm);
+  const filters = {
+    from:data.get('from').trim(), subject:data.get('subject').trim(), words:data.get('words').trim(),
+    folder:data.get('folder'), attachments:data.has('attachments'),
+  };
+  const active = filters.from || filters.subject || filters.words || filters.attachments || filters.folder !== 'everywhere';
+  closePopup(true);
+  setSearch(searchInput.value.trim(), active ? filters : null);
+  announce(visibleMessages.length+' search results.');
+});
+composeForm.addEventListener('input', saveDraft);
+composeForm.addEventListener('submit', sendMessage);
+composeWindow.addEventListener('close', () => {
+  if (composeWindow.open || !activeDraft) return;
+  saveDraft();
+  activeDraft = null;
+  render({retainSelection:true});
+});
+$('#label-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const message = byId(pickerMessageId);
+  if (!message) return;
+  message.labels = new FormData(event.currentTarget).getAll('labels');
+  $('#label-picker').close();
+  persist();
+  render({retainSelection:true});
+  announce('Labels updated.');
+});
+$('#snooze-date').addEventListener('input', event => event.target.setCustomValidity(''));
+$('#snooze-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const field = $('#snooze-date');
+  const timestamp = new Date(field.value).getTime();
+  if (timestamp > Date.now()) snoozeMessage(timestamp);
+  else {
+    field.setCustomValidity('Choose a time in the future.');
+    field.reportValidity();
+  }
+});
+$('#archive-toast').addEventListener('focusin', () => clearTimeout(toastTimer));
+$('#archive-toast').addEventListener('focusout', event => {
+  if (!$('#archive-toast').contains(event.relatedTarget) && !$('#archive-toast').hidden) toastTimer = setTimeout(hideToast, 10000);
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden) wakeMessages(); });
+wakeMessages();
+setInterval(wakeMessages, 20000);
+render();
+</script>
+</body>
+</html>

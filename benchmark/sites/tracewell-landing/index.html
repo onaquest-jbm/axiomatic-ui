@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Tracewell brings API requests, traces, and performance metrics together so you can see what happened and where to look next.">
+  <title>Tracewell | API observability</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233249e8'/%3E%3Cpath d='M7 18h5l3-8 4 12 3-6h3' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page: #f7f8fc;
+      --surface: #fff;
+      --panel: #edf0fb;
+      --ink: #141b37;
+      --muted: #525a75;
+      --line: #d9deed;
+      --accent: #3047db;
+      --accent-hover: #2135b7;
+      --accent-soft: #e9edff;
+      --on-accent: #fff;
+      --lime: #d9fa79;
+      --lime-ink: #273516;
+      --success-bg: #ddf6e8;
+      --success: #136549;
+      --error-bg: #fde8ed;
+      --error: #9c2446;
+      --header: #f7f8fcf2;
+      --shadow: 0 20px 55px #252d5d18;
+      --mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #111529;
+        --surface: #181e35;
+        --panel: #1c2440;
+        --ink: #f1f3ff;
+        --muted: #b6bfdc;
+        --line: #343d5d;
+        --accent: #aebaff;
+        --accent-hover: #c9d1ff;
+        --accent-soft: #292f5b;
+        --on-accent: #101535;
+        --success-bg: #183c35;
+        --success: #a3ecc7;
+        --error-bg: #49253c;
+        --error: #ffb1c6;
+        --header: #111529f2;
+        --shadow: 0 20px 55px #05071650;
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: 1rem/1.6 var(--sans); }
+    h1, h2, h3, p, figure, blockquote { margin: 0; }
+    h1, h2, h3 { line-height: 1.06; letter-spacing: -.045em; text-wrap: balance; }
+    a { color: inherit; }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+    ::selection { background: var(--lime); color: var(--lime-ink); }
+    .wrap { width: min(100% - 3rem, 72rem); margin-inline: auto; }
+    .skip { position: fixed; inset: .5rem auto auto .5rem; z-index: 20; padding: .65rem 1rem; background: var(--surface); transform: translateY(-160%); }
+    .skip:focus { transform: none; }
+    .icon { width: 1.2rem; height: 1.2rem; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .brand { display: inline-flex; align-items: center; gap: .6rem; font-size: 1.32rem; font-weight: 750; letter-spacing: -.065em; line-height: 1; text-decoration: none; white-space: nowrap; }
+    .brand-mark { display: grid; place-items: center; width: 2.15rem; aspect-ratio: 1; border-radius: .65rem; background: var(--accent); color: var(--on-accent); }
+    .brand-mark .icon { width: 1.35rem; height: 1.35rem; stroke-width: 2; }
+    .button { display: inline-flex; justify-content: center; align-items: center; gap: .5rem; min-height: 2.9rem; padding: .65rem 1rem; border: 1px solid transparent; border-radius: .65rem; font-weight: 700; line-height: 1.2; text-align: center; text-decoration: none; transition: background-color .18s, border-color .18s; }
+    .primary { background: var(--accent); color: var(--on-accent); }
+    .primary:hover { background: var(--accent-hover); }
+    .secondary { background: var(--surface); border-color: var(--line); color: var(--ink); }
+    .secondary:hover { background: var(--accent-soft); border-color: var(--accent); }
+    .icon-button { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0; border: 1px solid var(--line); border-radius: .65rem; background: var(--surface); color: var(--ink); }
+    .icon-button:hover { background: var(--accent-soft); }
+    .label { color: var(--accent); font: 700 .8rem/1.35 var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+    .section { padding-block: clamp(4rem, 8vw, 7rem); }
+    .section-title { margin-bottom: 2rem; }
+    .section-title h2 { margin-top: .65rem; font-size: clamp(2.1rem, 4.8vw, 3.7rem); }
+    .section-title > p:last-child:not(.label) { max-width: 37rem; margin-top: .9rem; color: var(--muted); }
+
+    .site-header { position: sticky; top: 0; z-index: 5; background: var(--header); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); }
+    .nav { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.6rem; }
+    .desktop-nav { display: flex; align-items: center; gap: .45rem; }
+    .desktop-nav > a, #product-toggle { padding: .65rem .85rem; border: 0; border-radius: .5rem; background: transparent; color: var(--muted); line-height: 1.25; font-weight: 650; text-decoration: none; }
+    .desktop-nav > a:hover, #product-toggle:hover, #product-toggle[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+    #product-toggle { display: flex; align-items: center; gap: .3rem; }
+    #product-toggle .icon { width: .95rem; height: .95rem; }
+    #product-toggle[aria-expanded="true"] .icon { transform: rotate(180deg); }
+    .dropdown { position: relative; }
+    #product-menu, #mobile-menu { margin: 0; padding: .45rem; border: 1px solid var(--line); border-radius: .8rem; background: var(--surface); box-shadow: var(--shadow); }
+    #product-menu { position: absolute; top: calc(100% + .7rem); left: 0; width: 13.5rem; }
+    #product-menu a, #mobile-menu a { display: block; padding: .65rem .75rem; border-radius: .45rem; font-weight: 650; text-decoration: none; }
+    #product-menu a:hover, #mobile-menu a:hover { background: var(--accent-soft); color: var(--accent); }
+    #mobile-toggle, #mobile-menu { display: none; }
+
+    .hero { position: relative; isolation: isolate; overflow: clip; padding: clamp(3.75rem, 8vw, 7rem) 0 clamp(3.4rem, 7vw, 6rem); }
+    .hero::before { content: ""; position: absolute; z-index: -1; inset: 0 0 auto; height: 100%; background: radial-gradient(ellipse at 84% 24%, var(--accent-soft), transparent 62%); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr); align-items: center; gap: clamp(2rem, 5vw, 5rem); }
+    .hero h1 { margin-top: 1.05rem; font-size: clamp(3.2rem, 6.25vw, 6.05rem); line-height: .99; letter-spacing: -.079em; text-wrap: initial; }
+    .hero h1 span { color: var(--accent); }
+    .hero-copy > p:not(.label) { max-width: 32rem; margin-top: 1.3rem; color: var(--muted); font-size: clamp(1.06rem, 1.6vw, 1.23rem); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.7rem; }
+    .code-card { min-width: 0; overflow: hidden; border: 1px solid #3b4565; border-radius: 1rem; background: #161d34; color: #e5e9fa; box-shadow: 0 20px 48px #111a4238; }
+    .code-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .65rem .85rem; border-bottom: 1px solid #3b4565; background: #202942; }
+    .code-head > span { display: inline-flex; align-items: center; gap: .48rem; font: .86rem var(--mono); }
+    .code-head .icon { color: #b4bfff; }
+    #copy-setup { display: inline-flex; align-items: center; gap: .35rem; min-height: 2.5rem; padding: .35rem .55rem; border: 1px solid #525f83; border-radius: .5rem; background: transparent; color: #f0f3ff; font-size: .875rem; font-weight: 650; }
+    #copy-setup:hover { background: #35415f; }
+    #copy-setup:focus-visible { outline-color: #b4bfff; }
+    .code-card pre { margin: 0; padding: 1.35rem 1rem 1.55rem; overflow: auto; tab-size: 2; font: clamp(.81rem, 1.3vw, .94rem)/1.9 var(--mono); }
+    .code-card code { font: inherit; }
+    .token-keyword { color: #b4bfff; }
+    .token-string { color: #ffc5a7; }
+    .token-comment { color: #a9b4d1; }
+    .code-caption { display: flex; align-items: center; gap: .55rem; padding: .75rem 1rem; border-top: 1px solid #3b4565; color: #d7def5; font-size: .875rem; }
+    .code-caption .icon { color: var(--lime); }
+
+    .preview { padding-bottom: clamp(4rem, 8vw, 7rem); }
+    .preview .section-title { display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; }
+    .preview .section-title > p { max-width: 24rem; }
+    .dashboard { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 1.15rem; background: var(--surface); box-shadow: var(--shadow); }
+    .dash-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .7rem; padding: .9rem 1.15rem; border-bottom: 1px solid var(--line); }
+    .dash-crumb { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem; font-size: .9rem; font-weight: 700; }
+    .dash-crumb .icon { color: var(--accent); }
+    .dash-crumb span { color: var(--muted); font-weight: 550; }
+    .sample-tag { display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font: .78rem var(--mono); }
+    .sample-tag::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--accent); }
+    .dash-body { padding: clamp(.85rem, 2.5vw, 1.5rem); }
+    .dash-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .85rem; margin-bottom: .85rem; }
+    .dash-title h3 { font-size: clamp(1.3rem, 2.5vw, 1.7rem); }
+    .segments { display: inline-flex; align-items: center; gap: .15rem; padding: .2rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--page); }
+    .segments button { min-height: 2.4rem; padding: .35rem .72rem; border: 1px solid transparent; border-radius: .48rem; background: transparent; color: var(--muted); font-size: .875rem; font-weight: 700; white-space: nowrap; }
+    .segments button:hover { color: var(--accent); }
+    .segments button[aria-pressed="true"] { border-color: var(--line); background: var(--surface); color: var(--accent); box-shadow: 0 1px 3px #11194212; }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin-bottom: .8rem; }
+    .metric { padding: .7rem .8rem; border: 1px solid var(--line); border-radius: .7rem; background: var(--page); }
+    .metric span { display: block; color: var(--muted); font-size: .875rem; line-height: 1.25; }
+    .metric strong { display: block; margin-top: .4rem; color: var(--ink); font: 750 clamp(1rem, 3vw, 1.62rem)/1.2 var(--mono); letter-spacing: -.07em; }
+    .dash-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: .75rem; }
+    .dash-card { min-width: 0; padding: .8rem; border: 1px solid var(--line); border-radius: .7rem; }
+    .dash-card h4 { margin: 0 0 .6rem; font-size: .95rem; }
+    .chart-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .45rem; }
+    .chart-axis { display: flex; flex-direction: column; justify-content: space-between; color: var(--muted); font: .68rem var(--mono); text-align: right; }
+    .bars { display: grid; grid-template: 1fr / repeat(24, minmax(0, 1fr)); align-items: end; gap: clamp(2px, .42vw, 6px); height: 8.6rem; background: repeating-linear-gradient(to top, var(--line) 0 1px, transparent 1px 33.333%); }
+    .bars i { display: block; height: var(--height); min-height: 2px; border-radius: .25rem .25rem 0 0; background: var(--accent); opacity: .67; }
+    .bars i:nth-child(4n + 1), .bars i:nth-child(7n) { opacity: 1; }
+    .chart-times { grid-column: 2; display: flex; justify-content: space-between; gap: .2rem; color: var(--muted); font: .7rem var(--mono); }
+    .trace-list { display: grid; gap: .28rem; }
+    .trace { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: .38rem; min-height: 2.75rem; padding: .18rem .35rem; border: 1px solid transparent; border-radius: .45rem; background: var(--page); color: var(--ink); text-align: left; font: .78rem var(--mono); }
+    .trace:hover, .trace[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+    .trace-route { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .http { display: inline-block; min-width: 2.25em; padding: .15rem .25rem; border-radius: .3rem; background: var(--success-bg); color: var(--success); text-align: center; }
+    .http.error { background: var(--error-bg); color: var(--error); }
+    .trace-detail { padding-top: .55rem; color: var(--muted); font-size: .875rem; }
+
+    .features { border-block: 1px solid var(--line); background: var(--surface); }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+    .feature-card { padding: clamp(1.1rem, 2.6vw, 1.7rem); border: 1px solid var(--line); border-radius: .85rem; background: var(--page); }
+    .feature-icon { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: .65rem; background: var(--accent-soft); color: var(--accent); }
+    .feature-card h3 { margin-block: .9rem .45rem; font-size: 1.25rem; letter-spacing: -.03em; }
+    .feature-card p { color: var(--muted); }
+
+    .voices { background: #1c286b; color: #f4f6ff; }
+    .voices .label { color: var(--lime); }
+    .voices .section-title > p:last-child { color: #ced6ff; }
+    .quote-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+    .quote { display: flex; flex-direction: column; gap: 1rem; justify-content: space-between; padding: clamp(1.1rem, 2.6vw, 1.7rem); border: 1px solid #6774ad; border-radius: .85rem; background: #263575; }
+    .quote blockquote { font-size: clamp(1.05rem, 2vw, 1.22rem); line-height: 1.5; }
+    .quote figcaption { color: #d8dfff; font-size: .875rem; font-weight: 650; }
+
+    .pricing-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 1.25rem; margin-bottom: 2rem; }
+    .pricing-head .section-title { margin-bottom: 0; }
+    .billing-note { margin-top: .5rem; color: var(--muted); font-size: .875rem; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+    .plan { display: flex; flex-direction: column; gap: 1rem; padding: clamp(1.15rem, 2.6vw, 1.85rem); border: 1px solid var(--line); border-radius: .95rem; background: var(--surface); }
+    .plan.featured { border-color: var(--accent); box-shadow: inset 0 3px var(--accent); }
+    .plan h3 { font-size: 1.5rem; }
+    .plan-intro, .plan-caption { color: var(--muted); }
+    .plan-caption { font-size: .875rem; }
+    .plan-price { font-size: .9rem; color: var(--muted); }
+    .plan-price strong { color: var(--ink); font-size: clamp(2.4rem, 4vw, 3.3rem); font-weight: 750; letter-spacing: -.07em; line-height: 1; }
+    .plan .button { width: 100%; margin-top: auto; }
+    .plan ul { display: grid; gap: .48rem; padding: 0; margin: 0 0 .4rem; list-style: none; }
+    .plan li { display: flex; align-items: baseline; gap: .5rem; }
+    .plan li::before { content: ""; flex: 0 0 .36rem; height: .64rem; border: solid var(--accent); border-width: 0 2px 2px 0; transform: rotate(43deg); }
+
+    .faq { border-top: 1px solid var(--line); background: var(--surface); }
+    .faq-grid { display: grid; grid-template-columns: minmax(0, .63fr) minmax(0, 1fr); gap: clamp(1rem, 5vw, 5rem); }
+    .faq-list { border-top: 1px solid var(--line); }
+    .faq-list details { border-bottom: 1px solid var(--line); }
+    .faq-list summary { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; font-weight: 700; list-style: none; cursor: pointer; }
+    .faq-list summary::-webkit-details-marker { display: none; }
+    .faq-list summary:hover { color: var(--accent); }
+    .faq-sign { display: grid; place-items: center; flex: 0 0 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
+    .faq-list details[open] .faq-sign .vertical { display: none; }
+    .faq-list details > div { padding: 0 2rem 1rem 0; color: var(--muted); }
+
+    .site-footer { padding-block: 2rem; border-top: 1px solid var(--line); }
+    .footer-grid { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.2rem; }
+    .footer-links { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1rem; }
+    .footer-links a, .footer-links button { padding: .4rem 0; border: 0; background: transparent; color: var(--muted); font-weight: 650; text-decoration: none; }
+    .footer-links a:hover, .footer-links button:hover { color: var(--accent); text-decoration: underline; }
+    .copyright { color: var(--muted); font-size: .875rem; }
+
+    #demo-dialog { width: min(100% - 2rem, 31rem); max-height: calc(100% - 2rem); padding: clamp(1rem, 4vw, 2rem); border: 1px solid var(--line); border-radius: 1rem; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+    #demo-dialog::backdrop { background: #0a1029b9; }
+    body:has(#demo-dialog[open]) { overflow: hidden; }
+    .dialog-head { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+    .dialog-head h2 { margin-top: .4rem; font-size: clamp(1.8rem, 6vw, 2.65rem); }
+    .dialog-intro { margin-top: .7rem; color: var(--muted); }
+    .demo-form { display: grid; gap: .75rem; margin-top: 1rem; }
+    .demo-form label { display: grid; gap: .25rem; font-size: .9rem; font-weight: 700; }
+    .demo-form input, .demo-form textarea { width: 100%; min-height: 2.8rem; padding: .45rem .6rem; border: 1px solid var(--line); border-radius: .5rem; background: var(--page); color: var(--ink); font-size: 1rem; }
+    .demo-form textarea { min-height: 4.4rem; resize: vertical; }
+    .form-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+    #demo-status { min-height: 1.4em; color: var(--success); font-size: .875rem; }
+    #copy-toast { position: fixed; z-index: 10; right: 1rem; bottom: 1rem; max-width: calc(100% - 2rem); padding: .75rem 1rem; border: 1px solid var(--line); border-radius: .65rem; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); font-weight: 650; }
+
+    @media (max-width: 56rem) {
+      .hero-grid { gap: 1.6rem; }
+      .preview .section-title { display: block; }
+      .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 45rem) {
+      .wrap { width: calc(100% - 2rem); }
+      .desktop-nav, .nav > .button { display: none; }
+      #mobile-toggle { display: grid; }
+      #mobile-menu { position: absolute; inset: calc(100% + .45rem) 0 auto; display: grid; gap: .15rem; }
+      #mobile-menu .button { margin: .22rem; }
+      .hero-grid, .pricing-grid, .quote-grid, .faq-grid { grid-template-columns: minmax(0, 1fr); }
+      .hero h1 { font-size: clamp(3.05rem, 10vw, 4.7rem); }
+      .dash-grid { grid-template-columns: minmax(0, 1fr); }
+      .faq-grid .section-title { margin-bottom: .55rem; }
+    }
+    @media (max-width: 30rem) {
+      .feature-grid { grid-template-columns: minmax(0, 1fr); }
+      .metrics { gap: .35rem; }
+      .metric { padding-inline: .4rem; }
+      .metric span { font-size: .8rem; }
+      .chart-times span:nth-child(even) { display: none; }
+    }
+    @media (max-width: 23rem) {
+      .form-pair { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body id="top">
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true" style="position:absolute">
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2 13h5l3-8 4 14 3-7h5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 4 4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16m-12-4v-3m4 3V8m4 8v-5m4 5V6"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 10a6 6 0 1 0-12 0c0 5-2 5-2 7h16c0-2-2-2-2-7m-8 10a2 2 0 0 0 4 0"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3"/></symbol>
+    <symbol id="i-flow" viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10m12-8a7 7 0 0 1-7 7H6"/></symbol>
+  </svg>
+
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="#top"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-pulse"/></svg></span>Tracewell</a>
+      <nav class="desktop-nav" aria-label="Main">
+        <div class="dropdown">
+          <button id="product-toggle" type="button" aria-expanded="false" aria-controls="product-menu">Product <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+          <div id="product-menu" hidden>
+            <a href="#explore">Interactive preview</a>
+            <a href="#features">Features</a>
+            <a href="#setup">Quickstart</a>
+          </div>
+        </div>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <button class="button secondary" type="button" data-demo>Book a demo</button>
+      <button id="mobile-toggle" class="icon-button" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobile-menu"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <nav id="mobile-menu" aria-label="Mobile" hidden>
+        <a href="#explore">Interactive preview</a>
+        <a href="#features">Features</a>
+        <a href="#setup">Quickstart</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <button class="button primary" type="button" data-demo>Book a demo</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="label">API observability</p>
+          <h1 id="hero-title">See where your <span>API slows down.</span></h1>
+          <p>Follow a request from the edge to the database. Tracewell puts latency, errors, and traces in one view so you can find the call that went wrong.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#explore">Explore the product</a>
+            <button class="button secondary" type="button" data-demo>Book a demo</button>
+          </div>
+        </div>
+        <figure class="code-card" id="setup">
+          <div class="code-head">
+            <span><svg class="icon" aria-hidden="true"><use href="#i-terminal"/></svg> setup.js</span>
+            <button id="copy-setup" type="button"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg> Copy</button>
+          </div>
+          <pre id="setup-scroll" tabindex="0" aria-label="JavaScript setup example"><code id="setup-code"><span class="token-comment">// npm install @tracewell/node</span>
+<span class="token-keyword">import</span> { tracewell } <span class="token-keyword">from</span> <span class="token-string">'@tracewell/node'</span>;
+
+tracewell.init({
+  service: <span class="token-string">'checkout-api'</span>,
+  apiKey: process.env.TRACEWELL_API_KEY,
+});</code></pre>
+          <figcaption class="code-caption"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg> Example Node.js setup</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="preview" id="explore" aria-labelledby="preview-title">
+      <div class="wrap">
+        <div class="section-title">
+          <div>
+            <p class="label">Interactive preview</p>
+            <h2 id="preview-title">From spike to source.</h2>
+          </div>
+          <p>Change the time range or pick a request to see what contributed to its latency.</p>
+        </div>
+        <div class="dashboard">
+          <div class="dash-head">
+            <div class="dash-crumb"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg> Checkout API <span>/ Production</span></div>
+            <div class="sample-tag">Sample data</div>
+          </div>
+          <div class="dash-body">
+            <div class="dash-title">
+              <h3>Request overview</h3>
+              <div class="segments" role="group" aria-label="Time range">
+                <button type="button" data-range="hour" aria-pressed="true">1 hour</button>
+                <button type="button" data-range="day" aria-pressed="false">24 hours</button>
+                <button type="button" data-range="week" aria-pressed="false">7 days</button>
+              </div>
+            </div>
+            <div class="metrics" aria-live="polite" aria-atomic="true">
+              <div class="metric"><span>Requests</span><strong id="metric-requests">14.2k</strong></div>
+              <div class="metric"><span>p95 latency</span><strong id="metric-latency">238 ms</strong></div>
+              <div class="metric"><span>Error rate</span><strong id="metric-errors">0.42%</strong></div>
+            </div>
+            <div class="dash-grid">
+              <figure class="dash-card">
+                <h4>p95 latency over time</h4>
+                <div class="chart-grid" id="latency-chart" role="img" aria-label="p95 latency peaked at 308 milliseconds in the past hour.">
+                  <div class="chart-axis" aria-hidden="true"><span>360 ms</span><span>240 ms</span><span>120 ms</span><span>0</span></div>
+                  <div class="bars" id="latency-bars" aria-hidden="true"></div>
+                  <div class="chart-times" id="chart-times" aria-hidden="true"></div>
+                </div>
+              </figure>
+              <div class="dash-card">
+                <h4>Recent traces</h4>
+                <div class="trace-list" role="group" aria-label="Request traces">
+                  <button class="trace" type="button" data-trace="0" aria-pressed="true"><span class="trace-route">POST /checkout</span><span class="http error">504</span><span>842 ms</span></button>
+                  <button class="trace" type="button" data-trace="1" aria-pressed="false"><span class="trace-route">GET /cart</span><span class="http">200</span><span>106 ms</span></button>
+                  <button class="trace" type="button" data-trace="2" aria-pressed="false"><span class="trace-route">POST /payment</span><span class="http">201</span><span>193 ms</span></button>
+                </div>
+                <p class="trace-detail" id="trace-detail" aria-live="polite">Payment gateway timed out after 728 ms.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section features" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <div class="section-title">
+          <p class="label">Features</p>
+          <h2 id="features-title">Debug with the whole request in view.</h2>
+          <p>Start with an endpoint, an error, or a single request ID and follow it across the services it touched.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-flow"/></svg></div><h3>Distributed traces</h3><p>Follow a request through your gateway, application, and database with timing for each span.</p></article>
+          <article class="feature-card"><div class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></div><h3>Request search</h3><p>Filter by route, status, service, or request ID to find the calls that tell you what broke.</p></article>
+          <article class="feature-card"><div class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div><h3>Endpoint performance</h3><p>Track request volume, tail latency, and error rates for each route.</p></article>
+          <article class="feature-card"><div class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></div><h3>Threshold alerts</h3><p>Set latency and error thresholds for the endpoints your customers rely on.</p></article>
+          <article class="feature-card"><div class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg></div><h3>Collection controls</h3><p>Choose which headers and request attributes enter your telemetry.</p></article>
+          <article class="feature-card"><div class="feature-icon"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg></div><h3>OpenTelemetry ingest</h3><p>Send traces from services you already instrument with OpenTelemetry.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section voices" aria-labelledby="voices-title">
+      <div class="wrap">
+        <div class="section-title">
+          <p class="label">Team perspectives</p>
+          <h2 id="voices-title">What better debugging feels like.</h2>
+          <p>Illustrative testimonials for common API debugging workflows.</p>
+        </div>
+        <div class="quote-grid">
+          <figure class="quote"><blockquote>“I can open a slow checkout and see which dependency ate most of the request time.”</blockquote><figcaption>Backend engineer</figcaption></figure>
+          <figure class="quote"><blockquote>“When the alert fires, I can see which routes are affected before opening a second dashboard.”</blockquote><figcaption>On-call engineer</figcaption></figure>
+          <figure class="quote"><blockquote>“A request ID gives support and engineering the same place to start.”</blockquote><figcaption>Platform lead</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pricing" aria-labelledby="pricing-title">
+      <div class="wrap">
+        <div class="pricing-head">
+          <div class="section-title">
+            <p class="label">Pricing</p>
+            <h2 id="pricing-title">A plan for every API.</h2>
+          </div>
+          <div>
+            <div class="segments" role="group" aria-label="Billing period">
+              <button type="button" data-billing="monthly" aria-pressed="true">Monthly</button>
+              <button type="button" data-billing="yearly" aria-pressed="false">Yearly</button>
+            </div>
+            <p class="billing-note" id="billing-note" role="status">Prices in USD. Billed monthly.</p>
+          </div>
+        </div>
+        <div class="pricing-grid">
+          <article class="plan">
+            <h3>Starter</h3>
+            <p class="plan-intro">For a side project or a first service.</p>
+            <div><p class="plan-price"><strong>$0</strong> / month</p><p class="plan-caption">Free</p></div>
+            <ul><li>100k requests per month</li><li>1 service</li><li>7-day trace retention</li></ul>
+            <a class="button secondary" href="#setup">View quickstart</a>
+          </article>
+          <article class="plan featured">
+            <h3>Team</h3>
+            <p class="plan-intro">For teams running production APIs.</p>
+            <div><p class="plan-price"><strong id="team-price">$49</strong> / month</p><p class="plan-caption" id="team-caption">$49 billed monthly</p></div>
+            <ul><li>2M requests per month</li><li>10 services</li><li>30-day trace retention</li><li>Threshold alerts</li></ul>
+            <button class="button primary" type="button" data-demo="Team">Discuss Team</button>
+          </article>
+          <article class="plan">
+            <h3>Scale</h3>
+            <p class="plan-intro">For high-volume and multi-team APIs.</p>
+            <div><p class="plan-price"><strong>Custom</strong></p><p class="plan-caption">Based on usage</p></div>
+            <ul><li>Custom request volume</li><li>Unlimited services</li><li>Custom trace retention</li><li>SSO and onboarding support</li></ul>
+            <button class="button secondary" type="button" data-demo="Scale">Discuss Scale</button>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section faq" id="faq" aria-labelledby="faq-title">
+      <div class="wrap faq-grid">
+        <div class="section-title">
+          <p class="label">FAQ</p>
+          <h2 id="faq-title">Frequently asked questions.</h2>
+        </div>
+        <div class="faq-list">
+          <details name="tracewell-faq">
+            <summary id="faq-scope-toggle" aria-controls="faq-scope">What does Tracewell monitor?<span class="faq-sign" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M6 12h12"/><path class="vertical" d="M12 6v12"/></svg></span></summary>
+            <div id="faq-scope"><p>Tracewell tracks request volume, latency, errors, and distributed traces for instrumented APIs. You can look at an individual request or compare performance across endpoints.</p></div>
+          </details>
+          <details name="tracewell-faq">
+            <summary id="faq-otel-toggle" aria-controls="faq-otel">Can I use my existing OpenTelemetry setup?<span class="faq-sign" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M6 12h12"/><path class="vertical" d="M12 6v12"/></svg></span></summary>
+            <div id="faq-otel"><p>Yes. You can export traces from an existing OpenTelemetry Collector. The Node.js quickstart shows an SDK-based setup for a service you’re instrumenting for the first time.</p></div>
+          </details>
+          <details name="tracewell-faq">
+            <summary id="faq-data-toggle" aria-controls="faq-data">What request data do I need to send?<span class="faq-sign" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M6 12h12"/><path class="vertical" d="M12 6v12"/></svg></span></summary>
+            <div id="faq-data"><p>Route, timing, and status are enough to get started. You can configure your SDK or collector to drop sensitive headers and attributes before export.</p></div>
+          </details>
+          <details name="tracewell-faq">
+            <summary id="faq-retention-toggle" aria-controls="faq-retention">How long can I look back at traces?<span class="faq-sign" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M6 12h12"/><path class="vertical" d="M12 6v12"/></svg></span></summary>
+            <div id="faq-retention"><p>Starter keeps traces for 7 days and Team keeps them for 30 days. Scale offers configurable retention.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <a class="brand" href="#top"><span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-pulse"/></svg></span>Tracewell</a>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#features">Features</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><button type="button" data-demo>Book a demo</button>
+      </nav>
+      <p class="copyright">© Tracewell</p>
+    </div>
+  </footer>
+
+  <dialog id="demo-dialog" aria-labelledby="demo-title" aria-describedby="demo-intro">
+    <div class="dialog-head">
+      <div><p class="label">Tracewell demo</p><h2 id="demo-title">Book a demo</h2></div>
+      <button class="icon-button" id="demo-close" type="button" aria-label="Close demo dialog"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    </div>
+    <p class="dialog-intro" id="demo-intro">Tell us what you’d like to explore. This offline page prepares a request you can download.</p>
+    <form class="demo-form" id="demo-form" method="dialog">
+      <div class="form-pair">
+        <label>Name<input name="name" autocomplete="name" maxlength="100" required autofocus></label>
+        <label>Company<input name="company" autocomplete="organization" maxlength="120" required></label>
+      </div>
+      <label>Work email<input name="email" type="email" autocomplete="email" maxlength="254" required></label>
+      <label>What would you like to explore? <textarea name="notes" maxlength="600" rows="2"></textarea></label>
+      <button class="button primary" type="submit">Download demo request</button>
+      <p id="demo-status" role="status"></p>
+    </form>
+  </dialog>
+
+  <div id="copy-toast" role="status" hidden></div>
+
+  <script>
+    'use strict';
+
+    const productToggle = document.querySelector('#product-toggle');
+    const mobileToggle = document.querySelector('#mobile-toggle');
+    const productMenu = document.querySelector('#product-menu');
+    const mobileMenu = document.querySelector('#mobile-menu');
+    const mobileIcon = mobileToggle.querySelector('use');
+    const navDisclosures = [[productToggle, productMenu], [mobileToggle, mobileMenu]];
+
+    function setDisclosure(button, panel, open) {
+      button.setAttribute('aria-expanded', String(open));
+      panel.hidden = !open;
+      if (button === mobileToggle) {
+        button.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+        mobileIcon.setAttribute('href', open ? '#i-close' : '#i-menu');
+      }
+    }
+
+    for (const [button, panel] of navDisclosures) {
+      button.addEventListener('click', () => setDisclosure(button, panel, panel.hidden));
+      panel.addEventListener('click', event => {
+        const link = event.target.closest('a');
+        if (!link) return;
+        setDisclosure(button, panel, false);
+        const destination = document.querySelector(link.getAttribute('href'));
+        destination.setAttribute('tabindex', '-1');
+        destination.focus({ preventScroll: true });
+      });
+    }
+
+    document.addEventListener('click', event => {
+      for (const [button, panel] of navDisclosures) {
+        if (!button.contains(event.target) && !panel.contains(event.target)) setDisclosure(button, panel, false);
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || demoDialog.open) return;
+      for (const [button, panel] of navDisclosures) {
+        if (!panel.hidden) {
+          setDisclosure(button, panel, false);
+          button.focus();
+        }
+      }
+    });
+    matchMedia('(max-width: 45rem)').addEventListener('change', () => {
+      for (const [button, panel] of navDisclosures) setDisclosure(button, panel, false);
+    });
+
+    const copyButton = document.querySelector('#copy-setup');
+    const copyToast = document.querySelector('#copy-toast');
+    const code = document.querySelector('#setup-code');
+    let toastTimer;
+
+    async function copyCode() {
+      try {
+        await navigator.clipboard.writeText(code.textContent);
+        return true;
+      } catch {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        try {
+          if (!document.execCommand('copy')) return false;
+          selection.removeAllRanges();
+          copyButton.focus({ preventScroll: true });
+          return true;
+        } catch {
+          return false;
+        }
+      }
+    }
+
+    copyButton.addEventListener('click', async () => {
+      const copied = await copyCode();
+      clearTimeout(toastTimer);
+      copyToast.hidden = false;
+      copyToast.textContent = copied ? 'Setup snippet copied.' : 'Snippet selected. Use your device’s copy command.';
+      toastTimer = setTimeout(() => {
+        copyToast.hidden = true;
+        copyToast.textContent = '';
+      }, 3800);
+    });
+
+    const datasets = {
+      hour: {
+        requests: '14.2k', latency: '238 ms', errors: '0.42%', times: ['09:00', '09:15', '09:30', '09:45', '10:00'],
+        bars: [106, 132, 118, 153, 142, 174, 165, 127, 136, 149, 208, 242, 308, 266, 214, 174, 154, 177, 193, 162, 149, 190, 218, 176],
+        period: 'the past hour'
+      },
+      day: {
+        requests: '310k', latency: '211 ms', errors: '0.31%', times: ['00:00', '06:00', '12:00', '18:00', '00:00'],
+        bars: [82, 76, 64, 79, 96, 112, 139, 168, 212, 266, 237, 197, 168, 152, 184, 231, 245, 211, 177, 159, 144, 151, 136, 106],
+        period: 'the past 24 hours'
+      },
+      week: {
+        requests: '2.12M', latency: '225 ms', errors: '0.36%', times: ['Mon', 'Tue', 'Thu', 'Sat', 'Sun'],
+        bars: [123, 159, 191, 170, 151, 209, 178, 165, 194, 222, 281, 320, 270, 215, 203, 187, 210, 236, 209, 180, 170, 143, 115, 139],
+        period: 'the past 7 days'
+      }
+    };
+    const rangeButtons = document.querySelectorAll('[data-range]');
+    const chart = document.querySelector('#latency-chart');
+    const bars = document.querySelector('#latency-bars');
+    const chartTimes = document.querySelector('#chart-times');
+    const requestMetric = document.querySelector('#metric-requests');
+    const latencyMetric = document.querySelector('#metric-latency');
+    const errorMetric = document.querySelector('#metric-errors');
+
+    function renderRange(key) {
+      const data = datasets[key];
+      for (const button of rangeButtons) button.setAttribute('aria-pressed', String(button.dataset.range === key));
+      requestMetric.textContent = data.requests;
+      latencyMetric.textContent = data.latency;
+      errorMetric.textContent = data.errors;
+      chart.setAttribute('aria-label', `p95 latency peaked at ${Math.max(...data.bars)} milliseconds in ${data.period}.`);
+      bars.replaceChildren(...data.bars.map(value => {
+        const bar = document.createElement('i');
+        bar.style.setProperty('--height', `${value / 360 * 100}%`);
+        return bar;
+      }));
+      chartTimes.replaceChildren(...data.times.map(time => {
+        const label = document.createElement('span');
+        label.textContent = time;
+        return label;
+      }));
+    }
+
+    for (const button of rangeButtons) button.addEventListener('click', () => renderRange(button.dataset.range));
+    renderRange('hour');
+
+    const traceButtons = document.querySelectorAll('[data-trace]');
+    const traceDetail = document.querySelector('#trace-detail');
+    const traceNotes = [
+      'Payment gateway timed out after 728 ms.',
+      'The cart cache returned a hit in 21 ms.',
+      'The payment gateway authorized the charge in 147 ms.'
+    ];
+    for (const button of traceButtons) {
+      button.addEventListener('click', () => {
+        for (const trace of traceButtons) trace.setAttribute('aria-pressed', String(trace === button));
+        traceDetail.textContent = traceNotes[Number(button.dataset.trace)];
+      });
+    }
+
+    const billingButtons = document.querySelectorAll('[data-billing]');
+    const teamPrice = document.querySelector('#team-price');
+    const teamCaption = document.querySelector('#team-caption');
+    const billingNote = document.querySelector('#billing-note');
+    for (const button of billingButtons) {
+      button.addEventListener('click', () => {
+        const yearly = button.dataset.billing === 'yearly';
+        for (const option of billingButtons) option.setAttribute('aria-pressed', String(option === button));
+        teamPrice.textContent = yearly ? '$39' : '$49';
+        teamCaption.textContent = yearly ? '$468 billed yearly' : '$49 billed monthly';
+        billingNote.textContent = yearly ? 'Prices in USD. Save $120 a year on Team.' : 'Prices in USD. Billed monthly.';
+      });
+    }
+
+    const demoDialog = document.querySelector('#demo-dialog');
+    const demoForm = document.querySelector('#demo-form');
+    const demoStatus = document.querySelector('#demo-status');
+    let demoOpener;
+    let demoPlan;
+
+    for (const button of document.querySelectorAll('[data-demo]')) {
+      button.addEventListener('click', () => {
+        demoOpener = mobileMenu.contains(button) ? mobileToggle : button;
+        if (!mobileMenu.hidden) setDisclosure(mobileToggle, mobileMenu, false);
+        if (!productMenu.hidden) setDisclosure(productToggle, productMenu, false);
+        demoPlan = button.dataset.demo;
+        demoStatus.textContent = '';
+        demoDialog.showModal();
+      });
+    }
+    document.querySelector('#demo-close').addEventListener('click', () => demoDialog.close());
+    demoDialog.addEventListener('close', () => {
+      const fallback = mobileToggle.getClientRects().length ? mobileToggle : document.querySelector('.nav > [data-demo]');
+      (demoOpener?.getClientRects().length ? demoOpener : fallback).focus({ preventScroll: true });
+    });
+
+    demoForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const data = new FormData(demoForm);
+      const request = [
+        'Tracewell demo request', '',
+        `Name: ${data.get('name').trim()}`,
+        `Company: ${data.get('company').trim()}`,
+        `Work email: ${data.get('email').trim()}`,
+        `Plan of interest: ${demoPlan || 'Undecided'}`, '',
+        'Topics to explore', data.get('notes').trim()
+      ].join('\n');
+      const url = URL.createObjectURL(new Blob([request], { type: 'text/plain;charset=utf-8' }));
+      const download = document.createElement('a');
+      download.href = url;
+      download.download = 'tracewell-demo-request.txt';
+      document.body.append(download);
+      download.click();
+      download.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      demoStatus.textContent = 'Your demo request is ready in your downloads.';
+    });
+  </script>
+</body>
+</html>

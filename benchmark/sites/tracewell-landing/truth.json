@@ -1,0 +1,125 @@
+{
+  "builder": "gpt-6.2-sol (Codex CLI)",
+  "brief": "marketing landing page for an API observability tool",
+  "surfaces": [
+    {
+      "name": "product menu",
+      "opener": "#product-toggle"
+    },
+    {
+      "name": "demo dialog",
+      "opener": "[data-demo]"
+    },
+    {
+      "name": "copy toast",
+      "opener": "#copy-setup"
+    },
+    {
+      "name": "faq answer",
+      "opener": "#faq-scope-toggle"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "The main task (book a demo) is a quiet secondary button; the only filled primary just scrolls the page",
+      "expect": [
+        "primary-not-first",
+        "unearned-salience"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "A dark code snippet dominates the fold; the product itself is below it",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "choice",
+      "layer": "render",
+      "what": "On phone the main conversion action is hidden inside the collapsed menu",
+      "expect": [
+        "plan-missing"
+      ]
+    },
+    {
+      "surface": "demo dialog",
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "'Book a demo' leads to downloading a text file; label, heading and outcome disagree",
+      "expect": []
+    },
+    {
+      "surface": "demo dialog",
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Required and optional fields look the same; small labels; browser-default errors only",
+      "expect": []
+    },
+    {
+      "surface": "copy toast",
+      "principle": "response",
+      "layer": "render",
+      "what": "Copy only selects text; the toast is far from the button and confirms nothing",
+      "expect": []
+    },
+    {
+      "surface": "copy toast",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "A loud lime selection colour used nowhere else, hard to read on the snippet",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "11-12px chart and trace labels in muted colour, hard to read in dark mode; hero letters nearly touch",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "product menu",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Dropdown hides three in-page anchors and mixes navigation levels",
+      "expect": []
+    },
+    {
+      "surface": "faq answer",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Large empty heading column; faint toggle far from the question",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Pricing repeats prices and labels like 'View quickstart' do not say what happens",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Invented, unattributed testimonials take a full section",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "The strongest call to action is in pricing, not in the hero",
+      "expect": [
+        "salience-inversion"
+      ]
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)"
+}
