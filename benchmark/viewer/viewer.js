@@ -9,7 +9,8 @@
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const main = $('main');
-  const state = { view: 'sites', cards: new Map(), open: new Set(), pf: { principle: '', layer: '', level: '', plan: 'plan', changed: false } };
+  const siteFromHash = () => new URLSearchParams(location.hash.slice(1)).get('site');
+  const state = { view: 'sites', site: siteFromHash(), cards: new Map(), open: new Set(), pf: { principle: '', layer: '', level: '', plan: 'plan', changed: false } };
 
   // ---------- sources (the unmodified sites, or a run) ----------
   const sources = [];
@@ -24,6 +25,10 @@
   bSel.value = String(sources.length > 1 ? 1 : 0);
   const A = () => sources[+aSel.value], Bs = () => sources[+bSel.value];
   const same = () => aSel.value === bSel.value;
+  if (state.site && !siteList().includes(state.site)) {
+    const source = sources.findIndex((s) => Object.hasOwn(s.truth || {}, state.site));
+    if (source >= 0) bSel.value = String(source);
+  }
 
   // ---------- statuses ----------
   const norm = (s) => (!s ? 'none' : /^caught/.test(s) ? 'caught' : /^silent/.test(s) ? 'silent' : /^no-rule/.test(s) ? 'norule' : 'other');
@@ -109,6 +114,28 @@
   }
 
   // ---------- sites ----------
+  const onePass = 'One pass';
+  function siteMethod(site) {
+    const method = [Bs(), A(), ORIG].map((src) => src?.truth[site]?.method?.trim()).find(Boolean);
+    if (!method || method.toLowerCase() === 'one pass') return onePass;
+    return method[0].toUpperCase() + method.slice(1);
+  }
+
+  function siteGroups() {
+    const groups = new Map();
+    for (const site of siteList()) {
+      const method = siteMethod(site);
+      const key = method.toLowerCase();
+      if (!groups.has(key)) groups.set(key, { method, sites: [] });
+      groups.get(key).sites.push(site);
+    }
+    return [...groups.values()].sort((a, b) => {
+      if (a.method === onePass) return -1;
+      if (b.method === onePass) return 1;
+      return a.method.localeCompare(b.method);
+    });
+  }
+
   function shot(src, site, surface, width) {
     const from = src.original ? (src.shotsFrom || {})[site] : src.slug;
     const file = `${slug(surface)}-${width}-light.png`;
@@ -246,37 +273,33 @@
     updateCardShots(card);
   }
 
-  function sitesView() {
-    const sites = siteList();
-    if (!sites.length) return '<p class="note">No generated-site results in this selection.</p>';
+  function siteCard(site, animate = false) {
     const a = A(), b = Bs();
     const sides = comparedSources();
-    let h = '<div class="site-list">';
-    for (const [index, site] of sites.entries()) {
-      const t = truthOf(site);
-      const defs = defectsOf(site);
-      const bySurface = new Map([['page', []]]);
-      for (const src of [b, a]) for (const surface of src.truth[site]?.surfaces || []) {
-        if (!bySurface.has(surface.name)) bySurface.set(surface.name, []);
-      }
-      for (const d of defs) {
-        if (!bySurface.has(d.surface)) bySurface.set(d.surface, []);
-        bySurface.get(d.surface).push(d);
-      }
-      const changed = !same() && a && b && a.siteVersions && b.siteVersions && a.siteVersions[site] && b.siteVersions[site] && a.siteVersions[site] !== b.siteVersions[site];
-      const ca = caughtCount(a, site, defs), cb = caughtCount(b, site, defs);
-      const facts = `${defs.length} problem${defs.length === 1 ? '' : 's'}${ca !== null || cb !== null ? ` · caught ${pair(ca, cb)}` : ''}${changed ? ' · page changed' : ''}`;
-      const chosen = cardState(site);
-      if (!bySurface.has(chosen.surface)) chosen.surface = 'page';
-      const { surface: selected, width } = chosen;
-      const surfaces = [...bySurface].map(([name, list]) => ({
-        name: esc(name), label: `${esc(surfaceName(name))} (${list.length})`, selected: name === selected,
-      }));
-      h += `<article class="site-card" data-site="${esc(site)}" aria-labelledby="site-${index}">
+    const t = truthOf(site);
+    const defs = defectsOf(site);
+    const bySurface = new Map([['page', []]]);
+    for (const src of [b, a]) for (const surface of src.truth[site]?.surfaces || []) {
+      if (!bySurface.has(surface.name)) bySurface.set(surface.name, []);
+    }
+    for (const d of defs) {
+      if (!bySurface.has(d.surface)) bySurface.set(d.surface, []);
+      bySurface.get(d.surface).push(d);
+    }
+    const changed = !same() && a && b && a.siteVersions && b.siteVersions && a.siteVersions[site] && b.siteVersions[site] && a.siteVersions[site] !== b.siteVersions[site];
+    const ca = caughtCount(a, site, defs), cb = caughtCount(b, site, defs);
+    const facts = `${defs.length} problem${defs.length === 1 ? '' : 's'}${ca !== null || cb !== null ? ` · caught ${pair(ca, cb)}` : ''}${changed ? ' · page changed' : ''}`;
+    const chosen = cardState(site);
+    if (!bySurface.has(chosen.surface)) chosen.surface = 'page';
+    const { surface: selected, width } = chosen;
+    const surfaces = [...bySurface].map(([name, list]) => ({
+      name: esc(name), label: `${esc(surfaceName(name))} (${list.length})`, selected: name === selected,
+    }));
+    return `<article class="site-card${animate ? ' site-enter' : ''}" data-site="${esc(site)}" aria-labelledby="site-title">
         <header>
           <div class="site-heading">
-            <h2 id="site-${index}">${esc(site)}</h2>
-            <span class="meta">${esc(t.builder)}</span>
+            <h2 id="site-title">${esc(site)}</h2>
+            <span class="meta">${[siteMethod(site), t.builder].filter(Boolean).map(esc).join(' · ')}</span>
             <span class="site-facts">${facts}</span>
           </div>
           ${t.brief ? `<p class="brief meta">${esc(t.brief)}</p>` : ''}
@@ -299,8 +322,55 @@
         </div>
         <div class="site-problems">${problems(site, bySurface.get(selected))}</div>
       </article>`;
+  }
+
+  function sitesView() {
+    const groups = siteGroups();
+    if (!groups.length) return '<p class="note">No generated-site results in this selection.</p>';
+    if (!groups.some(({ sites }) => sites.includes(state.site))) state.site = groups[0].sites[0];
+    const options = groups.map(({ method, sites }) => `<optgroup label="${esc(method)}">${sites.map((site) =>
+      `<option value="${esc(site)}">${esc(site)}</option>`).join('')}</optgroup>`).join('');
+    return `<div class="sites-view">
+      <label class="site-picker">Site <select id="site-picker">${options}</select></label>
+      <button type="button" class="site-previous" data-site-step="-1" aria-keyshortcuts="ArrowLeft">‹</button>
+      <span class="site-position" role="status"></span>
+      <button type="button" class="site-next" data-site-step="1" aria-keyshortcuts="ArrowRight">›</button>
+      ${siteCard(state.site)}
+    </div>`;
+  }
+
+  function adjacentSite(picker, step) {
+    const { options, selectedIndex } = picker;
+    return options[(selectedIndex + step + options.length) % options.length].value;
+  }
+
+  function syncSiteNavigation(picker) {
+    picker.value = state.site;
+    main.querySelector('.site-position').textContent = `${picker.selectedIndex + 1} of ${picker.length}`;
+    for (const button of main.querySelectorAll('[data-site-step]')) {
+      const step = Number(button.dataset.siteStep);
+      button.disabled = picker.length < 2;
+      button.setAttribute('aria-label', `${step < 0 ? 'Previous' : 'Next'} site: ${adjacentSite(picker, step)}`);
     }
-    return h + '</div>';
+    const hash = new URLSearchParams(location.hash.slice(1));
+    if (hash.get('site') !== state.site) {
+      hash.set('site', state.site);
+      history.replaceState(null, '', `#${hash}`);
+    }
+  }
+
+  function showSite(site, picker) {
+    if (state.site !== site) {
+      state.site = site;
+      main.querySelector('.site-card').outerHTML = siteCard(site, true);
+      observeSiteCard();
+    }
+    syncSiteNavigation(picker);
+  }
+
+  function stepSite(step) {
+    const picker = $('site-picker');
+    if (picker && picker.length > 1) showSite(adjacentSite(picker, step), picker);
   }
 
   // ---------- planted ----------
@@ -352,13 +422,21 @@
   }
 
   // ---------- render + events ----------
+  function observeSiteCard() {
+    highlightObserver.disconnect();
+    const card = main.querySelector('.site-card');
+    if (!card) return;
+    for (const frame of card.querySelectorAll('.shot-frame')) highlightObserver.observe(frame);
+    updateHighlights(card);
+  }
+
   function render(animate = false) {
     for (const b of document.querySelectorAll('.tabs button')) b.setAttribute('aria-pressed', String(b.dataset.view === state.view));
     const html = state.view === 'sites' ? sitesView() : state.view === 'planted' ? plantedView() : overview();
-    highlightObserver.disconnect();
     main.innerHTML = animate ? `<div class="view-enter">${html}</div>` : html;
-    for (const frame of main.querySelectorAll('.shot-frame')) highlightObserver.observe(frame);
-    for (const card of main.querySelectorAll('.site-card')) updateHighlights(card);
+    observeSiteCard();
+    const picker = $('site-picker');
+    if (picker) syncSiteNavigation(picker);
   }
   document.querySelector('.tabs').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -367,6 +445,21 @@
     render(true);
   });
   for (const picker of [aSel, bSel]) picker.addEventListener('change', () => render());
+  window.addEventListener('hashchange', () => {
+    const site = siteFromHash();
+    const picker = $('site-picker');
+    if (!picker) state.site = site;
+    else if (Array.from(picker.options).some((option) => option.value === site)) showSite(site, picker);
+    else syncSiteNavigation(picker);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    const focused = document.activeElement;
+    if (focused?.isContentEditable || focused?.closest('input, textarea, select') || !$('site-picker')) return;
+    e.preventDefault();
+    stepSite(e.key === 'ArrowLeft' ? -1 : 1);
+  });
   main.addEventListener('load', (e) => {
     if (e.target.matches('.shot-layer img')) positionHighlight(e.target.closest('.shot-frame'));
   }, true);
@@ -378,6 +471,10 @@
   }, true);
   main.addEventListener('click', (e) => {
     const b = e.target.closest('button');
+    if (b?.hasAttribute('data-site-step')) {
+      stepSite(Number(b.dataset.siteStep));
+      return;
+    }
     const card = b?.closest('.site-card');
     if (!card) return;
     const site = card.dataset.site;
@@ -401,6 +498,10 @@
     updateCardShots(card);
   });
   main.addEventListener('change', (e) => {
+    if (e.target.id === 'site-picker') {
+      showSite(e.target.value, e.target);
+      return;
+    }
     if (e.target.matches('.surface-select')) {
       selectSurface(e.target.closest('.site-card'), e.target.value);
       return;
