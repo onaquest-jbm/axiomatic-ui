@@ -1,6 +1,6 @@
 # Planted-defect results
 
-Generated 2026-11-19 against `demo/model.json`. lint + verify.
+Generated 2026-11-20 against `demo/model.json`. lint + verify.
 
 Status per defect: **caught** = an expected rule fired; **other signal** = some new finding, not one meant for this; **silent** = nothing new; **no-rule** = no rule exists for it (ground truth says so).
 
@@ -68,16 +68,33 @@ Status per defect: **caught** = an expected rule fired; **other signal** = some 
 | response | 2 | 1 | 0 | 1 | 0 |
 | salience | 8 | 4 | 1 | 2 | 1 |
 
+## With a plan inferred from the page (no hand-written plan)
+
+| | defects | caught | other signal | silent | no rule |
+|---|---|---|---|---|---|
+| choice | 3 | 1 | 0 | 1 | 1 |
+| consequence | 5 | 1 | 1 | 0 | 3 |
+| convention | 2 | 0 | 0 | 1 | 1 |
+| encoding | 15 | 14 | 0 | 0 | 1 |
+| grouping | 4 | 2 | 0 | 1 | 1 |
+| legibility | 17 | 13 | 1 | 1 | 2 |
+| memory | 1 | 0 | 1 | 0 | 0 |
+| motion | 7 | 6 | 0 | 1 | 0 |
+| pointing | 4 | 4 | 0 | 0 | 0 |
+| purpose | 2 | 1 | 0 | 1 | 0 |
+| response | 2 | 1 | 0 | 1 | 0 |
+| salience | 8 | 6 | 0 | 1 | 1 |
+
 ## False alarms on clean controls
 
-| control | lint | verify (plan) | verify (no plan) |
-|---|---|---|---|
-| Base page (menu and dialog closed) | 0 | 0 | 0 |
-| Clean menu open at load | 0 | 0 | 0 |
-| Clean menu open at load | 0 | 0 | 0 |
-| Clean dialog open at load | 0 | 0 | 0 |
-| Clean dialog open at load | 0 | competing-primaries | competing-primaries |
-| Clean page with a long transcript | 0 | layout-shift | layout-shift |
+| control | lint | verify (plan) | verify (no plan) | verify (inferred plan) |
+|---|---|---|---|---|
+| Base page (menu and dialog closed) | 0 | 0 | 0 | 0 |
+| Clean menu open at load | 0 | 0 | 0 | 0 |
+| Clean menu open at load | 0 | 0 | 0 | 0 |
+| Clean dialog open at load | 0 | 0 | 0 | 0 |
+| Clean dialog open at load | 0 | competing-primaries | competing-primaries | competing-primaries |
+| Clean page with a long transcript | 0 | layout-shift | layout-shift | 0 |
 
 ## Every defect
 

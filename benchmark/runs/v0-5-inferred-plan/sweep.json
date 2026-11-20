@@ -1,0 +1,1685 @@
+{
+  "generatedAt": "2026-11-19T22:40:57.133Z",
+  "model": "demo/model.json",
+  "cells": {
+    "c-det-iter": {
+      "builder": "gpt-6.2-sol",
+      "brief": "det",
+      "process": "iter",
+      "rounds": {
+        "r0": {
+          "bytes": 71673,
+          "lines": 1389,
+          "distinct": 2,
+          "onSurfaces": 2,
+          "surfaces": 7,
+          "openers": 7,
+          "rules": {
+            "flat-emphasis": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 273,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "decorative-depth"
+          ]
+        },
+        "r1": {
+          "bytes": 79903,
+          "lines": 1537,
+          "distinct": 2,
+          "onSurfaces": 2,
+          "surfaces": 8,
+          "openers": 8,
+          "rules": {
+            "flat-emphasis": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 288,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "decorative-depth"
+          ]
+        },
+        "r2": {
+          "bytes": 87397,
+          "lines": 1688,
+          "distinct": 2,
+          "onSurfaces": 2,
+          "surfaces": 9,
+          "openers": 9,
+          "rules": {
+            "flat-emphasis": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 298,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "decorative-depth"
+          ]
+        },
+        "r3": {
+          "bytes": 106042,
+          "lines": 2079,
+          "distinct": 4,
+          "onSurfaces": 4,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "flat-emphasis": 2,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 311,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "decorative-depth"
+          ]
+        },
+        "r4": {
+          "bytes": 113294,
+          "lines": 2208,
+          "distinct": 6,
+          "onSurfaces": 6,
+          "surfaces": 12,
+          "openers": 12,
+          "rules": {
+            "flat-emphasis": 4,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 335,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r5": {
+          "bytes": 121741,
+          "lines": 2373,
+          "distinct": 6,
+          "onSurfaces": 6,
+          "surfaces": 13,
+          "openers": 13,
+          "rules": {
+            "flat-emphasis": 4,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 343,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r6": {
+          "bytes": 121741,
+          "lines": 2373,
+          "distinct": 6,
+          "onSurfaces": 6,
+          "surfaces": 13,
+          "openers": 13,
+          "rules": {
+            "flat-emphasis": 4,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 343,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-size",
+            "raw-layer",
+            "raw-radius",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        }
+      },
+      "bytes": 121741,
+      "lines": 2373,
+      "distinct": 39,
+      "onSurfaces": 31,
+      "surfaces": 13,
+      "openers": 13,
+      "rules": {
+        "flat-emphasis": 5,
+        "redundant-enclosure": 2,
+        "destructive-unseparated": 1,
+        "small-target": 31
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 1,
+        "derivation": 343,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-space",
+        "raw-size",
+        "raw-layer",
+        "raw-radius",
+        "unknown-token",
+        "decorative-depth"
+      ]
+    },
+    "c-det-one": {
+      "builder": "gpt-6.2-sol",
+      "brief": "det",
+      "process": "one",
+      "rounds": {},
+      "bytes": 102363,
+      "lines": 1313,
+      "distinct": 40,
+      "onSurfaces": 27,
+      "surfaces": 13,
+      "openers": 13,
+      "rules": {
+        "redundant-enclosure": 3,
+        "text-overflow": 2,
+        "small-target": 29,
+        "too-many-peers": 1,
+        "flat-emphasis": 3,
+        "surface-offscreen": 1,
+        "destructive-unseparated": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 4,
+        "derivation": 341,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-space",
+        "raw-radius",
+        "raw-size",
+        "decorative-depth",
+        "raw-layer",
+        "decorative-color",
+        "unknown-token",
+        "raw-motion"
+      ]
+    },
+    "c-stun-iter": {
+      "builder": "gpt-6.2-sol",
+      "brief": "stun",
+      "process": "iter",
+      "rounds": {
+        "r0": {
+          "bytes": 67278,
+          "lines": 1111,
+          "distinct": 16,
+          "onSurfaces": 6,
+          "surfaces": 10,
+          "openers": 12,
+          "rules": {
+            "flat-emphasis": 2,
+            "low-contrast": 12,
+            "redundant-enclosure": 1,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 318,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion"
+          ]
+        },
+        "r1": {
+          "bytes": 75383,
+          "lines": 1221,
+          "distinct": 18,
+          "onSurfaces": 8,
+          "surfaces": 10,
+          "openers": 12,
+          "rules": {
+            "flat-emphasis": 3,
+            "low-contrast": 12,
+            "redundant-enclosure": 2,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 338,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion"
+          ]
+        },
+        "r2": {
+          "bytes": 77446,
+          "lines": 1260,
+          "distinct": 18,
+          "onSurfaces": 8,
+          "surfaces": 10,
+          "openers": 12,
+          "rules": {
+            "flat-emphasis": 3,
+            "low-contrast": 12,
+            "redundant-enclosure": 2,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 339,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion"
+          ]
+        },
+        "r3": {
+          "bytes": 85867,
+          "lines": 1412,
+          "distinct": 18,
+          "onSurfaces": 8,
+          "surfaces": 10,
+          "openers": 12,
+          "rules": {
+            "flat-emphasis": 3,
+            "low-contrast": 12,
+            "redundant-enclosure": 2,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 341,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion"
+          ]
+        },
+        "r4": {
+          "bytes": 97471,
+          "lines": 1603,
+          "distinct": 20,
+          "onSurfaces": 10,
+          "surfaces": 10,
+          "openers": 12,
+          "rules": {
+            "flat-emphasis": 4,
+            "low-contrast": 13,
+            "redundant-enclosure": 2,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 376,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion",
+            "unknown-token"
+          ]
+        },
+        "r5": {
+          "bytes": 103063,
+          "lines": 1706,
+          "distinct": 22,
+          "onSurfaces": 10,
+          "surfaces": 12,
+          "openers": 14,
+          "rules": {
+            "flat-emphasis": 4,
+            "low-contrast": 13,
+            "small-target": 2,
+            "redundant-enclosure": 2,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 381,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion",
+            "unknown-token"
+          ]
+        },
+        "r6": {
+          "bytes": 103063,
+          "lines": 1706,
+          "distinct": 22,
+          "onSurfaces": 10,
+          "surfaces": 12,
+          "openers": 14,
+          "rules": {
+            "flat-emphasis": 4,
+            "low-contrast": 13,
+            "small-target": 2,
+            "redundant-enclosure": 2,
+            "covers-trigger": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 13,
+            "derivation": 381,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-layer",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "decorative-color",
+            "raw-motion",
+            "unknown-token"
+          ]
+        }
+      },
+      "bytes": 103063,
+      "lines": 1706,
+      "distinct": 51,
+      "onSurfaces": 31,
+      "surfaces": 12,
+      "openers": 14,
+      "rules": {
+        "flat-emphasis": 5,
+        "low-contrast": 13,
+        "small-target": 30,
+        "redundant-enclosure": 2,
+        "covers-trigger": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 13,
+        "derivation": 381,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-layer",
+        "raw-space",
+        "raw-size",
+        "raw-radius",
+        "decorative-depth",
+        "decorative-color",
+        "raw-motion",
+        "unknown-token"
+      ]
+    },
+    "c-stun-one": {
+      "builder": "gpt-6.2-sol",
+      "brief": "stun",
+      "process": "one",
+      "rounds": {},
+      "bytes": 99481,
+      "lines": 1669,
+      "distinct": 50,
+      "onSurfaces": 34,
+      "surfaces": 15,
+      "openers": 15,
+      "rules": {
+        "text-on-gradient": 5,
+        "small-target": 39,
+        "flat-emphasis": 4,
+        "redundant-enclosure": 1,
+        "covers-trigger": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 8,
+        "derivation": 296,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-size",
+        "raw-space",
+        "raw-layer",
+        "raw-radius",
+        "decorative-depth",
+        "unknown-token",
+        "decorative-color",
+        "raw-motion"
+      ]
+    },
+    "c-terse-iter": {
+      "builder": "gpt-6.2-sol",
+      "brief": "terse",
+      "process": "iter",
+      "rounds": {
+        "r0": {
+          "bytes": 71762,
+          "lines": 1027,
+          "distinct": 5,
+          "onSurfaces": 2,
+          "surfaces": 15,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 1,
+            "small-target": 2,
+            "too-many-peers": 1,
+            "redundant-enclosure": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 262,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r1": {
+          "bytes": 79629,
+          "lines": 1167,
+          "distinct": 5,
+          "onSurfaces": 2,
+          "surfaces": 15,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 1,
+            "small-target": 2,
+            "too-many-peers": 1,
+            "redundant-enclosure": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 292,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r2": {
+          "bytes": 82288,
+          "lines": 1214,
+          "distinct": 5,
+          "onSurfaces": 2,
+          "surfaces": 15,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 1,
+            "small-target": 2,
+            "too-many-peers": 1,
+            "redundant-enclosure": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 299,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r3": {
+          "bytes": 87585,
+          "lines": 1322,
+          "distinct": 7,
+          "onSurfaces": 4,
+          "surfaces": 15,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 2,
+            "small-target": 2,
+            "too-many-peers": 1,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 299,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r4": {
+          "bytes": 93452,
+          "lines": 1403,
+          "distinct": 7,
+          "onSurfaces": 4,
+          "surfaces": 15,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 2,
+            "small-target": 2,
+            "too-many-peers": 1,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 315,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r5": {
+          "bytes": 100018,
+          "lines": 1515,
+          "distinct": 8,
+          "onSurfaces": 4,
+          "surfaces": 15,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 2,
+            "small-target": 3,
+            "too-many-peers": 1,
+            "redundant-enclosure": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 322,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        },
+        "r6": {
+          "bytes": 105947,
+          "lines": 1634,
+          "distinct": 7,
+          "onSurfaces": 3,
+          "surfaces": 14,
+          "openers": 15,
+          "rules": {
+            "low-contrast": 2,
+            "small-target": 3,
+            "too-many-peers": 1,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 6,
+            "derivation": 330,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-space",
+            "raw-layer",
+            "raw-radius",
+            "raw-size",
+            "unknown-token",
+            "decorative-depth"
+          ]
+        }
+      },
+      "bytes": 105947,
+      "lines": 1634,
+      "distinct": 35,
+      "onSurfaces": 24,
+      "surfaces": 15,
+      "openers": 15,
+      "rules": {
+        "low-contrast": 2,
+        "small-target": 28,
+        "too-many-peers": 1,
+        "destructive-unseparated": 1,
+        "text-overflow": 1,
+        "redundant-enclosure": 1,
+        "flat-emphasis": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 6,
+        "derivation": 330,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-space",
+        "raw-layer",
+        "raw-radius",
+        "raw-size",
+        "unknown-token",
+        "decorative-depth"
+      ]
+    },
+    "c-terse-one": {
+      "builder": "gpt-6.2-sol",
+      "brief": "terse",
+      "process": "one",
+      "rounds": {},
+      "bytes": 76600,
+      "lines": 944,
+      "distinct": 39,
+      "onSurfaces": 28,
+      "surfaces": 12,
+      "openers": 12,
+      "rules": {
+        "low-contrast": 1,
+        "small-target": 34,
+        "flat-emphasis": 3,
+        "surface-offscreen": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 247,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "unknown-token",
+        "raw-space",
+        "raw-layer",
+        "raw-size",
+        "raw-radius"
+      ]
+    },
+    "s-det-iter": {
+      "builder": "Sonnet 5.5",
+      "brief": "det",
+      "process": "iter",
+      "rounds": {
+        "r0": {
+          "bytes": 22088,
+          "lines": 270,
+          "distinct": 2,
+          "onSurfaces": 1,
+          "surfaces": 5,
+          "openers": 5,
+          "rules": {
+            "low-contrast": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 133,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        },
+        "r1": {
+          "bytes": 26267,
+          "lines": 315,
+          "distinct": 7,
+          "onSurfaces": 5,
+          "surfaces": 6,
+          "openers": 6,
+          "rules": {
+            "decorative-symbol": 1,
+            "low-contrast": 2,
+            "flat-emphasis": 1,
+            "small-target": 3
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 158,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        },
+        "r2": {
+          "bytes": 32730,
+          "lines": 378,
+          "distinct": 7,
+          "onSurfaces": 5,
+          "surfaces": 7,
+          "openers": 7,
+          "rules": {
+            "decorative-symbol": 1,
+            "low-contrast": 2,
+            "flat-emphasis": 1,
+            "small-target": 3
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 188,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        },
+        "r3": {
+          "bytes": 40648,
+          "lines": 461,
+          "distinct": 8,
+          "onSurfaces": 6,
+          "surfaces": 8,
+          "openers": 8,
+          "rules": {
+            "decorative-symbol": 1,
+            "low-contrast": 2,
+            "flat-emphasis": 1,
+            "small-target": 3,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 201,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        },
+        "r4": {
+          "bytes": 44843,
+          "lines": 502,
+          "distinct": 4,
+          "onSurfaces": 2,
+          "surfaces": 8,
+          "openers": 8,
+          "rules": {
+            "decorative-symbol": 1,
+            "low-contrast": 2,
+            "destructive-unseparated": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 214,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        },
+        "r5": {
+          "bytes": 49988,
+          "lines": 555,
+          "distinct": 7,
+          "onSurfaces": 5,
+          "surfaces": 9,
+          "openers": 9,
+          "rules": {
+            "decorative-symbol": 1,
+            "low-contrast": 2,
+            "destructive-unseparated": 1,
+            "flat-emphasis": 1,
+            "small-target": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 224,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        },
+        "r6": {
+          "bytes": 57050,
+          "lines": 607,
+          "distinct": 8,
+          "onSurfaces": 6,
+          "surfaces": 10,
+          "openers": 10,
+          "rules": {
+            "decorative-symbol": 1,
+            "low-contrast": 2,
+            "destructive-unseparated": 1,
+            "covers-trigger": 1,
+            "flat-emphasis": 1,
+            "small-target": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 0,
+            "derivation": 244,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-size",
+            "raw-space",
+            "raw-radius",
+            "raw-layer",
+            "raw-motion"
+          ]
+        }
+      },
+      "bytes": 57050,
+      "lines": 607,
+      "distinct": 21,
+      "onSurfaces": 10,
+      "surfaces": 10,
+      "openers": 10,
+      "rules": {
+        "decorative-symbol": 1,
+        "low-contrast": 3,
+        "destructive-unseparated": 1,
+        "covers-trigger": 1,
+        "flat-emphasis": 1,
+        "small-target": 14
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 244,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-size",
+        "raw-space",
+        "raw-radius",
+        "raw-layer",
+        "raw-motion"
+      ]
+    },
+    "s-det-one": {
+      "builder": "Sonnet 5.5",
+      "brief": "det",
+      "process": "one",
+      "rounds": {},
+      "bytes": 45773,
+      "lines": 603,
+      "distinct": 17,
+      "onSurfaces": 4,
+      "surfaces": 7,
+      "openers": 7,
+      "rules": {
+        "low-contrast": 5,
+        "small-target": 11,
+        "destructive-unseparated": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 0,
+        "derivation": 216,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-space",
+        "raw-radius",
+        "raw-size",
+        "raw-layer",
+        "raw-motion"
+      ]
+    },
+    "s-stun-iter": {
+      "builder": "Sonnet 5.5",
+      "brief": "stun",
+      "process": "iter",
+      "rounds": {
+        "r0": {
+          "bytes": 27459,
+          "lines": 345,
+          "distinct": 20,
+          "onSurfaces": 10,
+          "surfaces": 13,
+          "openers": 14,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1,
+            "small-target": 1,
+            "slow-motion": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 169,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r1": {
+          "bytes": 30823,
+          "lines": 378,
+          "distinct": 20,
+          "onSurfaces": 10,
+          "surfaces": 13,
+          "openers": 14,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1,
+            "small-target": 1,
+            "slow-motion": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 173,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r2": {
+          "bytes": 32074,
+          "lines": 385,
+          "distinct": 20,
+          "onSurfaces": 10,
+          "surfaces": 13,
+          "openers": 14,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1,
+            "small-target": 1,
+            "slow-motion": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 173,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r3": {
+          "bytes": 34184,
+          "lines": 407,
+          "distinct": 21,
+          "onSurfaces": 11,
+          "surfaces": 14,
+          "openers": 15,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "destructive-unseparated": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1,
+            "small-target": 1,
+            "slow-motion": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 176,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r4": {
+          "bytes": 37486,
+          "lines": 439,
+          "distinct": 21,
+          "onSurfaces": 11,
+          "surfaces": 14,
+          "openers": 15,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "destructive-unseparated": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1,
+            "small-target": 1,
+            "slow-motion": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 186,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r5": {
+          "bytes": 41413,
+          "lines": 481,
+          "distinct": 22,
+          "onSurfaces": 11,
+          "surfaces": 14,
+          "openers": 15,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "small-target": 3,
+            "destructive-unseparated": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 194,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r6": {
+          "bytes": 48317,
+          "lines": 560,
+          "distinct": 22,
+          "onSurfaces": 11,
+          "surfaces": 14,
+          "openers": 16,
+          "rules": {
+            "decorative-depth": 2,
+            "decorative-symbol": 1,
+            "text-on-gradient": 8,
+            "text-overflow": 1,
+            "small-target": 3,
+            "destructive-unseparated": 1,
+            "low-contrast": 4,
+            "too-many-peers": 1,
+            "unlabelled-field": 1
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 9,
+            "derivation": 215,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "decorative-color",
+            "raw-space",
+            "raw-size",
+            "raw-radius",
+            "decorative-depth",
+            "raw-motion",
+            "raw-layer",
+            "unknown-token"
+          ]
+        }
+      },
+      "bytes": 48317,
+      "lines": 560,
+      "distinct": 49,
+      "onSurfaces": 28,
+      "surfaces": 14,
+      "openers": 17,
+      "rules": {
+        "decorative-depth": 2,
+        "decorative-symbol": 1,
+        "text-on-gradient": 10,
+        "text-overflow": 1,
+        "small-target": 27,
+        "destructive-unseparated": 1,
+        "low-contrast": 5,
+        "too-many-peers": 1,
+        "unlabelled-field": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 9,
+        "derivation": 215,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "decorative-color",
+        "raw-space",
+        "raw-size",
+        "raw-radius",
+        "decorative-depth",
+        "raw-motion",
+        "raw-layer",
+        "unknown-token"
+      ]
+    },
+    "s-stun-one": {
+      "builder": "Sonnet 5.5",
+      "brief": "stun",
+      "process": "one",
+      "rounds": {},
+      "bytes": 53789,
+      "lines": 573,
+      "distinct": 75,
+      "onSurfaces": 49,
+      "surfaces": 11,
+      "openers": 12,
+      "rules": {
+        "decorative-depth": 5,
+        "slow-motion": 5,
+        "text-on-gradient": 12,
+        "low-contrast": 12,
+        "small-target": 30,
+        "destructive-unseparated": 1,
+        "unlabelled-field": 4,
+        "covers-trigger": 1,
+        "flat-emphasis": 4,
+        "surface-offscreen": 1
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 12,
+        "derivation": 237,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "decorative-color",
+        "raw-radius",
+        "raw-space",
+        "raw-size",
+        "raw-motion",
+        "decorative-depth",
+        "raw-layer",
+        "decorative-motion"
+      ]
+    },
+    "s-terse-iter": {
+      "builder": "Sonnet 5.5",
+      "brief": "terse",
+      "process": "iter",
+      "rounds": {
+        "r0": {
+          "bytes": 16404,
+          "lines": 162,
+          "distinct": 6,
+          "onSurfaces": 4,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "covers-trigger": 1,
+            "small-target": 3
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 77,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r1": {
+          "bytes": 19355,
+          "lines": 187,
+          "distinct": 6,
+          "onSurfaces": 4,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "small-target": 4
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 90,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r2": {
+          "bytes": 21278,
+          "lines": 197,
+          "distinct": 6,
+          "onSurfaces": 4,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "small-target": 4
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 93,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r3": {
+          "bytes": 24643,
+          "lines": 219,
+          "distinct": 4,
+          "onSurfaces": 2,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "destructive-unseparated": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 95,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r4": {
+          "bytes": 27967,
+          "lines": 239,
+          "distinct": 4,
+          "onSurfaces": 2,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "destructive-unseparated": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 102,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r5": {
+          "bytes": 30741,
+          "lines": 256,
+          "distinct": 9,
+          "onSurfaces": 2,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "small-target": 5,
+            "destructive-unseparated": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 106,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        },
+        "r6": {
+          "bytes": 33569,
+          "lines": 274,
+          "distinct": 9,
+          "onSurfaces": 2,
+          "surfaces": 11,
+          "openers": 11,
+          "rules": {
+            "decorative-motion": 1,
+            "slow-motion": 1,
+            "small-target": 5,
+            "destructive-unseparated": 2
+          },
+          "lint": {
+            "floor": 0,
+            "meaning": 1,
+            "derivation": 113,
+            "finish": 0
+          },
+          "lintRules": [
+            "raw-color",
+            "raw-radius",
+            "raw-space",
+            "raw-size",
+            "decorative-motion",
+            "raw-motion",
+            "raw-layer"
+          ]
+        }
+      },
+      "bytes": 33569,
+      "lines": 274,
+      "distinct": 28,
+      "onSurfaces": 14,
+      "surfaces": 11,
+      "openers": 11,
+      "rules": {
+        "decorative-motion": 1,
+        "slow-motion": 1,
+        "small-target": 22,
+        "destructive-unseparated": 2,
+        "low-contrast": 2
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 1,
+        "derivation": 113,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-radius",
+        "raw-space",
+        "raw-size",
+        "decorative-motion",
+        "raw-motion",
+        "raw-layer"
+      ]
+    },
+    "s-terse-one": {
+      "builder": "Sonnet 5.5",
+      "brief": "terse",
+      "process": "one",
+      "rounds": {},
+      "bytes": 25684,
+      "lines": 219,
+      "distinct": 31,
+      "onSurfaces": 18,
+      "surfaces": 6,
+      "openers": 7,
+      "rules": {
+        "small-target": 22,
+        "destructive-unseparated": 1,
+        "covers-trigger": 1,
+        "low-contrast": 7
+      },
+      "lint": {
+        "floor": 0,
+        "meaning": 4,
+        "derivation": 100,
+        "finish": 0
+      },
+      "lintRules": [
+        "raw-color",
+        "raw-radius",
+        "raw-space",
+        "raw-layer",
+        "raw-size",
+        "decorative-depth"
+      ]
+    }
+  }
+}

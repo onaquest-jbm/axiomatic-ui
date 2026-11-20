@@ -31,6 +31,10 @@ const slug = (s) => s.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLower
 const rulesOf = (fs_) => { const m = {}; for (const f of fs_) m[f.rule] = (m[f.rule] || 0) + 1; return m; };
 
 const OPEN_AT_LOAD = process.argv.includes('--open-at-load');
+// --infer-plan: give verify a plan drafted from each page (src/infer.js) instead of none;
+// results go to sites-infer.{json,md} so both can be compared.
+const INFER = process.argv.includes('--infer-plan');
+const OUT = INFER ? 'sites-infer' : 'sites';
 
 async function main() {
   fs.rmSync(BUILD, { recursive: true, force: true });
@@ -59,7 +63,7 @@ async function main() {
   }
 
   const scen = { model: path.relative(BUILD, MODEL).split(path.sep).join('/'), widths: [1280, 390], themes: ['light', 'dark'],
-    scenarios: pages.map((p) => ({ name: `${p.site}|${p.surface}`, url: p.file, plan: {}, settleMs: 700, steps: p.steps })) };
+    scenarios: pages.map((p) => ({ name: `${p.site}|${p.surface}`, url: p.file, plan: INFER ? 'infer' : {}, settleMs: 700, steps: p.steps })) };
   const sf = path.join(BUILD, 'scenarios.json');
   fs.writeFileSync(sf, JSON.stringify(scen, null, 2));
   process.stdout.write(`verify: ${pages.length} pages (${sites.length} sites)…\n`);
@@ -102,8 +106,8 @@ async function main() {
     }
   }
   const out = { generatedAt: new Date().toISOString(), sites: siteSummaries, rows };
-  fs.writeFileSync(path.join(RESULTS, 'sites.json'), JSON.stringify(out, null, 2) + '\n');
-  fs.writeFileSync(path.join(RESULTS, 'sites.md'), summarize(out));
+  fs.writeFileSync(path.join(RESULTS, `${OUT}.json`), JSON.stringify(out, null, 2) + '\n');
+  fs.writeFileSync(path.join(RESULTS, `${OUT}.md`), summarize(out));
   process.stdout.write(summarize(out).split('\n').slice(0, 45).join('\n') + '\n…\nWrote benchmark/results/sites.{json,md}\n');
 }
 

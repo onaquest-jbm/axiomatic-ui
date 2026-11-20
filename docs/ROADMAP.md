@@ -25,6 +25,17 @@ Measured by re-running the benchmark (`benchmark/results/`, frozen as the run "v
   - Generated sites: 19 of 118 (was 14). The new rules catch 4 of the 12 reviewed problems mapped to them. The mapping was made after the rules were written, for every problem of that kind and not only the ones they caught. One of the 4 (a Delete placed directly under Archive) came after `destructive-unseparated` was changed to ignore text colour as separation, so that number was tuned on the test set.
   - Known false alarms: `destructive-unseparated` fires on "Remove <item>" beside "Add note" in a cart, where removal is routine and has undo, so reversibility needs judgment. `layout-shift` on the long-transcript control now fires with a plan too (timing, flaky).
   - Still silent: plan-dependent salience (step 2), and judgment.
+- **Step 2, done (programmatic part).** `verify --infer-plan` (`src/infer.js`) drafts a screen plan from meaning only (text, roles, forms, landmarks; never size or colour):
+  - a region that asks for a decision and holds the answer;
+  - the view's main action;
+  - rare actions, by their labels;
+  - groups, from fieldsets and label/field pairs.
+
+  Results:
+  - Planted: 49 of 70 caught with an inferred plan, against 50 with the hand-written plan and 46 with none, and no new false alarms on the clean controls.
+  - Generated sites: **27 of 118**, against 19 with no plan. The new catches are the blocking approval below the fold, the wrong loudest element, a quiet main call to action, a decorative hero and two spacing problems.
+  - Each page also gets a few plan-based findings that match no reviewed problem. Some look real (a skip link left visible), some doubtful (quantity steppers read as split groups); precision is not measured yet.
+  - Not done: the model call for pages where the rules find nothing (a dashboard and a landing page got no plan). The rules inferred the primary action of six of the eight generated sites. ALI's quiet model picker (Trial 1 item 1) needs a frequency the labels don't give.
 - **Gap analysis:** `benchmark/results/gap-analysis.md` (by gpt-6.2-sol, read-only) clusters the 79 no-rule problems, rates each cluster as programmatic, LLM or human-judged, and gives the cause of each silent case.
 - **Prompt sweep** (`benchmark/results/sweep-findings.md`): the same app built 12 ways. Adding one sentence, "make it look modern, stunning and premium", to a one-line brief roughly triples the problems at desktop width (mean 25 against 7). Blind reviewers rated the worst "stunning" page 4/10 but did not separate the other three pages. Building feature by feature in six fresh sessions did not make things worse; long accretion across files is untested.
 

@@ -1,0 +1,160 @@
+{
+  "builder": "Claude Sonnet (subagent)",
+  "brief": "SaaS revenue analytics dashboard",
+  "surfaces": [
+    {
+      "name": "date popover",
+      "opener": "#dateBtn"
+    },
+    {
+      "name": "export menu",
+      "opener": "#exportBtn"
+    },
+    {
+      "name": "customer drawer",
+      "opener": "#custBody tr"
+    },
+    {
+      "name": "share dialog",
+      "opener": "#shareBtn"
+    },
+    {
+      "name": "plan-mix tooltip",
+      "opener": "#donutSvg path.seg"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Share is the only filled control and the loudest thing, though the main task is reading the trend",
+      "selector": "#shareBtn",
+      "expect": [
+        "unearned-salience",
+        "primary-not-first"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Colours have no stable meaning: plan colours reuse the MRR/accent blue, each sparkline an arbitrary hue",
+      "selector": "#kpis svg, #donutSvg, #legend",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Cohort heatmap labels fail contrast in light and especially dark mode",
+      "selector": "#cohort",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Cohort table shows an empty current-month row that reads as broken",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "On phone the toolbar wraps into uneven rows and KPI trend context is dropped",
+      "selector": ".toolbar, #kpis .foot",
+      "expect": []
+    },
+    {
+      "surface": "date popover",
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Quick ranges wrap unevenly and are out of order; popover covers the KPIs it changes",
+      "selector": "#datePop",
+      "expect": []
+    },
+    {
+      "surface": "date popover",
+      "principle": "response",
+      "layer": "source",
+      "what": "Quick ranges apply instantly but custom range needs Apply; reversed range swapped silently",
+      "selector": "#datePop",
+      "expect": []
+    },
+    {
+      "surface": "export menu",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Immediate downloads and a persistent schedule setup in one flat list; focus ring reads as selection",
+      "selector": "#exportPop",
+      "expect": [],
+      "note": "The focus-ring part may come from the harness: surfaces are opened with a scripted click, and Chrome shows focus rings when there was no real pointer input."
+    },
+    {
+      "surface": "customer drawer",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Close button 34px, under the 44px touch minimum; no outside-tap exit on phone",
+      "selector": "#drawerClose",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "customer drawer",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Drawer padded with made-up rows and a status that never varies; no action",
+      "selector": "#dBody",
+      "expect": []
+    },
+    {
+      "surface": "share dialog",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "'Remove' is an option inside the role select and applies immediately with no confirmation or undo",
+      "selector": "#people",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "expectNote": "destructive-unseparated mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "share dialog",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Link field opens scrolled to the end; small grey access text; unlabeled toggles",
+      "selector": "#shareLink, #shareDialog .sw",
+      "expect": [
+        "low-contrast",
+        "unlabelled-field"
+      ]
+    },
+    {
+      "surface": "plan-mix tooltip",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Tooltip repeats legend figures; hover earns little",
+      "selector": "#mixTip, #legend",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "Delta badges contradict the chart, and arrow direction and colour are read two ways",
+      "selector": "#kpis .delta",
+      "expect": []
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)",
+  "removed": [
+    {
+      "what": "Tooltip covers the slice it describes",
+      "why": "Artifact of the harness: the surface was opened with a scripted click from a hidden section or at a fixed point, so its position is not what a person would see."
+    }
+  ]
+}

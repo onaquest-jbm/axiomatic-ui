@@ -1,0 +1,4034 @@
+{
+  "generatedAt": "2026-11-20T00:49:35.621Z",
+  "verified": true,
+  "model": "demo/model.json",
+  "controls": [
+    {
+      "id": "ctl-base",
+      "title": "Base page (menu and dialog closed)",
+      "lint": [],
+      "verifyPlan": [],
+      "verifyNoplan": [],
+      "verifyInfer": []
+    },
+    {
+      "id": "ctl-menu-open--step",
+      "title": "Clean menu open at load",
+      "lint": [],
+      "verifyPlan": [],
+      "verifyNoplan": [],
+      "verifyInfer": []
+    },
+    {
+      "id": "ctl-menu-open--open",
+      "title": "Clean menu open at load",
+      "lint": [],
+      "verifyPlan": [],
+      "verifyNoplan": [],
+      "verifyInfer": []
+    },
+    {
+      "id": "ctl-dialog-open--step",
+      "title": "Clean dialog open at load",
+      "lint": [],
+      "verifyPlan": [],
+      "verifyNoplan": [],
+      "verifyInfer": []
+    },
+    {
+      "id": "ctl-dialog-open--open",
+      "title": "Clean dialog open at load",
+      "lint": [],
+      "verifyPlan": [
+        "competing-primaries"
+      ],
+      "verifyNoplan": [
+        "competing-primaries"
+      ],
+      "verifyInfer": [
+        "competing-primaries"
+      ]
+    },
+    {
+      "id": "ctl-long-content",
+      "title": "Clean page with a long transcript",
+      "lint": [],
+      "verifyPlan": [
+        "layout-shift"
+      ],
+      "verifyNoplan": [
+        "layout-shift"
+      ],
+      "verifyInfer": []
+    }
+  ],
+  "rows": [
+    {
+      "case": "enc-gradient-bar",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Decorative gradient on the header",
+      "expect": [
+        "decorative-color",
+        "text-on-gradient",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color"
+        ],
+        "caught": [
+          "raw-color",
+          "decorative-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "text-on-gradient"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-gradient-text",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Gradient text on the title",
+      "expect": [
+        "decorative-color",
+        "raw-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color"
+        ],
+        "caught": [
+          "raw-color",
+          "decorative-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-color",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "decorative-color"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-color",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "decorative-color"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-color",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "decorative-color"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-glass-card",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Backdrop blur with no layering meaning",
+      "expect": [
+        "decorative-depth",
+        "raw-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-depth"
+        ],
+        "caught": [
+          "raw-color",
+          "decorative-depth"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-shadow-soup",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Literal shadows on in-flow boxes (depth that means nothing)",
+      "expect": [
+        "decorative-depth",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-depth"
+        ],
+        "caught": [
+          "raw-color",
+          "decorative-depth"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-emoji-labels",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Emoji that map to no state or object",
+      "expect": [
+        "decorative-symbol"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-near-duplicate-sizes",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "12 / 12.5 / 13 / 13.5 px: differences no one can name a meaning for",
+      "expect": [
+        "raw-size",
+        "underived-size"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-radius-zoo",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Radii with no meaning per value",
+      "expect": [
+        "raw-radius"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-radius"
+        ],
+        "caught": [
+          "raw-radius"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-pastel-rows",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Color variety that encodes nothing",
+      "expect": [
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-color",
+          "salience-inversion",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "enc-state-lost",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "encoding",
+      "layer": "judgment",
+      "what": "A meaningful state (waiting on you) with no visible difference",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "no-rule",
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
+    },
+    {
+      "case": "enc-icon-header",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "salience",
+      "layer": "judgment",
+      "what": "Eight actions of very different frequency drawn identically",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "status": "no-rule, incidental signal",
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
+    },
+    {
+      "case": "enc-icon-header",
+      "variant": "base",
+      "defect": 1,
+      "level": 2,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Icon-only buttons with no accessible name",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "status": "no-rule, incidental signal",
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
+    },
+    {
+      "case": "sal-three-primaries",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "salience",
+      "layer": "render",
+      "what": "Three accent-filled actions in one view",
+      "expect": [
+        "competing-primaries"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "competing-primaries",
+          "pointing-order"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "sal-promo-banner",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "salience",
+      "layer": "render",
+      "what": "An element serving no task is the loudest thing on screen",
+      "expect": [
+        "unearned-salience",
+        "primary-not-first",
+        "competing-primaries"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience"
+        ],
+        "caught": [
+          "primary-not-first",
+          "unearned-salience"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience"
+        ],
+        "caught": [
+          "primary-not-first",
+          "unearned-salience"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "silent",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "sal-all-bold",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "salience",
+      "layer": "render",
+      "what": "Emphasis everywhere, so it marks nothing",
+      "expect": [
+        "flat-emphasis"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "flat-emphasis"
+        ],
+        "caught": [
+          "flat-emphasis"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "flat-emphasis"
+        ],
+        "caught": [
+          "flat-emphasis"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "flat-emphasis"
+        ],
+        "caught": [
+          "flat-emphasis"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "sal-blocking-quiet",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "salience",
+      "layer": "render",
+      "what": "The one thing blocking work is among the quietest elements",
+      "expect": [
+        "primary-not-first",
+        "salience-inversion",
+        "low-contrast"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "sal-sidebar-shouts",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "salience",
+      "layer": "render",
+      "what": "Switching chats (frequent) outranks the blocking decision (constant)",
+      "expect": [
+        "primary-not-first",
+        "salience-inversion",
+        "unearned-salience"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "salience-inversion",
+          "low-contrast"
+        ],
+        "caught": [
+          "salience-inversion"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "low-contrast"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "low-contrast"
+        ],
+        "caught": [
+          "primary-not-first",
+          "unearned-salience"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "other signal",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "grp-even-spacing",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Gaps inside and between groups are equal, so grouping is ambiguous",
+      "expect": [
+        "weak-grouping",
+        "raw-space",
+        "underived-space"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-space"
+        ],
+        "caught": [
+          "raw-space"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "weak-grouping",
+          "underived-space"
+        ],
+        "caught": [
+          "weak-grouping",
+          "underived-space"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": [
+          "underived-space"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": [
+          "underived-space"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "grp-box-in-box",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "grouping",
+      "layer": "render",
+      "what": "Nested enclosures repeat \"this is a group\"",
+      "expect": [
+        "redundant-enclosure"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": [
+          "redundant-enclosure"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": [
+          "redundant-enclosure"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": [
+          "redundant-enclosure"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "grp-orphan-control",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "A stray control that belongs to no group and aligns with nothing",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "no-rule",
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
+    },
+    {
+      "case": "grp-split-group",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "grouping",
+      "layer": "render",
+      "what": "The two answers to one question are split across the row",
+      "expect": [
+        "weak-grouping"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "weak-grouping"
+        ],
+        "caught": [
+          "weak-grouping"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "mem-flat-nav",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "memory",
+      "layer": "judgment",
+      "what": "Ten peers at one level, more than can be held in mind",
+      "expect": [
+        "too-many-peers"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "status": "other signal",
+      "statusNoPlan": "other signal",
+      "statusInfer": "other signal"
+    },
+    {
+      "case": "mem-flat-nav",
+      "variant": "base",
+      "defect": 1,
+      "level": 2,
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Rare features given the same weight as constant ones",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
+      "status": "no-rule, incidental signal",
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
+    },
+    {
+      "case": "cho-action-wall",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "Rare actions shown beside the constant one slow every decision",
+      "expect": [
+        "too-many-peers"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "weak-grouping",
+          "too-many-peers"
+        ],
+        "caught": [
+          "too-many-peers"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "too-many-peers"
+        ],
+        "caught": [
+          "too-many-peers"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "too-many-peers"
+        ],
+        "caught": [
+          "too-many-peers"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "cho-frequent-hidden",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "choice",
+      "layer": "render",
+      "what": "A frequent action removed from view",
+      "expect": [
+        "plan-missing"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "pnt-tiny-targets",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Targets below the minimum",
+      "expect": [
+        "small-target",
+        "raw-space"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-space"
+        ],
+        "caught": [
+          "raw-space"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "pointing-order",
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "pnt-div-button",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "pointing",
+      "layer": "source",
+      "what": "Not focusable or operable by keyboard",
+      "expect": [
+        "clickable-non-control"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "clickable-non-control"
+        ],
+        "caught": [
+          "clickable-non-control"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "pnt-inverted-sizes",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Occasional action is a bigger target than the constant one",
+      "expect": [
+        "pointing-order",
+        "salience-inversion"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "pointing-order",
+          "small-target"
+        ],
+        "caught": [
+          "pointing-order"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "pointing-order",
+          "small-target"
+        ],
+        "caught": [
+          "pointing-order"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "other signal",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-grey-on-white",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Text below 4.5:1",
+      "expect": [
+        "low-contrast",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "salience-inversion",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-tiny-text",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Text below the legible size",
+      "expect": [
+        "raw-size",
+        "underived-size"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-focus-removed",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Keyboard users cannot see where they are",
+      "expect": [
+        "focus-removed",
+        "invisible-focus"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "invisible-focus"
+        ],
+        "caught": [
+          "invisible-focus"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "invisible-focus"
+        ],
+        "caught": [
+          "invisible-focus"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "invisible-focus"
+        ],
+        "caught": [
+          "invisible-focus"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-zoom-blocked",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "People who need to zoom cannot",
+      "expect": [
+        "zoom-blocked"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "zoom-blocked"
+        ],
+        "caught": [
+          "zoom-blocked"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-long-lines",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Running text far past 75 characters per line",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "no-rule",
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
+    },
+    {
+      "case": "leg-sideways-scroll",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Page scrolls sideways at phone width",
+      "expect": [
+        "horizontal-scroll",
+        "text-overflow"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "surface-offscreen"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "surface-offscreen"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "surface-offscreen"
+        ],
+        "caught": []
+      },
+      "status": "other signal",
+      "statusNoPlan": "other signal",
+      "statusInfer": "other signal"
+    },
+    {
+      "case": "leg-placeholder-label",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "A field with no label once typed in",
+      "expect": [
+        "unlabelled-field"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-img-no-alt",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Image with no text alternative",
+      "expect": [
+        "img-no-alt"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "img-no-alt"
+        ],
+        "caught": [
+          "img-no-alt"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "img-no-alt"
+        ],
+        "caught": [
+          "img-no-alt"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "img-no-alt"
+        ],
+        "caught": [
+          "img-no-alt"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "img-no-alt"
+        ],
+        "caught": [
+          "img-no-alt"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "leg-dark-hardcoded",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Near-white text on white in dark mode",
+      "expect": [
+        "low-contrast",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "salience-inversion",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "mot-bounce",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "motion",
+      "layer": "source",
+      "what": "Overshoot easing that reports no change",
+      "expect": [
+        "decorative-motion"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "decorative-motion"
+        ],
+        "caught": [
+          "decorative-motion"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "mot-glow-loop",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "motion",
+      "layer": "source",
+      "what": "Looping motion that carries no information",
+      "expect": [
+        "decorative-motion"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "decorative-motion",
+          "raw-motion"
+        ],
+        "caught": [
+          "decorative-motion"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-motion",
+          "slow-motion"
+        ],
+        "caught": [
+          "decorative-motion"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-motion",
+          "slow-motion"
+        ],
+        "caught": [
+          "decorative-motion"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-motion",
+          "slow-motion"
+        ],
+        "caught": [
+          "decorative-motion"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "mot-transition-all",
+      "variant": "base",
+      "defect": 0,
+      "level": 1,
+      "principle": "motion",
+      "layer": "source",
+      "what": "Every property animates, including ones that should not move",
+      "expect": [
+        "motion-unscoped"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "motion-unscoped"
+        ],
+        "caught": [
+          "motion-unscoped"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "mot-slow-reveal",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "motion",
+      "layer": "render",
+      "what": "Motion long enough that people wait for it",
+      "expect": [
+        "raw-motion",
+        "slow-motion"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-motion"
+        ],
+        "caught": [
+          "raw-motion"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "slow-motion"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "slow-motion"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "slow-motion"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "rsp-delayed-feedback",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "response",
+      "layer": "render",
+      "what": "No visible result within 100 ms of the click",
+      "expect": [
+        "slow-response"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "rsp-blocking-click",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "response",
+      "layer": "render",
+      "what": "A 250 ms long task on every click",
+      "expect": [
+        "long-task",
+        "slow-response"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "slow-response",
+          "long-task"
+        ],
+        "caught": [
+          "slow-response",
+          "long-task"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "slow-response",
+          "long-task"
+        ],
+        "caught": [
+          "slow-response",
+          "long-task"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "slow-response",
+          "long-task"
+        ],
+        "caught": [
+          "slow-response",
+          "long-task"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "rsp-late-banner",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "motion",
+      "layer": "render",
+      "what": "Content jumps by itself after load",
+      "expect": [
+        "layout-shift"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "pur-stat-cards",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Elements that serve no task in the model",
+      "expect": [
+        "unearned-salience",
+        "primary-not-first",
+        "underived-size",
+        "raw-size"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "pur-decor-blobs",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Decoration with no meaning, using only derived tokens",
+      "expect": [
+        "unearned-salience"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "csq-delete-beside-run",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "An irreversible rare action placed among frequent ones, styled the same",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "weak-grouping",
+          "pointing-order"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "pointing-order"
+        ],
+        "caught": []
+      },
+      "status": "other signal",
+      "statusNoPlan": "silent",
+      "statusInfer": "other signal"
+    },
+    {
+      "case": "csq-vague-labels",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "An irreversible, frequent action whose control does not say what it does",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "no-rule",
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
+    },
+    {
+      "case": "csq-confirm-habit",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Confirmation on a constant action becomes a reflex",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-space",
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-space",
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-space",
+          "small-target"
+        ],
+        "caught": []
+      },
+      "status": "no-rule, incidental signal",
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
+    },
+    {
+      "case": "cnv-composer-on-top",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "convention",
+      "layer": "judgment",
+      "what": "Breaks the layout every chat tool has taught people",
+      "expect": [],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "no-rule",
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
+    },
+    {
+      "case": "cnv-desktop-hamburger",
+      "variant": "base",
+      "defect": 0,
+      "level": 2,
+      "principle": "convention",
+      "layer": "render",
+      "what": "A frequent destination hidden where there is room for it",
+      "expect": [
+        "plan-missing"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "cmp-generated-look",
+      "variant": "base",
+      "defect": 0,
+      "level": 3,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Purple-blue gradient header",
+      "expect": [
+        "decorative-color",
+        "text-on-gradient"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color",
+          "decorative-depth",
+          "raw-radius",
+          "motion-unscoped",
+          "decorative-motion",
+          "raw-motion",
+          "raw-size",
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "salience-inversion",
+          "competing-primaries",
+          "pointing-order",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "cmp-generated-look",
+      "variant": "base",
+      "defect": 1,
+      "level": 3,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Glass card with a colored shadow",
+      "expect": [
+        "decorative-depth"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color",
+          "decorative-depth",
+          "raw-radius",
+          "motion-unscoped",
+          "decorative-motion",
+          "raw-motion",
+          "raw-size",
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "salience-inversion",
+          "competing-primaries",
+          "pointing-order",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "cmp-generated-look",
+      "variant": "base",
+      "defect": 2,
+      "level": 3,
+      "principle": "motion",
+      "layer": "source",
+      "what": "Bouncy lift on every button",
+      "expect": [
+        "decorative-motion",
+        "motion-unscoped"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color",
+          "decorative-depth",
+          "raw-radius",
+          "motion-unscoped",
+          "decorative-motion",
+          "raw-motion",
+          "raw-size",
+          "decorative-symbol"
+        ],
+        "caught": [
+          "motion-unscoped",
+          "decorative-motion"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "salience-inversion",
+          "competing-primaries",
+          "pointing-order",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "cmp-generated-look",
+      "variant": "base",
+      "defect": 3,
+      "level": 3,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Slate-400 body text",
+      "expect": [
+        "low-contrast"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color",
+          "decorative-depth",
+          "raw-radius",
+          "motion-unscoped",
+          "decorative-motion",
+          "raw-motion",
+          "raw-size",
+          "decorative-symbol"
+        ],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "salience-inversion",
+          "competing-primaries",
+          "pointing-order",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "cmp-generated-look",
+      "variant": "base",
+      "defect": 4,
+      "level": 3,
+      "principle": "salience",
+      "layer": "render",
+      "what": "Two primaries",
+      "expect": [
+        "competing-primaries"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color",
+          "decorative-depth",
+          "raw-radius",
+          "motion-unscoped",
+          "decorative-motion",
+          "raw-motion",
+          "raw-size",
+          "decorative-symbol"
+        ],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "salience-inversion",
+          "competing-primaries",
+          "pointing-order",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "cmp-generated-look",
+      "variant": "base",
+      "defect": 5,
+      "level": 3,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Sparkle emoji",
+      "expect": [
+        "decorative-symbol"
+      ],
+      "surface": "page",
+      "lint": {
+        "fired": [
+          "raw-color",
+          "decorative-color",
+          "decorative-depth",
+          "raw-radius",
+          "motion-unscoped",
+          "decorative-motion",
+          "raw-motion",
+          "raw-size",
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "salience-inversion",
+          "competing-primaries",
+          "pointing-order",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-tiny-items",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Menu targets below the minimum",
+      "expect": [
+        "small-target"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-tiny-items",
+      "variant": "step",
+      "defect": 1,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Menu text below the derived sizes",
+      "expect": [
+        "raw-size",
+        "underived-size"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-tiny-items",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "pointing",
+      "layer": "render",
+      "what": "Menu targets below the minimum",
+      "expect": [
+        "small-target"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-tiny-items",
+      "variant": "open",
+      "defect": 1,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Menu text below the derived sizes",
+      "expect": [
+        "raw-size",
+        "underived-size"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-size"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-faded",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Menu items below 4.5:1",
+      "expect": [
+        "low-contrast",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-faded",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Menu items below 4.5:1",
+      "expect": [
+        "low-contrast",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-own-style",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Menu uses its own radii, shadow, blur and spacing instead of the system",
+      "expect": [
+        "raw-radius",
+        "decorative-depth",
+        "raw-space",
+        "raw-color",
+        "underived-space",
+        "underived-color"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-radius",
+          "raw-color",
+          "decorative-depth",
+          "raw-space"
+        ],
+        "caught": [
+          "raw-radius",
+          "raw-color",
+          "decorative-depth",
+          "raw-space"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-own-style",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Menu uses its own radii, shadow, blur and spacing instead of the system",
+      "expect": [
+        "raw-radius",
+        "decorative-depth",
+        "raw-space",
+        "raw-color",
+        "underived-space",
+        "underived-color"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-radius",
+          "raw-color",
+          "decorative-depth",
+          "raw-space"
+        ],
+        "caught": [
+          "raw-radius",
+          "raw-color",
+          "decorative-depth",
+          "raw-space"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-depth",
+          "primary-not-first",
+          "unearned-salience",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-depth",
+          "primary-not-first",
+          "unearned-salience",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-delete-mixed",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Irreversible item not separated, not marked, no second step",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-delete-mixed",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Irreversible item not separated, not marked, no second step",
+      "expect": [
+        "destructive-unseparated"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-emoji",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Pictographs as decoration",
+      "expect": [
+        "decorative-symbol"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-emoji",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Pictographs as decoration",
+      "expect": [
+        "decorative-symbol"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-dialog-two-primaries",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "salience",
+      "layer": "render",
+      "what": "Two primaries, one of them destructive",
+      "expect": [
+        "competing-primaries"
+      ],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-dialog-two-primaries",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "salience",
+      "layer": "render",
+      "what": "Two primaries, one of them destructive",
+      "expect": [
+        "competing-primaries"
+      ],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "other signal",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "srf-dialog-fixed-width",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Dialog wider than the phone",
+      "expect": [
+        "horizontal-scroll",
+        "text-overflow",
+        "surface-offscreen"
+      ],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "srf-dialog-fixed-width",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Dialog wider than the phone",
+      "expect": [
+        "horizontal-scroll",
+        "text-overflow",
+        "surface-offscreen"
+      ],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "silent",
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
+    },
+    {
+      "case": "srf-dialog-unlabelled",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Fields with no label",
+      "expect": [
+        "unlabelled-field"
+      ],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-dialog-unlabelled",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Fields with no label",
+      "expect": [
+        "unlabelled-field"
+      ],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-dialog-vague-confirm",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Labels that do not say what will happen",
+      "expect": [],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
+      "status": "no-rule",
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
+    },
+    {
+      "case": "srf-dialog-vague-confirm",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Labels that do not say what will happen",
+      "expect": [],
+      "surface": "#settings",
+      "lint": {
+        "fired": [],
+        "caught": []
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "status": "no-rule, incidental signal",
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
+    },
+    {
+      "case": "srf-tooltip-faint",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Tooltip text below 4.5:1",
+      "expect": [
+        "low-contrast",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "#tip",
+      "lint": {
+        "fired": [
+          "raw-space",
+          "raw-size",
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-tooltip-faint",
+      "variant": "step",
+      "defect": 1,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Tooltip text below the derived sizes",
+      "expect": [
+        "raw-size",
+        "underived-size"
+      ],
+      "surface": "#tip",
+      "lint": {
+        "fired": [
+          "raw-space",
+          "raw-size",
+          "raw-color"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-tooltip-faint",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Tooltip text below 4.5:1",
+      "expect": [
+        "low-contrast",
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "#tip",
+      "lint": {
+        "fired": [
+          "raw-space",
+          "raw-size",
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-tooltip-faint",
+      "variant": "open",
+      "defect": 1,
+      "level": 4,
+      "principle": "legibility",
+      "layer": "source",
+      "what": "Tooltip text below the derived sizes",
+      "expect": [
+        "raw-size",
+        "underived-size"
+      ],
+      "surface": "#tip",
+      "lint": {
+        "fired": [
+          "raw-space",
+          "raw-size",
+          "raw-color"
+        ],
+        "caught": [
+          "raw-size"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-toast-slow",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "motion",
+      "layer": "render",
+      "what": "Motion long enough that people wait for it",
+      "expect": [
+        "raw-motion",
+        "slow-motion"
+      ],
+      "surface": "#toast",
+      "lint": {
+        "fired": [
+          "raw-motion"
+        ],
+        "caught": [
+          "raw-motion"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "slow-motion",
+          "small-target",
+          "slow-response"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "slow-motion",
+          "small-target",
+          "slow-response"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "slow-motion",
+          "small-target",
+          "slow-response"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-toast-slow",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "motion",
+      "layer": "render",
+      "what": "Motion long enough that people wait for it",
+      "expect": [
+        "raw-motion",
+        "slow-motion"
+      ],
+      "surface": "#toast",
+      "lint": {
+        "fired": [
+          "raw-motion"
+        ],
+        "caught": [
+          "raw-motion"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "slow-motion",
+          "small-target"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "slow-motion",
+          "small-target"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "slow-motion",
+          "small-target"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-off-palette",
+      "variant": "step",
+      "defect": 0,
+      "level": 4,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Colors that are not in the derived palette",
+      "expect": [
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    },
+    {
+      "case": "srf-menu-off-palette",
+      "variant": "open",
+      "defect": 0,
+      "level": 4,
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Colors that are not in the derived palette",
+      "expect": [
+        "raw-color",
+        "underived-color"
+      ],
+      "surface": "#more-menu",
+      "lint": {
+        "fired": [
+          "raw-color"
+        ],
+        "caught": [
+          "raw-color"
+        ]
+      },
+      "verifyPlan": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "verifyNoplan": {
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
+      "status": "caught",
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
+    }
+  ]
+}

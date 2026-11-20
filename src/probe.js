@@ -140,7 +140,7 @@ function probe(opts) {
   if (plannedSal.length) {
     const top = plannedSal[0];
     const insidePlanned = (el) => present.some((x) => x.el === el || x.el.contains(el) || el.contains(x.el));
-    const rivals = vis.filter((el) => !insidePlanned(el) && !specimen(el)).map((el) => ({ el, s: localSalience(el) })).filter((x) => x.s > top.s * 1.0).sort((a, b) => b.s - a.s);
+    const rivals = vis.filter((el) => !insidePlanned(el) && !specimen(el)).map((el) => ({ el, s: localSalience(el) })).filter((x) => x.s > top.s * (plan.inferred ? 1.25 : 1.0)).sort((a, b) => b.s - a.s);
     if (rivals.length) {
       add('primary-not-first', 'meaning', 'salience', `"${top.p.selector}" (${top.p.task || 'top task'}) should be seen first, but ${rivals.length} unplanned element(s) draw more attention.`, top.el);
       for (const r of rivals.slice(0, 4)) add('unearned-salience', 'meaning', 'salience', `Draws more attention (${r.s.toFixed(0)}) than the top task (${top.s.toFixed(0)}) without serving a task.`, r.el);
@@ -185,6 +185,7 @@ function probe(opts) {
     for (const el of scope.querySelectorAll('*')) {
       if (!styles.has(el) || members.some((m) => m === el || m.contains(el) || el.contains(m))) continue;
       if (lca && el.contains(lca)) continue;
+      if (plan.inferred && lca && lca.contains(el)) continue; // an inferred group is its container: what is inside it is not outside it
       const r = el.getBoundingClientRect();
       if (r.width < 4 || r.height < 4) continue;
       const overlapX = r.left < bb.right && r.right > bb.left, overlapY = r.top < bb.bottom && r.bottom > bb.top;

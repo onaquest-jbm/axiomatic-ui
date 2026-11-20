@@ -33,6 +33,13 @@ axiomatic verify scenarios.json --out axiomatic-report
 Every click step is followed by a check of what it revealed (a menu, dialog, popover, panel or new view), so surfaces get the same checks as the page. Problems already on the page aren't repeated; surface findings carry a `surface` name. Each result also lists **coverage**: the controls that look like openers, and which were never clicked.
 
 - `--explore` clicks every likely opener the steps didn't, one at a time from a fresh load, and checks what each reveals. It never clicks destructive or committing actions (delete, send, pay, sign out…); add more with `"exploreSkip": ["regex", …]` in scenarios.json. `--explore-max N` caps it (default 20). Use it before reporting UI work as done: rarely opened surfaces are where problems hide.
+- `--infer-plan` (or `"plan": "infer"` on a scenario) drafts a screen plan when there is none, so the salience, pointing and grouping checks can run on any page. It reads meaning only (text, roles, form structure, landmarks), never size or colour. It finds:
+  - a region that asks the person to decide and holds the answer;
+  - the view's main action;
+  - rare actions, by their labels;
+  - groups, from fieldsets and label/field pairs.
+
+  The draft is in the report (`plan`, with `inferred: true` and notes). Treat it as a guess: confirm it, or write the real plan into `model.json`. With an inferred plan, a rival must be 25% louder than the top task before it counts.
 - `--attach <port|url>` checks an app that is already running with `--remote-debugging-port` (an Electron app, a signed-in browser) instead of launching one. Scenarios may omit `url` and give `"match": "<url substring>"` to pick the page. The attached app is checked once, at its real window size and theme (emulation is skipped, because it stops Electron from painting), is never reloaded (between surfaces dialogs are closed, Escape is pressed and toggles are flipped back), and is left running. Restart it at another window size to check another width. Run it against a fixture or test profile, never real data: explore clicks things.
 
 ## What the findings mean

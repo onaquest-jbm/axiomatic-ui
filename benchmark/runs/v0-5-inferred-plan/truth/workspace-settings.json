@@ -1,0 +1,169 @@
+{
+  "builder": "gpt-6.2-sol (Codex CLI)",
+  "brief": "account and workspace settings for a team product",
+  "surfaces": [
+    {
+      "name": "timezone popover",
+      "opener": "#timezone-trigger"
+    },
+    {
+      "name": "role menu",
+      "opener": ".role-trigger"
+    },
+    {
+      "name": "invite dialog",
+      "opener": "#invite-member"
+    },
+    {
+      "name": "remove member dialog",
+      "opener": ".remove-member"
+    },
+    {
+      "name": "delete workspace dialog",
+      "opener": "#delete-workspace"
+    },
+    {
+      "name": "save toast",
+      "opener": "#save-profile"
+    }
+  ],
+  "defects": [
+    {
+      "surface": "page",
+      "principle": "purpose",
+      "layer": "judgment",
+      "what": "Decorative 157px hero banner with orbit rings repeats the title and pushes the form down",
+      "selector": ".hero",
+      "expect": [
+        "unearned-salience",
+        "primary-not-first"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "grouping",
+      "layer": "judgment",
+      "what": "Danger zone is a peer of routine sections in the nav",
+      "selector": ".settings-nav [data-section=\"danger\"]",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "salience",
+      "layer": "render",
+      "what": "42px title outweighs the fields people came to change; a rare avatar action gets a full panel",
+      "selector": "#page-title, #profile .panel:first-child",
+      "expect": [
+        "primary-not-first",
+        "salience-inversion"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "memory",
+      "layer": "judgment",
+      "what": "Saving split across a panel button, a floating bar and a status label with different wording",
+      "selector": "#save-status, #save-profile, #change-bar",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "encoding",
+      "layer": "source",
+      "what": "Active nav item marked four ways; decorative label styling and tile",
+      "selector": ".settings-nav [data-section=\"profile\"], .settings-nav .nav-label, .workspace-tile",
+      "expect": []
+    },
+    {
+      "surface": "page",
+      "principle": "pointing",
+      "layer": "render",
+      "what": "On phone, 38px-high 12px tabs in a 3x2 grid take the first screen",
+      "selector": ".settings-nav",
+      "expect": [
+        "small-target"
+      ]
+    },
+    {
+      "surface": "page",
+      "principle": "legibility",
+      "layer": "render",
+      "what": "Much supporting text is 10-12px muted grey; low-contrast footer",
+      "expect": [
+        "low-contrast"
+      ]
+    },
+    {
+      "surface": "timezone popover",
+      "principle": "convention",
+      "layer": "render",
+      "what": "Picker opens above its trigger and covers the field label and other inputs",
+      "selector": "#timezone-popover",
+      "expect": [
+        "covers-trigger"
+      ],
+      "expectNote": "covers-trigger mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "timezone popover",
+      "principle": "choice",
+      "layer": "judgment",
+      "what": "About 400 ungrouped zone names with no offsets; five rows visible",
+      "selector": "#timezone-options",
+      "expect": [
+        "too-many-peers"
+      ],
+      "expectNote": "too-many-peers mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "role menu",
+      "principle": "legibility",
+      "layer": "judgment",
+      "what": "Roles listed without what they can do; current role marked twice",
+      "selector": "#role-menu",
+      "expect": []
+    },
+    {
+      "surface": "remove member dialog",
+      "principle": "consequence",
+      "layer": "judgment",
+      "what": "Does not say what happens to the person's content, whether it can be undone, or billing; red trash always visible per row",
+      "selector": "#remove-dialog",
+      "expect": []
+    },
+    {
+      "surface": "delete workspace dialog",
+      "principle": "consequence",
+      "layer": "source",
+      "what": "Copy understates a permanent deletion; button looks active before the name is typed",
+      "selector": "#delete-dialog",
+      "expect": []
+    },
+    {
+      "surface": "save toast",
+      "principle": "salience",
+      "layer": "render",
+      "what": "Toast covers the Save button just clicked, at both widths",
+      "selector": "#toast, #save-profile",
+      "expect": [
+        "covers-trigger"
+      ],
+      "expectNote": "covers-trigger mapped 2026-11-19 after the rule was written"
+    },
+    {
+      "surface": "invite dialog",
+      "principle": "legibility",
+      "layer": "judgment",
+      "what": "Roles unexplained, jargon copy, unclear if an email is sent or a seat billed; dark radios look disabled",
+      "selector": "#invite-dialog",
+      "expect": []
+    }
+  ],
+  "reviewer": "Claude Sonnet, blind review of screenshots and source (never saw the rule list)",
+  "removed": [
+    {
+      "what": "Role menu renders in the top-left corner",
+      "why": "Artifact of the harness: the surface was opened with a scripted click from a hidden section or at a fixed point, so its position is not what a person would see."
+    }
+  ]
+}

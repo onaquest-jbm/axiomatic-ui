@@ -7,6 +7,7 @@ const path = require('path');
 const { pathToFileURL } = require('url');
 const { launch, attach, existingPage, openPage } = require('./cdp');
 const { probe } = require('./probe');
+const { inferPlan } = require('./infer');
 const { derive } = require('./derive');
 
 const OBSERVERS = `
@@ -181,7 +182,11 @@ async function audit(scenarioFile, outDir, opts = {}) {
   try {
     for (const sc of cfg.scenarios) {
       const screen = (model.screens || []).find((s) => s.id === sc.screen) || {};
-      const plan = sc.plan || screen.plan || {};
+      // "plan": "infer" (or --infer-plan for scenarios with no plan) drafts one from the page's
+      // meaning (src/infer.js); it is reported as inferred, for the owner to confirm.
+      const empty = (p) => !p || (typeof p === 'object' && !Object.keys(p).length);
+      const wantInfer = sc.plan === 'infer' || ((opts.inferPlan || cfg.inferPlan) && empty(sc.plan) && empty(screen.plan));
+      const givenPlan = wantInfer ? null : (sc.plan || screen.plan || {});
       // An attached app is checked once, at its real window size and theme: emulating either one
       // stops Electron from painting screenshots. Restart the app at another size for other widths.
       for (const t of (attachTo ? ['native'] : (sc.themes || themes))) {
@@ -217,6 +222,8 @@ async function audit(scenarioFile, outDir, opts = {}) {
           dbg('screenshot', slug);
           const shot = await screenshot(page, path.join(outDir, `${slug}.png`), width, !!attachTo);
           dbg('probe');
+          const plan = givenPlan || await page.evaluate(`(${inferPlan.toString()})()`);
+          if (plan.inferred) dbg('inferred plan', JSON.stringify(plan.notes));
           const palette = d.color[theme] ? Object.values(d.color[theme]) : [];
           const probeOpts = {
             budgets: d.budget, plan, sizes: Object.values(d.type.sizes), space: Object.values(d.space),
@@ -316,7 +323,7 @@ async function audit(scenarioFile, outDir, opts = {}) {
           } else await browser.send('Target.closeTarget', { targetId: page.targetId });
           const counts = { floor: 0, meaning: 0, derivation: 0, finish: 0 };
           for (const f of findings) counts[f.tier]++;
-          results.push({ scenario: sc.name, url: sc.url, theme, width, screenshot: shot, metrics: measured.metrics, focus: { reached: focus.reached, invisible: focus.invisible.length }, steps, surfaces, coverage, perf, findings, counts });
+          results.push({ scenario: sc.name, url: sc.url, theme, width, plan: plan.inferred ? plan : undefined, screenshot: shot, metrics: measured.metrics, focus: { reached: focus.reached, invisible: focus.invisible.length }, steps, surfaces, coverage, perf, findings, counts });
           if (!opts.quiet) process.stdout.write(`  ${sc.name} [${theme} ${width}px] floor ${counts.floor}  meaning ${counts.meaning}  derivation ${counts.derivation}  surfaces ${surfaces.filter((s) => s.newElements).length}  openers exercised ${coverage.exercised}/${coverage.openers}\n`);
         }
       }

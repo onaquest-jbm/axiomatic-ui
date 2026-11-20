@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-19T22:20:14.738Z",
+  "generatedAt": "2026-11-20T00:49:35.621Z",
   "verified": true,
   "model": "demo/model.json",
   "controls": [
@@ -8,28 +8,32 @@
       "title": "Base page (menu and dialog closed)",
       "lint": [],
       "verifyPlan": [],
-      "verifyNoplan": []
+      "verifyNoplan": [],
+      "verifyInfer": []
     },
     {
       "id": "ctl-menu-open--step",
       "title": "Clean menu open at load",
       "lint": [],
       "verifyPlan": [],
-      "verifyNoplan": []
+      "verifyNoplan": [],
+      "verifyInfer": []
     },
     {
       "id": "ctl-menu-open--open",
       "title": "Clean menu open at load",
       "lint": [],
       "verifyPlan": [],
-      "verifyNoplan": []
+      "verifyNoplan": [],
+      "verifyInfer": []
     },
     {
       "id": "ctl-dialog-open--step",
       "title": "Clean dialog open at load",
       "lint": [],
       "verifyPlan": [],
-      "verifyNoplan": []
+      "verifyNoplan": [],
+      "verifyInfer": []
     },
     {
       "id": "ctl-dialog-open--open",
@@ -39,6 +43,9 @@
         "competing-primaries"
       ],
       "verifyNoplan": [
+        "competing-primaries"
+      ],
+      "verifyInfer": [
         "competing-primaries"
       ]
     },
@@ -51,7 +58,8 @@
       ],
       "verifyNoplan": [
         "layout-shift"
-      ]
+      ],
+      "verifyInfer": []
     }
   ],
   "rows": [
@@ -98,8 +106,19 @@
           "text-on-gradient"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-gradient-text",
@@ -142,8 +161,18 @@
           "decorative-color"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-color",
+          "text-on-gradient"
+        ],
+        "caught": [
+          "decorative-color"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-glass-card",
@@ -186,8 +215,18 @@
           "decorative-depth"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-shadow-soup",
@@ -221,8 +260,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-emoji-labels",
@@ -260,8 +304,17 @@
           "decorative-symbol"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-near-duplicate-sizes",
@@ -300,8 +353,17 @@
           "underived-size"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-radius-zoo",
@@ -331,8 +393,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-pastel-rows",
@@ -374,8 +441,18 @@
           "underived-color"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "enc-state-lost",
@@ -399,8 +476,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
     },
     {
       "case": "enc-icon-header",
@@ -434,8 +516,17 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
       "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule, incidental signal"
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
     },
     {
       "case": "enc-icon-header",
@@ -469,8 +560,17 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol",
+          "small-target",
+          "underived-space"
+        ],
+        "caught": []
+      },
       "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule, incidental signal"
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
     },
     {
       "case": "sal-three-primaries",
@@ -505,8 +605,17 @@
           "competing-primaries"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "sal-promo-banner",
@@ -540,8 +649,19 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience"
+        ],
+        "caught": [
+          "primary-not-first",
+          "unearned-salience"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "caught"
     },
     {
       "case": "sal-all-bold",
@@ -575,8 +695,17 @@
           "flat-emphasis"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "flat-emphasis"
+        ],
+        "caught": [
+          "flat-emphasis"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "sal-blocking-quiet",
@@ -604,8 +733,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "sal-sidebar-shouts",
@@ -640,8 +774,20 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "low-contrast"
+        ],
+        "caught": [
+          "primary-not-first",
+          "unearned-salience"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "other signal"
+      "statusNoPlan": "other signal",
+      "statusInfer": "caught"
     },
     {
       "case": "grp-even-spacing",
@@ -683,8 +829,17 @@
           "underived-space"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": [
+          "underived-space"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "grp-box-in-box",
@@ -718,8 +873,17 @@
           "redundant-enclosure"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": [
+          "redundant-enclosure"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "grp-orphan-control",
@@ -743,8 +907,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
     },
     {
       "case": "grp-split-group",
@@ -774,8 +943,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "mem-flat-nav",
@@ -805,8 +979,15 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
       "status": "other signal",
-      "statusNoPlan": "other signal"
+      "statusNoPlan": "other signal",
+      "statusInfer": "other signal"
     },
     {
       "case": "mem-flat-nav",
@@ -834,8 +1015,15 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-space"
+        ],
+        "caught": []
+      },
       "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule, incidental signal"
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
     },
     {
       "case": "cho-action-wall",
@@ -870,8 +1058,17 @@
           "too-many-peers"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "too-many-peers"
+        ],
+        "caught": [
+          "too-many-peers"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "cho-frequent-hidden",
@@ -897,8 +1094,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "pnt-tiny-targets",
@@ -938,8 +1140,17 @@
           "small-target"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "pnt-div-button",
@@ -973,8 +1184,15 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "redundant-enclosure"
+        ],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "pnt-inverted-sizes",
@@ -1008,8 +1226,18 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "pointing-order",
+          "small-target"
+        ],
+        "caught": [
+          "pointing-order"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "other signal"
+      "statusNoPlan": "other signal",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-grey-on-white",
@@ -1054,8 +1282,19 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-tiny-text",
@@ -1094,8 +1333,17 @@
           "underived-size"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-focus-removed",
@@ -1130,8 +1378,17 @@
           "invisible-focus"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "invisible-focus"
+        ],
+        "caught": [
+          "invisible-focus"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-zoom-blocked",
@@ -1161,8 +1418,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-long-lines",
@@ -1186,8 +1448,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
     },
     {
       "case": "leg-sideways-scroll",
@@ -1218,8 +1485,15 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "surface-offscreen"
+        ],
+        "caught": []
+      },
       "status": "other signal",
-      "statusNoPlan": "other signal"
+      "statusNoPlan": "other signal",
+      "statusInfer": "other signal"
     },
     {
       "case": "leg-placeholder-label",
@@ -1253,8 +1527,17 @@
           "unlabelled-field"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-img-no-alt",
@@ -1292,8 +1575,17 @@
           "img-no-alt"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "img-no-alt"
+        ],
+        "caught": [
+          "img-no-alt"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "leg-dark-hardcoded",
@@ -1338,8 +1630,21 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "mot-bounce",
@@ -1369,8 +1674,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "mot-glow-loop",
@@ -1411,8 +1721,18 @@
           "decorative-motion"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-motion",
+          "slow-motion"
+        ],
+        "caught": [
+          "decorative-motion"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "mot-transition-all",
@@ -1442,8 +1762,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "mot-slow-reveal",
@@ -1482,8 +1807,17 @@
           "slow-motion"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "slow-motion"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "rsp-delayed-feedback",
@@ -1509,8 +1843,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "rsp-blocking-click",
@@ -1549,8 +1888,19 @@
           "long-task"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "slow-response",
+          "long-task"
+        ],
+        "caught": [
+          "slow-response",
+          "long-task"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "rsp-late-banner",
@@ -1576,8 +1926,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "pur-stat-cards",
@@ -1618,8 +1973,17 @@
           "underived-size"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-size"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "pur-decor-blobs",
@@ -1645,8 +2009,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "csq-delete-beside-run",
@@ -1675,8 +2044,15 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "pointing-order"
+        ],
+        "caught": []
+      },
       "status": "other signal",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "other signal"
     },
     {
       "case": "csq-vague-labels",
@@ -1700,8 +2076,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
     },
     {
       "case": "csq-confirm-habit",
@@ -1731,8 +2112,16 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-space",
+          "small-target"
+        ],
+        "caught": []
+      },
       "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule, incidental signal"
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
     },
     {
       "case": "cnv-composer-on-top",
@@ -1756,8 +2145,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
     },
     {
       "case": "cnv-desktop-hamburger",
@@ -1783,8 +2177,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "cmp-generated-look",
@@ -1847,8 +2246,25 @@
           "text-on-gradient"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "text-on-gradient"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "cmp-generated-look",
@@ -1910,8 +2326,25 @@
           "decorative-depth"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "cmp-generated-look",
@@ -1971,8 +2404,23 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "cmp-generated-look",
@@ -2032,8 +2480,25 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "cmp-generated-look",
@@ -2093,8 +2558,25 @@
           "competing-primaries"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "cmp-generated-look",
@@ -2156,8 +2638,25 @@
           "decorative-symbol"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "competing-primaries",
+          "underived-color",
+          "slow-motion",
+          "decorative-depth",
+          "decorative-symbol",
+          "text-on-gradient",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-tiny-items",
@@ -2193,8 +2692,17 @@
           "small-target"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-tiny-items",
@@ -2229,8 +2737,15 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-tiny-items",
@@ -2266,8 +2781,17 @@
           "small-target"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": [
+          "small-target"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-tiny-items",
@@ -2302,8 +2826,15 @@
         ],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-faded",
@@ -2347,8 +2878,19 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-faded",
@@ -2392,8 +2934,19 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-own-style",
@@ -2444,8 +2997,18 @@
           "decorative-depth"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-depth",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-own-style",
@@ -2498,8 +3061,20 @@
           "decorative-depth"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-depth",
+          "primary-not-first",
+          "unearned-salience",
+          "low-contrast"
+        ],
+        "caught": [
+          "decorative-depth"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-delete-mixed",
@@ -2533,8 +3108,17 @@
           "destructive-unseparated"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-delete-mixed",
@@ -2568,8 +3152,17 @@
           "destructive-unseparated"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "destructive-unseparated"
+        ],
+        "caught": [
+          "destructive-unseparated"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-emoji",
@@ -2607,8 +3200,17 @@
           "decorative-symbol"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-emoji",
@@ -2646,8 +3248,17 @@
           "decorative-symbol"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "decorative-symbol"
+        ],
+        "caught": [
+          "decorative-symbol"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-dialog-two-primaries",
@@ -2681,8 +3292,17 @@
           "competing-primaries"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "competing-primaries"
+        ],
+        "caught": [
+          "competing-primaries"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-dialog-two-primaries",
@@ -2711,8 +3331,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "other signal",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "srf-dialog-fixed-width",
@@ -2740,8 +3365,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "srf-dialog-fixed-width",
@@ -2769,8 +3399,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "silent",
-      "statusNoPlan": "silent"
+      "statusNoPlan": "silent",
+      "statusInfer": "silent"
     },
     {
       "case": "srf-dialog-unlabelled",
@@ -2804,8 +3439,17 @@
           "unlabelled-field"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-dialog-unlabelled",
@@ -2839,8 +3483,17 @@
           "unlabelled-field"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "unlabelled-field"
+        ],
+        "caught": [
+          "unlabelled-field"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-dialog-vague-confirm",
@@ -2864,8 +3517,13 @@
         "fired": [],
         "caught": []
       },
+      "verifyInfer": {
+        "fired": [],
+        "caught": []
+      },
       "status": "no-rule",
-      "statusNoPlan": "no-rule"
+      "statusNoPlan": "no-rule",
+      "statusInfer": "no-rule"
     },
     {
       "case": "srf-dialog-vague-confirm",
@@ -2888,13 +3546,20 @@
         "caught": []
       },
       "verifyNoplan": {
+        "fired": [
+          "small-target"
+        ],
+        "caught": []
+      },
+      "verifyInfer": {
         "fired": [
           "small-target"
         ],
         "caught": []
       },
       "status": "no-rule, incidental signal",
-      "statusNoPlan": "no-rule, incidental signal"
+      "statusNoPlan": "no-rule, incidental signal",
+      "statusInfer": "no-rule, incidental signal"
     },
     {
       "case": "srf-tooltip-faint",
@@ -2946,8 +3611,22 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-tooltip-faint",
@@ -2996,8 +3675,21 @@
           "underived-size"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "small-target",
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-tooltip-faint",
@@ -3049,8 +3741,22 @@
           "low-contrast"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-color",
+          "low-contrast"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-tooltip-faint",
@@ -3099,8 +3805,21 @@
           "underived-size"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-size",
+          "underived-space",
+          "underived-color",
+          "low-contrast",
+          "small-target"
+        ],
+        "caught": [
+          "underived-size"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-toast-slow",
@@ -3136,14 +3855,26 @@
       "verifyNoplan": {
         "fired": [
           "slow-motion",
-          "small-target"
+          "small-target",
+          "slow-response"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
+      "verifyInfer": {
+        "fired": [
+          "slow-motion",
+          "small-target",
+          "slow-response"
         ],
         "caught": [
           "slow-motion"
         ]
       },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-toast-slow",
@@ -3184,8 +3915,18 @@
           "slow-motion"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "slow-motion",
+          "small-target"
+        ],
+        "caught": [
+          "slow-motion"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-off-palette",
@@ -3224,8 +3965,17 @@
           "underived-color"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     },
     {
       "case": "srf-menu-off-palette",
@@ -3266,8 +4016,19 @@
           "underived-color"
         ]
       },
+      "verifyInfer": {
+        "fired": [
+          "primary-not-first",
+          "unearned-salience",
+          "underived-color"
+        ],
+        "caught": [
+          "underived-color"
+        ]
+      },
       "status": "caught",
-      "statusNoPlan": "caught"
+      "statusNoPlan": "caught",
+      "statusInfer": "caught"
     }
   ]
 }

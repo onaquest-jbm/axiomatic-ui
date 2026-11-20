@@ -19,10 +19,11 @@ const HELP = `axiomatic: interfaces derived from people, tasks and perception in
   axiomatic verify <scenarios.json> [--out dir]    Render, measure and check the screen against the derivation.
       [--explore [--explore-max N]]  also click each likely opener (menus, dialogs, tabs) and check what appears
       [--attach <port|url>]          check an app already running with --remote-debugging-port (e.g. Electron)
+      [--infer-plan]                 draft a screen plan from the page's meaning when a scenario has none
   axiomatic principles                        The premises everything is derived from, with sources.
 `;
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i !== -1 ? process.argv[i + 1] : d; };
-const pos = () => { const a = process.argv.slice(3), o = []; for (let i = 0; i < a.length; i++) { if (a[i].startsWith('--')) { if (!['--headed', '--explore'].includes(a[i])) i++; continue; } o.push(a[i]); } return o; };
+const pos = () => { const a = process.argv.slice(3), o = []; for (let i = 0; i < a.length; i++) { if (a[i].startsWith('--')) { if (!['--headed', '--explore', '--infer-plan'].includes(a[i])) i++; continue; } o.push(a[i]); } return o; };
 const load = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
 
 async function main() {
@@ -78,7 +79,7 @@ async function main() {
     const { writeReport } = require('../src/report');
     const f = pos()[0];
     const out = arg('--out', path.join(path.dirname(f), 'axiomatic-report'));
-    const rep = await audit(f, out, { headed: process.argv.includes('--headed'), explore: process.argv.includes('--explore') ? (Number(arg('--explore-max')) || true) : undefined, attach: arg('--attach') });
+    const rep = await audit(f, out, { headed: process.argv.includes('--headed'), explore: process.argv.includes('--explore') ? (Number(arg('--explore-max')) || true) : undefined, attach: arg('--attach'), inferPlan: process.argv.includes('--infer-plan') });
     console.log(`\nReport: ${writeReport(out)}`);
     return rep.results.some((r) => r.counts.floor || r.counts.meaning) ? 1 : 0;
   }

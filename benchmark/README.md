@@ -14,7 +14,7 @@ Results are written to `results/` (committed). Built pages, screenshots and repo
 
 To compare approaches, freeze each one as a run (`node benchmark/viewer/snapshot.js --label "<name>"`, then `node benchmark/viewer/build.js`) and open `benchmark/viewer/index.html`. It shows each run's numbers and, per generated site and surface, before and after screenshots with each defect's status in both runs. Run JSON is committed. Run screenshots (about 7 MB per run) stay local.
 
-Baseline (v0.3): planted 45 of 70 caught; generated 14 of 118, 79 with no rule at all. Now (v0.4, surfaces + attach + four new checks): planted 50 of 70; generated 19 of 118, 67 with no rule. See `docs/ROADMAP.md`.
+Baseline (v0.3): planted 45 of 70 caught; generated 14 of 118, 79 with no rule at all. v0.4 (surfaces + attach + four new checks): planted 50 of 70; generated 19 of 118, 67 with no rule. v0.5 (a plan inferred from each page when there is none, `src/infer.js`): planted 49 of 70 with an inferred plan, against 50 with the hand-written plan and 46 with none; generated 27 of 118 (`run-sites.js --infer-plan`, results in `results/sites-infer.*`). See `docs/ROADMAP.md`.
 
 ## How a defect is scored
 

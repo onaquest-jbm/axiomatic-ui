@@ -122,7 +122,7 @@ function scenarioFor(p, mode) {
   const steps = [{ name: 'Show command details', click: '#why-toggle' }];
   if (p.variant === 'step') steps.push({ name: `Open ${p.c.surface.target}`, click: p.c.surface.trigger });
   const s = { name: `${p.slug}@${mode}`, url: `${p.slug}.html`, steps };
-  if (mode === 'plan') s.screen = 'session'; else s.plan = {};
+  if (mode === 'plan') s.screen = 'session'; else if (mode === 'infer') s.plan = 'infer'; else s.plan = {};
   // Controls render everything; cases render what they declare, against controls rendered the same way.
   if (p.c.themes) s.themes = p.c.themes; else s.themes = ['light', 'dark'];
   if (p.c.widths) s.widths = p.c.widths;
@@ -146,9 +146,10 @@ async function main() {
   for (const p of P) lint[p.slug] = rulesOf(lintPaths([path.join(BUILD, `${p.slug}.html`)], d).findings);
 
   // ---- verify: with the screen plan, and with no plan (what an arbitrary page gets) ----
-  const verify = { plan: {}, noplan: {} };
+  const verify = { plan: {}, noplan: {}, infer: {} };
   if (!noVerify) {
-    for (const mode of ['plan', 'noplan']) {
+    // plan: the hand-written screen plan; noplan: none; infer: one drafted from the page (src/infer.js).
+    for (const mode of ['plan', 'noplan', 'infer']) {
       const scen = { model: path.relative(BUILD, MODEL).split(path.sep).join('/'), widths: [1280, 390], scenarios: P.map((p) => scenarioFor(p, mode)) };
       const f = path.join(BUILD, `scenarios-${mode}.json`);
       fs.writeFileSync(f, JSON.stringify(scen, null, 2));
@@ -177,19 +178,20 @@ async function main() {
     lint: p.slug === 'ctl-base' ? Object.keys(lint[p.slug]) : lintNew(p.slug),
     verifyPlan: p.slug === 'ctl-base' ? [...new Set(Object.values(verify.plan[p.slug] || {}).flatMap(Object.keys))] : verifyNew('plan', p.slug),
     verifyNoplan: p.slug === 'ctl-base' ? [...new Set(Object.values(verify.noplan[p.slug] || {}).flatMap(Object.keys))] : verifyNew('noplan', p.slug),
+    verifyInfer: p.slug === 'ctl-base' ? [...new Set(Object.values(verify.infer[p.slug] || {}).flatMap(Object.keys))] : verifyNew('infer', p.slug),
   }));
 
   const rows = [];
   for (const p of P.filter((x) => x.kind === 'case')) {
-    const ln = lintNew(p.slug), vp = verifyNew('plan', p.slug), vn = verifyNew('noplan', p.slug);
+    const ln = lintNew(p.slug), vp = verifyNew('plan', p.slug), vn = verifyNew('noplan', p.slug), vi = verifyNew('infer', p.slug);
     p.c.defects.forEach((df, i) => {
       const hit = (arr) => arr.filter((r) => df.expect.includes(r));
       const status = (arr) => (!df.expect.length ? (arr.length ? 'no-rule, incidental signal' : 'no-rule') : hit(arr).length ? 'caught' : arr.length ? 'other signal' : 'silent');
       rows.push({
         case: p.c.id, variant: p.variant, defect: i, level: p.c.level, principle: df.principle, layer: df.layer, what: df.what, expect: df.expect,
         surface: p.c.surface ? p.c.surface.target : 'page',
-        lint: { fired: ln, caught: hit(ln) }, verifyPlan: { fired: vp, caught: hit(vp) }, verifyNoplan: { fired: vn, caught: hit(vn) },
-        status: status([...new Set([...ln, ...vp])]), statusNoPlan: status([...new Set([...ln, ...vn])]),
+        lint: { fired: ln, caught: hit(ln) }, verifyPlan: { fired: vp, caught: hit(vp) }, verifyNoplan: { fired: vn, caught: hit(vn) }, verifyInfer: { fired: vi, caught: hit(vi) },
+        status: status([...new Set([...ln, ...vp])]), statusNoPlan: status([...new Set([...ln, ...vn])]), statusInfer: status([...new Set([...ln, ...vi])]),
       });
     });
   }
@@ -219,8 +221,9 @@ function summarize(o) {
   tab('By level (1 obvious, 2 subtle, 3 compound, 4 rare surface)', (r) => `L${r.level}`, page);
   tab('Rare surfaces: opened by a click vs already open at load', (r) => `${r.surface} · ${r.variant}`, o.rows.filter((r) => r.surface !== 'page'));
   tab('Without a screen plan (what an arbitrary page gets)', (r) => r.principle, page, 'statusNoPlan');
-  L.push('## False alarms on clean controls', '', '| control | lint | verify (plan) | verify (no plan) |', '|---|---|---|---|');
-  for (const c of o.controls) L.push(`| ${c.title} | ${c.lint.join(', ') || '0'} | ${c.verifyPlan.join(', ') || '0'} | ${c.verifyNoplan.join(', ') || '0'} |`);
+  tab('With a plan inferred from the page (no hand-written plan)', (r) => r.principle, page, 'statusInfer');
+  L.push('## False alarms on clean controls', '', '| control | lint | verify (plan) | verify (no plan) | verify (inferred plan) |', '|---|---|---|---|---|');
+  for (const c of o.controls) L.push(`| ${c.title} | ${c.lint.join(', ') || '0'} | ${c.verifyPlan.join(', ') || '0'} | ${c.verifyNoplan.join(', ') || '0'} | ${(c.verifyInfer || []).join(', ') || '0'} |`);
   L.push('', '## Every defect', '', '| case | variant | principle | layer | defect | expected | lint | verify | status |', '|---|---|---|---|---|---|---|---|---|');
   for (const r of o.rows) L.push(`| ${r.case} | ${r.variant} | ${r.principle} | ${r.layer} | ${r.what} | ${r.expect.join(', ') || '(none)'} | ${r.lint.fired.join(', ') || '·'} | ${r.verifyPlan.fired.join(', ') || '·'} | ${r.status} |`);
   return L.join('\n') + '\n';
